@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * DefaultHeatMapDataset.java
  * --------------------------
- * (C) Copyright 2009, by Object Refinery Limited.
+ * (C) Copyright 2009-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -41,9 +41,8 @@
 package org.jfree.data.general;
 
 import java.io.Serializable;
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.data.DataUtilities;
+import org.jfree.data.DataUtils;
 
 /**
  * A default implementation of the {@link HeatMapDataset} interface.
@@ -124,8 +123,9 @@ public class DefaultHeatMapDataset extends AbstractDataset
      * values are evenly spaced between {@link #getMinimumXValue()} and
      * {@link #getMaximumXValue()}.
      *
-     * @return The number of x-values (always > 0).
+     * @return The number of x-values (always &gt; 0).
      */
+    @Override
     public int getXSampleCount() {
         return this.xSamples;
     }
@@ -135,8 +135,9 @@ public class DefaultHeatMapDataset extends AbstractDataset
      * values are evenly spaced between {@link #getMinimumYValue()} and
      * {@link #getMaximumYValue()}.
      *
-     * @return The number of y-values (always > 0).
+     * @return The number of y-values (always &gt; 0).
      */
+    @Override
     public int getYSampleCount() {
         return this.ySamples;
     }
@@ -148,6 +149,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The lowest x-value represented in this dataset.
      */
+    @Override
     public double getMinimumXValue() {
         return this.minX;
     }
@@ -159,6 +161,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The highest x-value represented in this dataset.
      */
+    @Override
     public double getMaximumXValue() {
         return this.maxX;
     }
@@ -170,6 +173,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The lowest y-value represented in this dataset.
      */
+    @Override
     public double getMinimumYValue() {
         return this.minY;
     }
@@ -181,6 +185,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The highest y-value represented in this dataset.
      */
+    @Override
     public double getMaximumYValue() {
         return this.maxY;
     }
@@ -192,6 +197,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The x-value.
      */
+    @Override
     public double getXValue(int xIndex) {
         double x = this.minX
                 + (this.maxX - this.minX) * (xIndex / (double) this.xSamples);
@@ -205,6 +211,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The y-value.
      */
+    @Override
     public double getYValue(int yIndex) {
         double y = this.minY
                 + (this.maxY - this.minY) * (yIndex / (double) this.ySamples);
@@ -220,6 +227,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The z-value.
      */
+    @Override
     public double getZValue(int xIndex, int yIndex) {
         return this.zValues[xIndex][yIndex];
     }
@@ -235,6 +243,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return The z-value.
      */
+    @Override
     public Number getZ(int xIndex, int yIndex) {
         return new Double(getZValue(xIndex, yIndex));
     }
@@ -263,18 +272,18 @@ public class DefaultHeatMapDataset extends AbstractDataset
     public void setZValue(int xIndex, int yIndex, double z, boolean notify) {
         this.zValues[xIndex][yIndex] = z;
         if (notify) {
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
     /**
      * Tests this dataset for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -301,7 +310,7 @@ public class DefaultHeatMapDataset extends AbstractDataset
         if (this.maxY != that.maxY) {
             return false;
         }
-        if (!DataUtilities.equal(this.zValues, that.zValues)) {
+        if (!DataUtils.equal(this.zValues, that.zValues)) {
             return false;
         }
         // can't find any differences
@@ -313,11 +322,13 @@ public class DefaultHeatMapDataset extends AbstractDataset
      *
      * @return A clone.
      *
-     * @throws CloneNotSupportedException
+     * @throws java.lang.CloneNotSupportedException if there is a problem 
+     *         cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultHeatMapDataset clone = (DefaultHeatMapDataset) super.clone();
-        clone.zValues = DataUtilities.clone(this.zValues);
+        clone.zValues = DataUtils.clone(this.zValues);
         return clone;
     }
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * StandardTickUnitSource.java
@@ -65,10 +65,11 @@ public class StandardTickUnitSource implements TickUnitSource, Serializable {
     /**
      * Returns a tick unit that is larger than the supplied unit.
      *
-     * @param unit  the unit (<code>null</code> not permitted).
+     * @param unit  the unit ({@code null} not permitted).
      *
      * @return A tick unit that is larger than the supplied unit.
      */
+    @Override
     public TickUnit getLargerTickUnit(TickUnit unit) {
         double x = unit.getSize();
         double log = Math.log(x) / LOG_10_VALUE;
@@ -81,10 +82,11 @@ public class StandardTickUnitSource implements TickUnitSource, Serializable {
      * Returns the tick unit in the collection that is greater than or equal
      * to (in size) the specified unit.
      *
-     * @param unit  the unit (<code>null</code> not permitted).
+     * @param unit  the unit ({@code null} not permitted).
      *
      * @return A unit from the collection.
      */
+    @Override
     public TickUnit getCeilingTickUnit(TickUnit unit) {
         return getLargerTickUnit(unit);
     }
@@ -97,6 +99,7 @@ public class StandardTickUnitSource implements TickUnitSource, Serializable {
      *
      * @return A unit from the collection.
      */
+    @Override
     public TickUnit getCeilingTickUnit(double size) {
         double log = Math.log(size) / LOG_10_VALUE;
         double higher = Math.ceil(log);
@@ -107,10 +110,11 @@ public class StandardTickUnitSource implements TickUnitSource, Serializable {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -123,6 +127,7 @@ public class StandardTickUnitSource implements TickUnitSource, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         return 0;
     }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * YisSymbolic.java
@@ -58,7 +58,7 @@ public interface YisSymbolic {
 
     /**
      * Returns the symbolic value of the data set specified by
-     * <CODE>series</CODE> and <CODE>item</CODE> parameters.
+     * {@code series} and {@code item} parameters.
      *
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
@@ -68,8 +68,7 @@ public interface YisSymbolic {
     public String getYSymbolicValue(int series, int item);
 
     /**
-     * Returns the symbolic value linked with the specified
-     * <CODE>Integer</CODE>.
+     * Returns the symbolic value linked with the specified {@code Integer}.
      *
      * @param val  value of the integer linked with the symbolic value.
      *

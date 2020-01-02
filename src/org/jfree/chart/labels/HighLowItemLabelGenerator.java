@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
  * USA.  
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------------
  * HighLowItemLabelGenerator.java
  * ------------------------------
- * (C) Copyright 2001-2008, by Object Refinery Limited.
+ * (C) Copyright 2001-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   David Basten;
@@ -46,7 +46,6 @@
  * 15-Jul-2004 : Switched getX() with getXValue() and getY() with 
  *               getYValue() (DG);
  * 20-Apr-2005 : Renamed XYLabelGenerator --> XYItemLabelGenerator (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 31-Mar-2008 : Added hashCode() method to appease FindBugs (DG);
  *
  */
@@ -58,7 +57,7 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Date;
 
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.util.PublicCloneable;
 import org.jfree.data.xy.OHLCDataset;
 import org.jfree.data.xy.XYDataset;
@@ -90,9 +89,9 @@ public class HighLowItemLabelGenerator implements XYItemLabelGenerator,
     /**
      * Creates a tool tip generator using the supplied date formatter.
      *
-     * @param dateFormatter  the date formatter (<code>null</code> not 
+     * @param dateFormatter  the date formatter ({@code null} not 
      *                       permitted).
-     * @param numberFormatter  the number formatter (<code>null</code> not 
+     * @param numberFormatter  the number formatter ({@code null} not 
      *                         permitted).
      */
     public HighLowItemLabelGenerator(DateFormat dateFormatter, 
@@ -118,57 +117,53 @@ public class HighLowItemLabelGenerator implements XYItemLabelGenerator,
      *
      * @return The tooltip text.
      */
+    @Override
     public String generateToolTip(XYDataset dataset, int series, int item) {
-
-        String result = null;
-
-        if (dataset instanceof OHLCDataset) {
-            OHLCDataset d = (OHLCDataset) dataset;
-            Number high = d.getHigh(series, item);
-            Number low = d.getLow(series, item);
-            Number open = d.getOpen(series, item);
-            Number close = d.getClose(series, item);
-            Number x = d.getX(series, item);
-
-            result = d.getSeriesKey(series).toString();
-
-            if (x != null) {
-                Date date = new Date(x.longValue());
-                result = result + "--> Date=" + this.dateFormatter.format(date);
-                if (high != null) {
-                    result = result + " High=" 
-                             + this.numberFormatter.format(high.doubleValue());
-                }
-                if (low != null) {
-                    result = result + " Low=" 
-                             + this.numberFormatter.format(low.doubleValue());
-                }
-                if (open != null) {
-                    result = result + " Open=" 
-                             + this.numberFormatter.format(open.doubleValue());
-                }
-                if (close != null) {
-                    result = result + " Close=" 
-                             + this.numberFormatter.format(close.doubleValue());
-                }
-            }
-
+        if (!(dataset instanceof OHLCDataset)) {
+            return null;
         }
-
-        return result;
-
+        StringBuilder sb = new StringBuilder();
+        OHLCDataset d = (OHLCDataset) dataset;
+        Number high = d.getHigh(series, item);
+        Number low = d.getLow(series, item);
+        Number open = d.getOpen(series, item);
+        Number close = d.getClose(series, item);
+        Number x = d.getX(series, item);
+        sb.append(d.getSeriesKey(series).toString());
+        if (x != null) {
+            Date date = new Date(x.longValue());
+            sb.append("--> Date=").append(this.dateFormatter.format(date));
+            if (high != null) {
+                sb.append(" High=");
+                sb.append(this.numberFormatter.format(high.doubleValue()));
+            }
+            if (low != null) {
+                sb.append(" Low=");
+                sb.append(this.numberFormatter.format(low.doubleValue()));
+            }
+            if (open != null) {
+                sb.append(" Open=");
+                sb.append(this.numberFormatter.format(open.doubleValue()));
+            }
+            if (close != null) {
+                sb.append(" Close=");
+                sb.append(this.numberFormatter.format(close.doubleValue()));
+            }
+        }
+        return sb.toString();
     }
 
     /**
      * Generates a label for the specified item. The label is typically a 
      * formatted version of the data value, but any text can be used.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series index (zero-based).
      * @param category  the category index (zero-based).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
+    @Override
     public String generateLabel(XYDataset dataset, int series, int category) {
         return null;  //TODO: implement this method properly
     }
@@ -180,20 +175,17 @@ public class HighLowItemLabelGenerator implements XYItemLabelGenerator,
      * 
      * @throws CloneNotSupportedException if cloning is not supported.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
-        
         HighLowItemLabelGenerator clone 
-            = (HighLowItemLabelGenerator) super.clone();
-
+                = (HighLowItemLabelGenerator) super.clone();
         if (this.dateFormatter != null) {
             clone.dateFormatter = (DateFormat) this.dateFormatter.clone();
         }
         if (this.numberFormatter != null) {
             clone.numberFormatter = (NumberFormat) this.numberFormatter.clone();
         }
-        
         return clone;
-        
     }
     
     /**
@@ -203,6 +195,7 @@ public class HighLowItemLabelGenerator implements XYItemLabelGenerator,
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -225,10 +218,11 @@ public class HighLowItemLabelGenerator implements XYItemLabelGenerator,
      * 
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 127;
-        result = HashUtilities.hashCode(result, this.dateFormatter);
-        result = HashUtilities.hashCode(result, this.numberFormatter);
+        result = HashUtils.hashCode(result, this.dateFormatter);
+        result = HashUtils.hashCode(result, this.numberFormatter);
         return result;
     }
     

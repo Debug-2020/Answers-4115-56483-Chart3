@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------
  * Second.java
  * -----------
- * (C) Copyright 2001-2008, by Object Refinery Limited.
+ * (C) Copyright 2001-2015, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -54,6 +54,9 @@
  * 05-Oct-2006 : Updated API docs (DG);
  * 06-Oct-2006 : Refactored to cache first and last millisecond values (DG);
  * 16-Sep-2008 : Deprecated DEFAULT_TIME_ZONE (DG);
+ * 02-Mar-2009 : Added new constructor with Locale (DG);
+ * 05-Jul-2012 : Replaced getTime().getTime() with getTimeInMillis() (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -62,7 +65,9 @@ package org.jfree.data.time;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
+import org.jfree.chart.util.Args;
 
 /**
  * Represents a second in a particular day.  This class is immutable, which is
@@ -107,13 +112,13 @@ public class Second extends RegularTimePeriod implements Serializable {
     /**
      * Constructs a new Second.
      *
-     * @param second  the second (0 to 24*60*60-1).
-     * @param minute  the minute (<code>null</code> not permitted).
+     * @param second  the second (0 to 59).
+     * @param minute  the minute ({@code null} not permitted).
      */
     public Second(int second, Minute minute) {
-        if (minute == null) {
-            throw new IllegalArgumentException("Null 'minute' argument.");
-        }
+        Args.requireInRange(second, "second", 
+                Second.FIRST_SECOND_IN_MINUTE, Second.LAST_SECOND_IN_MINUTE);
+        Args.nullNotPermitted(minute, "minute");
         this.day = minute.getDay();
         this.hour = (byte) minute.getHourValue();
         this.minute = (byte) minute.getMinute();
@@ -138,30 +143,32 @@ public class Second extends RegularTimePeriod implements Serializable {
 
     /**
      * Constructs a new instance from the specified date/time and the default
-     * time zone..
+     * time zone.
      *
-     * @param time  the time (<code>null</code> not permitted).
+     * @param time  the time ({@code null} not permitted).
      *
-     * @see #Second(Date, TimeZone)
+     * @see #Second(Date, TimeZone, Locale)
      */
     public Second(Date time) {
-        this(time, TimeZone.getDefault());
+        this(time, TimeZone.getDefault(), Locale.getDefault());
     }
 
     /**
      * Creates a new second based on the supplied time and time zone.
      *
-     * @param time  the instant in time.
-     * @param zone  the time zone.
+     * @param time  the time ({@code null} not permitted).
+     * @param zone  the time zone ({@code null} not permitted).
+     * @param locale  the locale ({@code null} not permitted).
+     *
+     * @since 1.0.13
      */
-    public Second(Date time, TimeZone zone) {
-        // FIXME:  need a locale as well as a time zone
-        Calendar calendar = Calendar.getInstance(zone);
+    public Second(Date time, TimeZone zone, Locale locale) {
+        Calendar calendar = Calendar.getInstance(zone, locale);
         calendar.setTime(time);
         this.second = (byte) calendar.get(Calendar.SECOND);
         this.minute = (byte) calendar.get(Calendar.MINUTE);
         this.hour = (byte) calendar.get(Calendar.HOUR_OF_DAY);
-        this.day = new Day(time, zone);
+        this.day = new Day(time, zone, locale);
         peg(calendar);
     }
 
@@ -177,7 +184,7 @@ public class Second extends RegularTimePeriod implements Serializable {
     /**
      * Returns the minute.
      *
-     * @return The minute (never <code>null</code>).
+     * @return The minute (never {@code null}).
      */
     public Minute getMinute() {
         return new Minute(this.minute, new Hour(this.hour, this.day));
@@ -193,6 +200,7 @@ public class Second extends RegularTimePeriod implements Serializable {
      *
      * @see #getLastMillisecond()
      */
+    @Override
     public long getFirstMillisecond() {
         return this.firstMillisecond;
     }
@@ -207,6 +215,7 @@ public class Second extends RegularTimePeriod implements Serializable {
      *
      * @see #getFirstMillisecond()
      */
+    @Override
     public long getLastMillisecond() {
         return this.firstMillisecond + 999L;
     }
@@ -215,10 +224,11 @@ public class Second extends RegularTimePeriod implements Serializable {
      * Recalculates the start date/time and end date/time for this time period
      * relative to the supplied calendar (which incorporates a time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @since 1.0.3
      */
+    @Override
     public void peg(Calendar calendar) {
         this.firstMillisecond = getFirstMillisecond(calendar);
     }
@@ -228,8 +238,8 @@ public class Second extends RegularTimePeriod implements Serializable {
      *
      * @return The second preceding this one.
      */
+    @Override
     public RegularTimePeriod previous() {
-
         Second result = null;
         if (this.second != FIRST_SECOND_IN_MINUTE) {
             result = new Second(this.second - 1, getMinute());
@@ -241,7 +251,6 @@ public class Second extends RegularTimePeriod implements Serializable {
             }
         }
         return result;
-
     }
 
     /**
@@ -249,8 +258,8 @@ public class Second extends RegularTimePeriod implements Serializable {
      *
      * @return The second following this one.
      */
+    @Override
     public RegularTimePeriod next() {
-
         Second result = null;
         if (this.second != LAST_SECOND_IN_MINUTE) {
             result = new Second(this.second + 1, getMinute());
@@ -262,7 +271,6 @@ public class Second extends RegularTimePeriod implements Serializable {
             }
         }
         return result;
-
     }
 
     /**
@@ -270,6 +278,7 @@ public class Second extends RegularTimePeriod implements Serializable {
      *
      * @return The serial index number.
      */
+    @Override
     public long getSerialIndex() {
         long hourIndex = this.day.getSerialIndex() * 24L + this.hour;
         long minuteIndex = hourIndex * 60L + this.minute;
@@ -279,34 +288,33 @@ public class Second extends RegularTimePeriod implements Serializable {
     /**
      * Returns the first millisecond of the minute.
      *
-     * @param calendar  the calendar/timezone (<code>null</code> not permitted).
+     * @param calendar  the calendar/timezone ({@code null} not permitted).
      *
      * @return The first millisecond.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is {@code null}.
      */
+    @Override
     public long getFirstMillisecond(Calendar calendar) {
         int year = this.day.getYear();
         int month = this.day.getMonth() - 1;
-        int day = this.day.getDayOfMonth();
+        int d = this.day.getDayOfMonth();
         calendar.clear();
-        calendar.set(year, month, day, this.hour, this.minute, this.second);
+        calendar.set(year, month, d, this.hour, this.minute, this.second);
         calendar.set(Calendar.MILLISECOND, 0);
-        //return calendar.getTimeInMillis();  // this won't work for JDK 1.3
-        return calendar.getTime().getTime();
+        return calendar.getTimeInMillis();
     }
 
     /**
      * Returns the last millisecond of the second.
      *
-     * @param calendar  the calendar/timezone (<code>null</code> not permitted).
+     * @param calendar  the calendar/timezone ({@code null} not permitted).
      *
      * @return The last millisecond.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is {@code null}.
      */
+    @Override
     public long getLastMillisecond(Calendar calendar) {
         return getFirstMillisecond(calendar) + 999L;
     }
@@ -317,11 +325,12 @@ public class Second extends RegularTimePeriod implements Serializable {
      * This method will return true ONLY if the object is a Second object
      * representing the same second as this instance.
      *
-     * @param obj  the object to compare (<code>null</code> permitted).
+     * @param obj  the object to compare ({@code null} permitted).
      *
-     * @return <code>true</code> if second and minute of this and the object
+     * @return {@code true} if second and minute of this and the object
      *         are the same.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -349,11 +358,12 @@ public class Second extends RegularTimePeriod implements Serializable {
      * Returns a hash code for this object instance.  The approach described by
      * Joshua Bloch in "Effective Java" has been used here:
      * <p>
-     * <code>http://developer.java.sun.com/developer/Books/effectivejava
-     * /Chapter3.pdf</code>
+     * {@code http://developer.java.sun.com/developer/Books/effectivejava
+     * /Chapter3.pdf}
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + this.second;
@@ -372,8 +382,8 @@ public class Second extends RegularTimePeriod implements Serializable {
      *
      * @return negative == before, zero == same, positive == after.
      */
+    @Override
     public int compareTo(Object o1) {
-
         int result;
 
         // CASE 1 : Comparing to another Second object
@@ -406,7 +416,6 @@ public class Second extends RegularTimePeriod implements Serializable {
         }
 
         return result;
-
     }
 
     /**
@@ -416,19 +425,16 @@ public class Second extends RegularTimePeriod implements Serializable {
      *
      * @param s  the string to parse.
      *
-     * @return The second, or <code>null</code> if the string is not parseable.
+     * @return The second, or {@code null} if the string is not parseable.
      */
     public static Second parseSecond(String s) {
-
         Second result = null;
         s = s.trim();
-
         String daystr = s.substring(0, Math.min(10, s.length()));
         Day day = Day.parseDay(daystr);
         if (day != null) {
-            String hmsstr = s.substring(
-                Math.min(daystr.length() + 1, s.length()), s.length()
-            );
+            String hmsstr = s.substring(Math.min(daystr.length() + 1,
+                    s.length()), s.length());
             hmsstr = hmsstr.trim();
 
             int l = hmsstr.length();
@@ -450,9 +456,7 @@ public class Second extends RegularTimePeriod implements Serializable {
                 }
             }
         }
-
         return result;
-
     }
 
 }

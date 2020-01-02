@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * EmptyBlock.java
@@ -37,7 +37,6 @@
  * 22-Oct-2004 : Version 1 (DG);
  * 04-Feb-2005 : Now cloneable and serializable (DG);
  * 20-Apr-2005 : Added new draw() method (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 08-Apr-2008 : Added support for margin and border (DG);
  * 08-May-2008 : Updated arrange() method to recognise
  *               incoming constraint (DG);
@@ -49,9 +48,8 @@ package org.jfree.chart.block;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
-
+import org.jfree.chart.ui.Size2D;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.Size2D;
 
 /**
  * An empty block with a fixed size.
@@ -78,10 +76,11 @@ public class EmptyBlock extends AbstractBlock
      * returns the block size.
      *
      * @param g2  the graphics device.
-     * @param constraint  the constraint (<code>null</code> not permitted).
+     * @param constraint  the constraint ({@code null} not permitted).
      *
-     * @return The block size (in Java2D units, never <code>null</code>).
+     * @return The block size (in Java2D units, never {@code null}).
      */
+    @Override
     public Size2D arrange(Graphics2D g2, RectangleConstraint constraint) {
         Size2D base = new Size2D(calculateTotalWidth(getWidth()),
                 calculateTotalHeight(getHeight()));
@@ -95,6 +94,7 @@ public class EmptyBlock extends AbstractBlock
      * @param g2  the graphics device.
      * @param area  the area.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area) {
         draw(g2, area, null);
     }
@@ -105,10 +105,11 @@ public class EmptyBlock extends AbstractBlock
      *
      * @param g2  the graphics device.
      * @param area  the area.
-     * @param params  ignored (<code>null</code> permitted).
+     * @param params  ignored ({@code null} permitted).
      *
-     * @return Always <code>null</code>.
+     * @return Always {@code null}.
      */
+    @Override
     public Object draw(Graphics2D g2, Rectangle2D area, Object params) {
         area = trimMargin(area);
         drawBorder(g2, area);
@@ -122,6 +123,7 @@ public class EmptyBlock extends AbstractBlock
      *
      * @throws CloneNotSupportedException if there is a problem cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

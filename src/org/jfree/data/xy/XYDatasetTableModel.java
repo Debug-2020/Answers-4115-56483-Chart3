@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------
  * XYDatasetTableModel.java
@@ -47,8 +47,8 @@ package org.jfree.data.xy;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
-import org.jfree.data.event.DatasetChangeEvent;
-import org.jfree.data.event.DatasetChangeListener;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeListener;
 
 /**
  * A READ-ONLY wrapper around a {@link TableXYDataset} to convert it to a
@@ -102,6 +102,7 @@ public class XYDatasetTableModel extends AbstractTableModel
      *
      * @return The row count.
      */
+    @Override
     public int getRowCount() {
         if (this.model == null) {
             return 0;
@@ -114,6 +115,7 @@ public class XYDatasetTableModel extends AbstractTableModel
      *
      * @return The number of columns in the model.
      */
+    @Override
     public int getColumnCount() {
         if (this.model == null) {
             return 0;
@@ -128,6 +130,7 @@ public class XYDatasetTableModel extends AbstractTableModel
      *
      * @return The column name.
      */
+    @Override
     public String getColumnName(int column) {
         if (this.model == null) {
             return super.getColumnName(column);
@@ -149,6 +152,7 @@ public class XYDatasetTableModel extends AbstractTableModel
      *
      * @return The value of the specified cell.
      */
+    @Override
     public Object getValueAt(int row, int column) {
         if (this.model == null) {
             return null;
@@ -168,6 +172,7 @@ public class XYDatasetTableModel extends AbstractTableModel
      *
      * @see DatasetChangeListener
      */
+    @Override
     public void datasetChanged(DatasetChangeEvent event) {
         fireTableDataChanged();
     }
@@ -178,8 +183,9 @@ public class XYDatasetTableModel extends AbstractTableModel
      * @param row  the row number.
      * @param column  the column number.
      *
-     * @return <code>true</code> if the specified cell is editable.
+     * @return {@code true} if the specified cell is editable.
      */
+    @Override
     public boolean isCellEditable(int row, int column) {
         return false;
    }
@@ -191,6 +197,7 @@ public class XYDatasetTableModel extends AbstractTableModel
      * @param row  the row.
      * @param column  the column.
      */
+    @Override
     public void setValueAt(Object value, int row, int column) {
         if (isCellEditable(row, column)) {
             // XYDataset only provides methods for reading a dataset...

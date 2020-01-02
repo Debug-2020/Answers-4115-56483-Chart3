@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,19 +21,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * NumberTickUnit.java
  * -------------------
- * (C) Copyright 2001-2008, by Object Refinery Limited.
+ * (C) Copyright 2001-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
  *
- * Changes (from 19-Dec-2001)
- * --------------------------
+ * Changes
+ * -------
  * 19-Dec-2001 : Added standard header (DG);
  * 01-May-2002 : Updated for changed to TickUnit class (DG);
  * 01-Oct-2002 : Fixed errors reported by Checkstyle (DG);
@@ -43,6 +43,7 @@
  * 05-Jul-2005 : Added equals() implementation (DG);
  * 05-Sep-2005 : Implemented hashCode(), thanks to Thomas Morgner (DG);
  * 02-Aug-2007 : Added new constructor with minorTickCount (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -50,6 +51,7 @@ package org.jfree.chart.axis;
 
 import java.io.Serializable;
 import java.text.NumberFormat;
+import org.jfree.chart.util.Args;
 
 /**
  * A numerical tick unit.
@@ -75,14 +77,12 @@ public class NumberTickUnit extends TickUnit implements Serializable {
      * Creates a new number tick unit.
      *
      * @param size  the size of the tick unit.
-     * @param formatter  a number formatter for the tick unit (<code>null</code>
+     * @param formatter  a number formatter for the tick unit ({@code null}
      *                   not permitted).
      */
     public NumberTickUnit(double size, NumberFormat formatter) {
         super(size);
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         this.formatter = formatter;
     }
 
@@ -90,7 +90,7 @@ public class NumberTickUnit extends TickUnit implements Serializable {
      * Creates a new number tick unit.
      *
      * @param size  the size of the tick unit.
-     * @param formatter  a number formatter for the tick unit (<code>null</code>
+     * @param formatter  a number formatter for the tick unit ({@code null}
      *                   not permitted).
      * @param minorTickCount  the number of minor ticks.
      *
@@ -99,9 +99,7 @@ public class NumberTickUnit extends TickUnit implements Serializable {
     public NumberTickUnit(double size, NumberFormat formatter,
             int minorTickCount) {
         super(size, minorTickCount);
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         this.formatter = formatter;
     }
 
@@ -112,6 +110,7 @@ public class NumberTickUnit extends TickUnit implements Serializable {
      *
      * @return The formatted string.
      */
+    @Override
     public String valueToString(double value) {
         return this.formatter.format(value);
     }
@@ -119,10 +118,11 @@ public class NumberTickUnit extends TickUnit implements Serializable {
     /**
      * Tests this formatter for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -145,6 +145,7 @@ public class NumberTickUnit extends TickUnit implements Serializable {
      *
      * @return A string.
      */
+    @Override
     public String toString() {
         return "[size=" + this.valueToString(this.getSize()) + "]";
     }
@@ -154,6 +155,7 @@ public class NumberTickUnit extends TickUnit implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = super.hashCode();
         result = 29 * result + (this.formatter != null

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------
  * Values.java
@@ -58,12 +58,12 @@ public interface Values {
     /**
      * Returns the value with the specified index.
      *
-     * @param index  the item index (in the range <code>0</code> to
-     *     <code>getItemCount() - 1</code>).
+     * @param index  the item index (in the range {@code 0} to
+     *     {@code getItemCount() -1}).
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      *
-     * @throws IndexOutOfBoundsException if <code>index</code> is not in the
+     * @throws IndexOutOfBoundsException if {@code index} is not in the
      *     specified range.
      */
     public Number getValue(int index);

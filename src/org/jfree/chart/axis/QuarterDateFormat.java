@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * QuarterDateFormat.java
  * ----------------------
- * (C) Copyright 2005-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2005-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -40,6 +40,7 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 08-Jun-2007 : Added Greek symbols, and support for reversing the date - see
  *               patch 1577221 (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -55,6 +56,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import org.jfree.chart.util.Args;
 
 /**
  * A formatter that formats dates to show the year and quarter (for example,
@@ -98,7 +100,7 @@ public class QuarterDateFormat extends DateFormat
     /**
      * Creates a new instance for the specified time zone.
      *
-     * @param zone  the time zone (<code>null</code> not permitted).
+     * @param zone  the time zone ({@code null} not permitted).
      */
     public QuarterDateFormat(TimeZone zone) {
         this(zone, REGULAR_QUARTERS);
@@ -107,7 +109,7 @@ public class QuarterDateFormat extends DateFormat
     /**
      * Creates a new instance for the specified time zone.
      *
-     * @param zone  the time zone (<code>null</code> not permitted).
+     * @param zone  the time zone ({@code null} not permitted).
      * @param quarterSymbols  the quarter symbols.
      */
     public QuarterDateFormat(TimeZone zone, String[] quarterSymbols) {
@@ -117,7 +119,7 @@ public class QuarterDateFormat extends DateFormat
     /**
      * Creates a new instance for the specified time zone.
      *
-     * @param zone  the time zone (<code>null</code> not permitted).
+     * @param zone  the time zone ({@code null} not permitted).
      * @param quarterSymbols  the quarter symbols.
      * @param quarterFirst  a flag that controls whether the quarter or the
      *         year is displayed first.
@@ -126,9 +128,7 @@ public class QuarterDateFormat extends DateFormat
      */
     public QuarterDateFormat(TimeZone zone, String[] quarterSymbols,
             boolean quarterFirst) {
-        if (zone == null) {
-            throw new IllegalArgumentException("Null 'zone' argument.");
-        }
+        Args.nullNotPermitted(zone, "zone");
         this.calendar = new GregorianCalendar(zone);
         this.quarters = quarterSymbols;
         this.quarterFirst = quarterFirst;
@@ -149,6 +149,7 @@ public class QuarterDateFormat extends DateFormat
      *
      * @return The formatted date.
      */
+    @Override
     public StringBuffer format(Date date, StringBuffer toAppendTo,
                                FieldPosition fieldPosition) {
         this.calendar.setTime(date);
@@ -174,8 +175,9 @@ public class QuarterDateFormat extends DateFormat
      * @param source  the date string.
      * @param pos  the parse position.
      *
-     * @return <code>null</code>, as this method has not been implemented.
+     * @return {@code null}, as this method has not been implemented.
      */
+    @Override
     public Date parse(String source, ParsePosition pos) {
         return null;
     }
@@ -183,10 +185,11 @@ public class QuarterDateFormat extends DateFormat
     /**
      * Tests this formatter for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

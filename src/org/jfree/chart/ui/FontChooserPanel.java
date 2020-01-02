@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,25 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * ---------------------
- * FontChooserPanel.java
- * ---------------------
- * (C) Copyright 2000-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   Arnaud Lelievre;
- *
- * Changes (from 26-Oct-2001)
- * --------------------------
- * 26-Oct-2001 : Changed package to com.jrefinery.ui.*;
- * 14-Oct-2002 : Fixed errors reported by Checkstyle (DG);
- * 08-Sep-2003 : Added internationalization via use of properties
- *               resourceBundle (RFE 690236) (AL);
- * 21-Feb-2004 : The FontParameter of the constructor was never used (TM);
- * 21-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -50,14 +33,12 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.util.ResourceBundle;
-
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
-
 import org.jfree.chart.util.ResourceBundleWrapper;
 
 /**
@@ -84,8 +65,7 @@ public class FontChooserPanel extends JPanel {
 
     /** The resourceBundle for the localization. */
     protected static ResourceBundle localizationResources =
-            ResourceBundleWrapper.getBundle(
-                    "org.jfree.chart.ui.LocalizationBundle");
+        ResourceBundleWrapper.getBundle("org.jfree.chart.ui.LocalizationBundle");
 
     /**
      * Standard constructor - builds a FontChooserPanel initialised with the
@@ -95,32 +75,33 @@ public class FontChooserPanel extends JPanel {
      */
     public FontChooserPanel(Font font) {
 
-        GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        String[] fonts = g.getAvailableFontFamilyNames();
+        final GraphicsEnvironment g
+                = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        final String[] fonts = g.getAvailableFontFamilyNames();
 
         setLayout(new BorderLayout());
-        JPanel right = new JPanel(new BorderLayout());
+        final JPanel right = new JPanel(new BorderLayout());
 
-        JPanel fontPanel = new JPanel(new BorderLayout());
+        final JPanel fontPanel = new JPanel(new BorderLayout());
         fontPanel.setBorder(BorderFactory.createTitledBorder(
                             BorderFactory.createEtchedBorder(),
                             localizationResources.getString("Font")));
         this.fontlist = new JList(fonts);
-        JScrollPane fontpane = new JScrollPane(this.fontlist);
+        final JScrollPane fontpane = new JScrollPane(this.fontlist);
         fontpane.setBorder(BorderFactory.createEtchedBorder());
         fontPanel.add(fontpane);
         add(fontPanel);
 
-        JPanel sizePanel = new JPanel(new BorderLayout());
+        final JPanel sizePanel = new JPanel(new BorderLayout());
         sizePanel.setBorder(BorderFactory.createTitledBorder(
                             BorderFactory.createEtchedBorder(),
                             localizationResources.getString("Size")));
         this.sizelist = new JList(SIZES);
-        JScrollPane sizepane = new JScrollPane(this.sizelist);
+        final JScrollPane sizepane = new JScrollPane(this.sizelist);
         sizepane.setBorder(BorderFactory.createEtchedBorder());
         sizePanel.add(sizepane);
 
-        JPanel attributes = new JPanel(new GridLayout(1, 2));
+        final JPanel attributes = new JPanel(new GridLayout(1, 2));
         this.bold = new JCheckBox(localizationResources.getString("Bold"));
         this.italic = new JCheckBox(localizationResources.getString("Italic"));
         attributes.add(this.bold);
@@ -182,7 +163,7 @@ public class FontChooserPanel extends JPanel {
      * @return the size.
      */
     public int getSelectedSize() {
-        String selected = (String) this.sizelist.getSelectedValue();
+        final String selected = (String) this.sizelist.getSelectedValue();
         if (selected != null) {
             return Integer.parseInt(selected);
         }
@@ -197,14 +178,14 @@ public class FontChooserPanel extends JPanel {
      *
      * @param font the font from which to read the properties.
      */
-    public void setSelectedFont( Font font) {
+    public void setSelectedFont (Font font) {
         if (font == null) {
             throw new NullPointerException();
         }
         this.bold.setSelected(font.isBold());
         this.italic.setSelected(font.isItalic());
 
-        String fontName = font.getName();
+        final String fontName = font.getName();
         ListModel model = this.fontlist.getModel();
         this.fontlist.clearSelection();
         for (int i = 0; i < model.getSize(); i++) {
@@ -214,7 +195,7 @@ public class FontChooserPanel extends JPanel {
             }
         }
 
-        String fontSize = String.valueOf(font.getSize());
+        final String fontSize = String.valueOf(font.getSize());
         model = this.sizelist.getModel();
         this.sizelist.clearSelection();
         for (int i = 0; i < model.getSize(); i++) {
@@ -225,3 +206,4 @@ public class FontChooserPanel extends JPanel {
         }
     }
 }
+

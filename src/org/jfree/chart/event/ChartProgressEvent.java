@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * ChartProgressEvent.java
  * -----------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2010, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,6 +35,7 @@
  * Changes
  * -------
  * 14-Jan-2003 : Version 1 (DG);
+ * 20-Jan-2010 : Fixed bug in constructor (DG);
  *
  */
 
@@ -44,7 +45,6 @@ import org.jfree.chart.JFreeChart;
 
 /**
  * An event that contains information about the drawing progress of a chart.
- *
  */
 public class ChartProgressEvent extends java.util.EventObject {
 
@@ -77,6 +77,7 @@ public class ChartProgressEvent extends java.util.EventObject {
         super(source);
         this.chart = chart;
         this.type = type;
+        this.percent = percent;
     }
 
     /**

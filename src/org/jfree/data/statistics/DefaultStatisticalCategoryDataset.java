@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------------------
  * DefaultStatisticalCategoryDataset.java
  * --------------------------------------
- * (C) Copyright 2002-2008, by Pascal Collet and Contributors.
+ * (C) Copyright 2002-2011, by Pascal Collet and Contributors.
  *
  * Original Author:  Pascal Collet;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -50,19 +50,21 @@
  * 02-Feb-2007 : Removed author tags from all over JFreeChart sources (DG);
  * 28-Sep-2007 : Fixed cloning bug (DG);
  * 02-Oct-2007 : Fixed bug updating cached range values (DG);
+ * 19-May-2009 : Fixed FindBugs warnings, patch by Michal Wozniak (DG);
+ * 20-Oct-2011 : Fixed getRangeBounds() bug 3072674 (DG);
  *
  */
 
 package org.jfree.data.statistics;
 
 import java.util.List;
-
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.KeyedObjects2D;
 import org.jfree.data.Range;
 import org.jfree.data.RangeInfo;
 import org.jfree.data.general.AbstractDataset;
+import org.jfree.data.general.DatasetChangeEvent;
 
 /**
  * A convenience class that provides a default implementation of the
@@ -147,8 +149,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The mean value (possibly <code>null</code>).
+     * @return The mean value (possibly {@code null}).
      */
+    @Override
     public Number getMeanValue(int row, int column) {
         Number result = null;
         MeanAndStandardDeviation masd = (MeanAndStandardDeviation)
@@ -166,8 +169,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      * @param row  the row index.
      * @param column  the column index.
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      */
+    @Override
     public Number getValue(int row, int column) {
         return getMeanValue(row, column);
     }
@@ -179,8 +183,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      * @param rowKey  the row key.
      * @param columnKey  the columnKey.
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      */
+    @Override
     public Number getValue(Comparable rowKey, Comparable columnKey) {
         return getMeanValue(rowKey, columnKey);
     }
@@ -191,8 +196,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      * @param rowKey  the row key.
      * @param columnKey  the columnKey.
      *
-     * @return The mean value (possibly <code>null</code>).
+     * @return The mean value (possibly {@code null}).
      */
+    @Override
     public Number getMeanValue(Comparable rowKey, Comparable columnKey) {
         Number result = null;
         MeanAndStandardDeviation masd = (MeanAndStandardDeviation)
@@ -209,8 +215,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The standard deviation (possibly <code>null</code>).
+     * @return The standard deviation (possibly {@code null}).
      */
+    @Override
     public Number getStdDevValue(int row, int column) {
         Number result = null;
         MeanAndStandardDeviation masd = (MeanAndStandardDeviation)
@@ -227,8 +234,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      * @param rowKey  the row key.
      * @param columnKey  the columnKey.
      *
-     * @return The standard deviation (possibly <code>null</code>).
+     * @return The standard deviation (possibly {@code null}).
      */
+    @Override
     public Number getStdDevValue(Comparable rowKey, Comparable columnKey) {
         Number result = null;
         MeanAndStandardDeviation masd = (MeanAndStandardDeviation)
@@ -242,10 +250,11 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     /**
      * Returns the column index for a given key.
      *
-     * @param key  the column key (<code>null</code> not permitted).
+     * @param key  the column key ({@code null} not permitted).
      *
      * @return The column index.
      */
+    @Override
     public int getColumnIndex(Comparable key) {
         // defer null argument check
         return this.data.getColumnIndex(key);
@@ -258,6 +267,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @return The column key.
      */
+    @Override
     public Comparable getColumnKey(int column) {
         return this.data.getColumnKey(column);
     }
@@ -267,6 +277,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @return The keys.
      */
+    @Override
     public List getColumnKeys() {
         return this.data.getColumnKeys();
     }
@@ -274,10 +285,11 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     /**
      * Returns the row index for a given key.
      *
-     * @param key  the row key (<code>null</code> not permitted).
+     * @param key  the row key ({@code null} not permitted).
      *
      * @return The row index.
      */
+    @Override
     public int getRowIndex(Comparable key) {
         // defer null argument check
         return this.data.getRowIndex(key);
@@ -290,6 +302,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @return The row key.
      */
+    @Override
     public Comparable getRowKey(int row) {
         return this.data.getRowKey(row);
     }
@@ -299,6 +312,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @return The keys.
      */
+    @Override
     public List getRowKeys() {
         return this.data.getRowKeys();
     }
@@ -310,6 +324,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @see #getColumnCount()
      */
+    @Override
     public int getRowCount() {
         return this.data.getRowCount();
     }
@@ -321,6 +336,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @see #getRowCount()
      */
+    @Override
     public int getColumnCount() {
         return this.data.getColumnCount();
     }
@@ -413,16 +429,15 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
                 }
             }
         }
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
      * Removes an item from the dataset and sends a {@link DatasetChangeEvent}
      * to all registered listeners.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #add(double, double, Comparable, Comparable)
      *
@@ -449,8 +464,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
             updateBounds();
         }
 
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
 
@@ -467,15 +481,14 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     public void removeRow(int rowIndex) {
         this.data.removeRow(rowIndex);
         updateBounds();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
      * Removes a row from the dataset and sends a {@link DatasetChangeEvent}
      * to all registered listeners.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
      *
      * @see #removeColumn(Comparable)
      *
@@ -484,8 +497,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     public void removeRow(Comparable rowKey) {
         this.data.removeRow(rowKey);
         updateBounds();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -501,15 +513,14 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     public void removeColumn(int columnIndex) {
         this.data.removeColumn(columnIndex);
         updateBounds();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
      * Removes a column from the dataset and sends a {@link DatasetChangeEvent}
      * to all registered listeners.
      *
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #removeRow(Comparable)
      *
@@ -518,8 +529,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     public void removeColumn(Comparable columnKey) {
         this.data.removeColumn(columnKey);
         updateBounds();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -531,8 +541,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     public void clear() {
         this.data.clear();
         updateBounds();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -556,15 +565,13 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
         int columnCount = this.data.getColumnCount();
         for (int r = 0; r < rowCount; r++) {
             for (int c = 0; c < columnCount; c++) {
-                double m = Double.NaN;
-                double sd = Double.NaN;
                 MeanAndStandardDeviation masd = (MeanAndStandardDeviation)
                         this.data.getObject(r, c);
                 if (masd == null) {
                     continue;
                 }
-                m = masd.getMeanValue();
-                sd = masd.getStandardDeviationValue();
+                double m = masd.getMeanValue();
+                double sd = masd.getStandardDeviationValue();
 
                 if (!Double.isNaN(m)) {
 
@@ -640,8 +647,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @see #getRangeUpperBound(boolean)
      */
+    @Override
     public double getRangeLowerBound(boolean includeInterval) {
-        if (includeInterval) {
+        if (includeInterval && !Double.isNaN(this.minimumRangeValueIncStdDev)) {
             return this.minimumRangeValueIncStdDev;
         }
         else {
@@ -659,8 +667,9 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @see #getRangeLowerBound(boolean)
      */
+    @Override
     public double getRangeUpperBound(boolean includeInterval) {
-        if (includeInterval) {
+        if (includeInterval && !Double.isNaN(this.maximumRangeValueIncStdDev)) {
             return this.maximumRangeValueIncStdDev;
         }
         else {
@@ -669,39 +678,31 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
     }
 
     /**
-     * Returns the range of the values in this dataset's range.
+     * Returns the bounds of the values in this dataset's y-values.
      *
      * @param includeInterval  a flag that determines whether or not the
      *                         y-interval is taken into account.
      *
      * @return The range.
      */
+    @Override
     public Range getRangeBounds(boolean includeInterval) {
-        Range result = null;
-        if (includeInterval) {
-            if (!Double.isNaN(this.minimumRangeValueIncStdDev)
-                    && !Double.isNaN(this.maximumRangeValueIncStdDev)) {
-                result = new Range(this.minimumRangeValueIncStdDev,
-                        this.maximumRangeValueIncStdDev);
-            }
+        double lower = getRangeLowerBound(includeInterval);
+        double upper = getRangeUpperBound(includeInterval);
+        if (Double.isNaN(lower) && Double.isNaN(upper)) {
+            return null;
         }
-        else {
-            if (!Double.isNaN(this.minimumRangeValue)
-                    && !Double.isNaN(this.maximumRangeValue)) {
-                result = new Range(this.minimumRangeValue,
-                        this.maximumRangeValue);
-            }
-        }
-        return result;
+        return new Range(lower, upper);
     }
 
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -724,6 +725,7 @@ public class DefaultStatisticalCategoryDataset extends AbstractDataset
      *
      * @throws CloneNotSupportedException if cloning cannot be completed.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultStatisticalCategoryDataset clone
                 = (DefaultStatisticalCategoryDataset) super.clone();

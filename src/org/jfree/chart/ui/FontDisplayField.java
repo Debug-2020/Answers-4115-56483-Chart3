@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,23 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * ---------------------
- * FontDisplayField.java
- * ---------------------
- * (C) Copyright 2000-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   Arnaud Lelievre;
- *
- * Changes (from 26-Oct-2001)
- * --------------------------
- * 26-Oct-2001 : Changed package to com.jrefinery.ui.*;
- * 14-Oct-2002 : Fixed errors reported by Checkstyle (DG);
- * 08-Sep-2003 : Added internationalization via use of properties resourceBundle (RFE 690236) (AL);
- * 21-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -45,9 +30,7 @@ package org.jfree.chart.ui;
 
 import java.awt.Font;
 import java.util.ResourceBundle;
-
 import javax.swing.JTextField;
-
 import org.jfree.chart.util.ResourceBundleWrapper;
 
 /**
@@ -62,8 +45,7 @@ public class FontDisplayField extends JTextField {
 
     /** The resourceBundle for the localization. */
     protected static final ResourceBundle localizationResources =
-            ResourceBundleWrapper.getBundle(
-                    "org.jfree.chart.ui.LocalizationBundle");
+            ResourceBundleWrapper.getBundle("org.jfree.chart.ui.LocalizationBundle");
 
     /**
      * Standard constructor - builds a FontDescriptionField initialised with
@@ -113,3 +95,4 @@ public class FontDisplayField extends JTextField {
     }
 
 }
+

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * DrawingSupplier.java
@@ -48,12 +48,12 @@ import java.awt.Shape;
 import java.awt.Stroke;
 
 /**
- * A supplier of <code>Paint</code>, <code>Stroke</code> and <code>Shape</code>
+ * A supplier of {@code Paint}, {@code Stroke} and {@code Shape}
  * objects for use by plots and renderers.  By providing a central place for
  * obtaining these items, we can ensure that duplication is avoided.
  * <p>
  * To support the cloning of charts, classes that implement this interface
- * should also implement <code>PublicCloneable</code>.
+ * should also implement {@code PublicCloneable}.
  */
 public interface DrawingSupplier {
 
@@ -81,7 +81,7 @@ public interface DrawingSupplier {
     public Paint getNextFillPaint();
 
     /**
-     * Returns the next <code>Stroke</code> object in a sequence maintained by
+     * Returns the next {@code Stroke} object in a sequence maintained by
      * the supplier.
      *
      * @return The stroke.
@@ -89,7 +89,7 @@ public interface DrawingSupplier {
     public Stroke getNextStroke();
 
     /**
-     * Returns the next <code>Stroke</code> object in a sequence maintained by
+     * Returns the next {@code Stroke} object in a sequence maintained by
      * the supplier.
      *
      * @return The stroke.
@@ -97,7 +97,7 @@ public interface DrawingSupplier {
     public Stroke getNextOutlineStroke();
 
     /**
-     * Returns the next <code>Shape</code> object in a sequence maintained by
+     * Returns the next {@code Shape} object in a sequence maintained by
      * the supplier.
      *
      * @return The shape.

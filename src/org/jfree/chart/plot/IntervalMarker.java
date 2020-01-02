@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * IntervalMarker.java
@@ -32,14 +32,14 @@
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
  *
- * Changes (since 20-Aug-2002)
- * --------------------------
+ * Changes
+ * -------
  * 20-Aug-2002 : Added stroke to constructor in Marker class (DG);
  * 02-Oct-2002 : Fixed errors reported by Checkstyle (DG);
  * 26-Mar-2003 : Implemented Serializable (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 05-Sep-2006 : Added MarkerChangeEvent notification (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 18-Dec-2007 : Added new constructor (DG);
  *
  */
 
@@ -52,9 +52,9 @@ import java.awt.Stroke;
 import java.io.Serializable;
 
 import org.jfree.chart.event.MarkerChangeEvent;
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.LengthAdjustmentType;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.ui.GradientPaintTransformer;
+import org.jfree.chart.ui.LengthAdjustmentType;
+import org.jfree.chart.util.ObjectUtils;
 
 /**
  * Represents an interval to be highlighted in some way.
@@ -86,11 +86,11 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
 
     /**
      * Creates a new interval marker with the specified range and fill paint.
-     * The outline paint and stroke default to <code>null</code>.
+     * The outline paint and stroke default to {@code null}.
      *
      * @param start  the lower bound of the interval.
      * @param end  the upper bound of the interval.
-     * @param paint  the fill paint (<code>null</code> not permitted).
+     * @param paint  the fill paint ({@code null} not permitted).
      *
      * @since 1.0.9
      */
@@ -103,8 +103,8 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
      *
      * @param start  the start of the interval.
      * @param end  the end of the interval.
-     * @param paint  the paint (<code>null</code> not permitted).
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      * @param outlinePaint  the outline paint.
      * @param outlineStroke  the outline stroke.
      * @param alpha  the alpha transparency.
@@ -169,7 +169,7 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
     /**
      * Returns the gradient paint transformer.
      *
-     * @return The gradient paint transformer (possibly <code>null</code>).
+     * @return The gradient paint transformer (possibly {@code null}).
      */
     public GradientPaintTransformer getGradientPaintTransformer() {
         return this.gradientPaintTransformer;
@@ -179,7 +179,7 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
      * Sets the gradient paint transformer and sends a
      * {@link MarkerChangeEvent} to all registered listeners.
      *
-     * @param transformer  the transformer (<code>null</code> permitted).
+     * @param transformer  the transformer ({@code null} permitted).
      */
     public void setGradientPaintTransformer(
             GradientPaintTransformer transformer) {
@@ -190,10 +190,11 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
     /**
      * Tests the marker for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -211,7 +212,7 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
         if (this.endValue != that.endValue) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.gradientPaintTransformer,
+        if (!ObjectUtils.equal(this.gradientPaintTransformer,
                 that.gradientPaintTransformer)) {
             return false;
         }
@@ -226,6 +227,7 @@ public class IntervalMarker extends Marker implements Cloneable, Serializable {
      * @throws CloneNotSupportedException Not thrown by this class, but the
      *         exception is declared for the use of subclasses.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

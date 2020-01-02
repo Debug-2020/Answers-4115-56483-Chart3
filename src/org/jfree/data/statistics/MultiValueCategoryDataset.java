@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------------
  * MultiValueCategoryDataset.java
@@ -40,9 +40,9 @@
 
 package org.jfree.data.statistics;
 
-import org.jfree.data.category.CategoryDataset;
-
 import java.util.List;
+
+import org.jfree.data.category.CategoryDataset;
 
 /**
  * A category dataset that defines multiple values for each item.
@@ -66,8 +66,8 @@ public interface MultiValueCategoryDataset extends CategoryDataset {
      * Returns a list (possibly empty) of the values for the specified item.
      * The returned list should be unmodifiable.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @return The list of values.
      */

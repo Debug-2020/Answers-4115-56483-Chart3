@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------------
  * CombinedRangeCategoryPlot.java
  * ------------------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Nicolas Brodu;
@@ -49,7 +49,6 @@
  * 21-Feb-2005 : The getLegendItems() method now returns the fixed legend
  *               items if set (DG);
  * 05-May-2005 : Updated draw() method parameters (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 14-Nov-2007 : Updated setFixedDomainAxisSpaceForSubplots() method (DG);
  * 27-Mar-2008 : Add documentation for getDataRange() method (DG);
  * 31-Mar-2008 : Updated getSubplots() to return EMPTY_LIST for null
@@ -57,6 +56,7 @@
  * 26-Jun-2008 : Fixed crosshair support (DG);
  * 11-Aug-2008 : Don't store totalWeight of subplots, calculate it as
  *               required (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -78,9 +78,11 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.event.PlotChangeListener;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.RectangleInsets;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.ShadowGenerator;
 import org.jfree.data.Range;
 
 /**
@@ -144,9 +146,9 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      * {@link PlotChangeEvent} to all registered listeners.
      * <br><br>
      * You must ensure that the subplot has a non-null domain axis.  The range
-     * axis for the subplot will be set to <code>null</code>.
+     * axis for the subplot will be set to {@code null}.
      *
-     * @param subplot  the subplot (<code>null</code> not permitted).
+     * @param subplot  the subplot ({@code null} not permitted).
      */
     public void add(CategoryPlot subplot) {
         // defer argument checking
@@ -158,15 +160,13 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      * listeners.
      * <br><br>
      * You must ensure that the subplot has a non-null domain axis.  The range
-     * axis for the subplot will be set to <code>null</code>.
+     * axis for the subplot will be set to {@code null}.
      *
-     * @param subplot  the subplot (<code>null</code> not permitted).
-     * @param weight  the weight (must be >= 1).
+     * @param subplot  the subplot ({@code null} not permitted).
+     * @param weight  the weight (must be &gt;= 1).
      */
     public void add(CategoryPlot subplot, int weight) {
-        if (subplot == null) {
-            throw new IllegalArgumentException("Null 'subplot' argument.");
-        }
+        Args.nullNotPermitted(subplot, "subplot");
         if (weight <= 0) {
             throw new IllegalArgumentException("Require weight >= 1.");
         }
@@ -189,12 +189,10 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
     /**
      * Removes a subplot from the combined chart.
      *
-     * @param subplot  the subplot (<code>null</code> not permitted).
+     * @param subplot  the subplot ({@code null} not permitted).
      */
     public void remove(CategoryPlot subplot) {
-        if (subplot == null) {
-            throw new IllegalArgumentException(" Null 'subplot' argument.");
-        }
+        Args.nullNotPermitted(subplot, "subplot");
         int position = -1;
         int size = this.subplots.size();
         int i = 0;
@@ -224,7 +222,7 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
 
     /**
      * Returns the list of subplots.  The returned list may be empty, but is
-     * never <code>null</code>.
+     * never {@code null}.
      *
      * @return An unmodifiable list of subplots.
      */
@@ -245,8 +243,9 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      *
      * @return The space required for the axes.
      */
-    protected AxisSpace calculateAxisSpace(Graphics2D g2,
-                                           Rectangle2D plotArea) {
+    @Override
+    protected AxisSpace calculateAxisSpace(Graphics2D g2, 
+            Rectangle2D plotArea) {
 
         AxisSpace space = new AxisSpace();
         PlotOrientation orientation = getOrientation();
@@ -328,11 +327,12 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      * @param g2  the graphics device.
      * @param area  the area within which the plot (including axis labels)
      *              should be drawn.
-     * @param anchor  the anchor point (<code>null</code> permitted).
+     * @param anchor  the anchor point ({@code null} permitted).
      * @param parentState  the parent state.
-     * @param info  collects information about the drawing (<code>null</code>
+     * @param info  collects information about the drawing ({@code null}
      *              permitted).
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
                      PlotState parentState,
                      PlotRenderingInfo info) {
@@ -391,16 +391,32 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      *
      * @param orientation  the orientation.
      */
+    @Override
     public void setOrientation(PlotOrientation orientation) {
-
         super.setOrientation(orientation);
-
         Iterator iterator = this.subplots.iterator();
         while (iterator.hasNext()) {
             CategoryPlot plot = (CategoryPlot) iterator.next();
             plot.setOrientation(orientation);
         }
+    }
 
+    /**
+     * Sets the shadow generator for the plot (and all subplots) and sends
+     * a {@link PlotChangeEvent} to all registered listeners.
+     * 
+     * @param generator  the new generator ({@code null} permitted).
+     */
+    @Override
+    public void setShadowGenerator(ShadowGenerator generator) {
+        setNotify(false);
+        super.setShadowGenerator(generator);
+        Iterator iterator = this.subplots.iterator();
+        while (iterator.hasNext()) {
+            CategoryPlot plot = (CategoryPlot) iterator.next();
+            plot.setShadowGenerator(generator);
+        }
+        setNotify(true);
     }
 
     /**
@@ -416,6 +432,7 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
       *
       * @return The range.
       */
+    @Override
      public Range getDataRange(ValueAxis axis) {
          Range result = null;
          if (this.subplots != null) {
@@ -433,6 +450,7 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      *
      * @return The legend items.
      */
+    @Override
     public LegendItemCollection getLegendItems() {
         LegendItemCollection result = getFixedLegendItems();
         if (result == null) {
@@ -471,8 +489,8 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      * @param info  information about the plot's dimensions.
      *
      */
+    @Override
     public void handleClick(int x, int y, PlotRenderingInfo info) {
-
         Rectangle2D dataArea = info.getDataArea();
         if (dataArea.contains(x, y)) {
             for (int i = 0; i < this.subplots.size(); i++) {
@@ -481,7 +499,6 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
                 subplot.handleClick(x, y, subplotInfo);
             }
         }
-
     }
 
     /**
@@ -490,6 +507,7 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      *
      * @param event  the event.
      */
+    @Override
     public void plotChanged(PlotChangeEvent event) {
         notifyListeners(event);
     }
@@ -497,10 +515,11 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
     /**
      * Tests the plot for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -512,7 +531,7 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
         if (this.gap != that.gap) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.subplots, that.subplots)) {
+        if (!ObjectUtils.equal(this.subplots, that.subplots)) {
             return false;
         }
         return super.equals(obj);
@@ -526,10 +545,11 @@ public class CombinedRangeCategoryPlot extends CategoryPlot
      * @throws CloneNotSupportedException  this class will not throw this
      *         exception, but subclasses (if any) might.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         CombinedRangeCategoryPlot result
             = (CombinedRangeCategoryPlot) super.clone();
-        result.subplots = (List) ObjectUtilities.deepClone(this.subplots);
+        result.subplots = (List) ObjectUtils.deepClone(this.subplots);
         for (Iterator it = result.subplots.iterator(); it.hasNext();) {
             Plot child = (Plot) it.next();
             child.setParent(result);

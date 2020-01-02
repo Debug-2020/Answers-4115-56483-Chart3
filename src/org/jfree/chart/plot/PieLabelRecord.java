@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * PieLabelRecord.java
@@ -36,7 +36,6 @@
  * -------
  * 08-Mar-2004 : Version 1 (DG);
  * 14-Jun-2007 : Implemented Serializable, updated API docs (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 21-Nov-2007 : Implemented equals() to shut up FindBugs (DG);
  *
  */
@@ -44,13 +43,11 @@
 package org.jfree.chart.plot;
 
 import java.io.Serializable;
-
 import org.jfree.chart.text.TextBox;
 
 /**
  * A structure that retains information about the label for a section in a pie
- * chart.  Instances of this class are created temporarily during chart drawing
- * only.
+ * chart.
  */
 public class PieLabelRecord implements Comparable, Serializable {
 
@@ -219,6 +216,7 @@ public class PieLabelRecord implements Comparable, Serializable {
      *
      * @return An integer that specifies the relative order of the two objects.
      */
+    @Override
     public int compareTo(Object obj) {
         int result = 0;
         if (obj instanceof PieLabelRecord) {
@@ -236,10 +234,11 @@ public class PieLabelRecord implements Comparable, Serializable {
     /**
      * Tests this record for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -280,6 +279,7 @@ public class PieLabelRecord implements Comparable, Serializable {
      *
      * @return A string.
      */
+    @Override
     public String toString() {
         return this.baseY + ", " + this.key.toString();
     }

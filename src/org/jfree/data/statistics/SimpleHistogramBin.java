@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * SimpleHistogramBin.java
  * -----------------------
- * (C) Copyright 2005-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2005-2008, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,15 +35,12 @@
  * Changes
  * -------
  * 10-Jan-2005 : Version 1 (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
- * 19-Jun-2009 : Added selection state (DG);
  *
  */
 
 package org.jfree.data.statistics;
 
 import java.io.Serializable;
-
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -77,13 +74,6 @@ public class SimpleHistogramBin implements Comparable,
     private int itemCount;
 
     /**
-     * A flag that indicates whether or not the bin is selected.
-     *
-     * @since 1.2.0
-     */
-    private boolean selected;
-
-    /**
      * Creates a new bin.
      *
      * @param lowerBound  the lower bound (inclusive).
@@ -105,23 +95,19 @@ public class SimpleHistogramBin implements Comparable,
                               boolean includeLowerBound,
                               boolean includeUpperBound) {
         if (lowerBound >= upperBound) {
-            throw new IllegalArgumentException("Invalid bounds; " + lowerBound
-                    + " to " + upperBound);
+            throw new IllegalArgumentException("Invalid bounds");
         }
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.includeLowerBound = includeLowerBound;
         this.includeUpperBound = includeUpperBound;
         this.itemCount = 0;
-        this.selected = false;
     }
 
     /**
      * Returns the lower bound.
      *
      * @return The lower bound.
-     *
-     * @see #getUpperBound()
      */
     public double getLowerBound() {
         return this.lowerBound;
@@ -131,8 +117,6 @@ public class SimpleHistogramBin implements Comparable,
      * Return the upper bound.
      *
      * @return The upper bound.
-     *
-     * @see #getLowerBound()
      */
     public double getUpperBound() {
         return this.upperBound;
@@ -142,57 +126,23 @@ public class SimpleHistogramBin implements Comparable,
      * Returns the item count.
      *
      * @return The item count.
-     *
-     * @see #setItemCount(int)
      */
     public int getItemCount() {
         return this.itemCount;
     }
 
     /**
-     * Sets the item count.  No event notification occurs when calling this
-     * method - if the bin is contained within a
-     * {@link SimpleHistogramDataset}, you should not be calling this method
-     * directly.  Instead, update the bin using methods such as
-     * {@link SimpleHistogramDataset#addObservations(double[])}.
+     * Sets the item count.
      *
      * @param count  the item count.
-     *
-     * @see #getItemCount()
      */
     public void setItemCount(int count) {
         this.itemCount = count;
     }
 
     /**
-     * Returns a flag indicating whether or not the bin is selected.
-     *
-     * @return A boolean.
-     *
-     * @see #setSelected(boolean)
-     *
-     * @since 1.2.0
-     */
-    public boolean isSelected() {
-        return this.selected;
-    }
-
-    /**
-     * Sets the flag that indicates whether or not the bin is selected.
-     *
-     * @param selected  the new flag value.
-     *
-     * @see #isSelected()
-     *
-     * @since 1.2.0
-     */
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    /**
-     * Returns <code>true</code> if the specified value belongs in the bin,
-     * and <code>false</code> otherwise.
+     * Returns {@code true} if the specified value belongs in the bin,
+     * and {@code false} otherwise.
      *
      * @param value  the value.
      *
@@ -218,10 +168,10 @@ public class SimpleHistogramBin implements Comparable,
     }
 
     /**
-     * Returns <code>true</code> if this bin overlaps with the specified bin,
-     * and <code>false</code> otherwise.
+     * Returns {@code true} if this bin overlaps with the specified bin,
+     * and {@code false} otherwise.
      *
-     * @param bin  the other bin (<code>null</code> not permitted).
+     * @param bin  the other bin ({@code null} not permitted).
      *
      * @return A boolean.
      */
@@ -250,6 +200,7 @@ public class SimpleHistogramBin implements Comparable,
      * @return An integer indicating the relative ordering of the this bin and
      *         the given object.
      */
+    @Override
     public int compareTo(Object obj) {
         if (!(obj instanceof SimpleHistogramBin)) {
             return 0;
@@ -274,10 +225,11 @@ public class SimpleHistogramBin implements Comparable,
     /**
      * Tests this bin for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof SimpleHistogramBin)) {
             return false;
@@ -298,9 +250,6 @@ public class SimpleHistogramBin implements Comparable,
         if (this.itemCount != that.itemCount) {
             return false;
         }
-        if (this.selected != that.selected) {
-            return false;
-        }
         return true;
     }
 
@@ -311,6 +260,7 @@ public class SimpleHistogramBin implements Comparable,
      *
      * @throws CloneNotSupportedException not thrown by this class.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

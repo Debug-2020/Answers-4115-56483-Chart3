@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * DefaultDrawingSupplier.java
  * ---------------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Jeremy Bowman;
@@ -43,7 +43,6 @@
  * 20-Aug-2003 : Implemented Cloneable and PublicCloneable (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 13-Jun-2007 : Added fillPaintSequence (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -62,11 +61,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Arrays;
-
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.ShapeUtilities;
+import org.jfree.chart.util.SerialUtils;
+import org.jfree.chart.util.ShapeUtils;
+
 
 /**
  * A default implementation of the {@link DrawingSupplier} interface.  All
@@ -85,11 +84,11 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
 
     /** The default outline paint sequence. */
     public static final Paint[] DEFAULT_OUTLINE_PAINT_SEQUENCE = new Paint[] {
-            Color.lightGray};
+            Color.LIGHT_GRAY};
 
     /** The default fill paint sequence. */
     public static final Paint[] DEFAULT_FILL_PAINT_SEQUENCE = new Paint[] {
-            Color.white};
+            Color.WHITE};
 
     /** The default stroke sequence. */
     public static final Stroke[] DEFAULT_STROKE_SEQUENCE = new Stroke[] {
@@ -209,6 +208,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
      *
      * @return The paint.
      */
+    @Override
     public Paint getNextPaint() {
         Paint result
             = this.paintSequence[this.paintIndex % this.paintSequence.length];
@@ -221,6 +221,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
      *
      * @return The paint.
      */
+    @Override
     public Paint getNextOutlinePaint() {
         Paint result = this.outlinePaintSequence[
                 this.outlinePaintIndex % this.outlinePaintSequence.length];
@@ -235,6 +236,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
      *
      * @since 1.0.6
      */
+    @Override
     public Paint getNextFillPaint() {
         Paint result = this.fillPaintSequence[this.fillPaintIndex
                 % this.fillPaintSequence.length];
@@ -247,6 +249,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
      *
      * @return The stroke.
      */
+    @Override
     public Stroke getNextStroke() {
         Stroke result = this.strokeSequence[
                 this.strokeIndex % this.strokeSequence.length];
@@ -259,6 +262,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
      *
      * @return The stroke.
      */
+    @Override
     public Stroke getNextOutlineStroke() {
         Stroke result = this.outlineStrokeSequence[
                 this.outlineStrokeIndex % this.outlineStrokeSequence.length];
@@ -271,6 +275,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
      *
      * @return The shape.
      */
+    @Override
     public Shape getNextShape() {
         Shape result = this.shapeSequence[
                 this.shapeIndex % this.shapeSequence.length];
@@ -290,8 +295,8 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
 
         double size = 6.0;
         double delta = size / 2.0;
-        int[] xpoints = null;
-        int[] ypoints = null;
+        int[] xpoints;
+        int[] ypoints;
 
         // square
         result[0] = new Rectangle2D.Double(-delta, -delta, size, size);
@@ -339,22 +344,19 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
     /**
      * Tests this object for equality with another object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
-
         if (obj == this) {
             return true;
         }
-
         if (!(obj instanceof DefaultDrawingSupplier)) {
             return false;
         }
-
         DefaultDrawingSupplier that = (DefaultDrawingSupplier) obj;
-
         if (!Arrays.equals(this.paintSequence, that.paintSequence)) {
             return false;
         }
@@ -388,14 +390,13 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
             return false;
         }
         return true;
-
     }
 
     /**
      * A utility method for testing the equality of two arrays of shapes.
      *
-     * @param s1  the first array (<code>null</code> permitted).
-     * @param s2  the second array (<code>null</code> permitted).
+     * @param s1  the first array ({@code null} permitted).
+     * @param s2  the second array ({@code null} permitted).
      *
      * @return A boolean.
      */
@@ -410,7 +411,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
             return false;
         }
         for (int i = 0; i < s1.length; i++) {
-            if (!ShapeUtilities.equal(s1[i], s2[i])) {
+            if (!ShapeUtils.equal(s1[i], s2[i])) {
                 return false;
             }
         }
@@ -430,31 +431,31 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
         int paintCount = this.paintSequence.length;
         stream.writeInt(paintCount);
         for (int i = 0; i < paintCount; i++) {
-            SerialUtilities.writePaint(this.paintSequence[i], stream);
+            SerialUtils.writePaint(this.paintSequence[i], stream);
         }
 
         int outlinePaintCount = this.outlinePaintSequence.length;
         stream.writeInt(outlinePaintCount);
         for (int i = 0; i < outlinePaintCount; i++) {
-            SerialUtilities.writePaint(this.outlinePaintSequence[i], stream);
+            SerialUtils.writePaint(this.outlinePaintSequence[i], stream);
         }
 
         int strokeCount = this.strokeSequence.length;
         stream.writeInt(strokeCount);
         for (int i = 0; i < strokeCount; i++) {
-            SerialUtilities.writeStroke(this.strokeSequence[i], stream);
+            SerialUtils.writeStroke(this.strokeSequence[i], stream);
         }
 
         int outlineStrokeCount = this.outlineStrokeSequence.length;
         stream.writeInt(outlineStrokeCount);
         for (int i = 0; i < outlineStrokeCount; i++) {
-            SerialUtilities.writeStroke(this.outlineStrokeSequence[i], stream);
+            SerialUtils.writeStroke(this.outlineStrokeSequence[i], stream);
         }
 
         int shapeCount = this.shapeSequence.length;
         stream.writeInt(shapeCount);
         for (int i = 0; i < shapeCount; i++) {
-            SerialUtilities.writeShape(this.shapeSequence[i], stream);
+            SerialUtils.writeShape(this.shapeSequence[i], stream);
         }
 
     }
@@ -474,31 +475,31 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
         int paintCount = stream.readInt();
         this.paintSequence = new Paint[paintCount];
         for (int i = 0; i < paintCount; i++) {
-            this.paintSequence[i] = SerialUtilities.readPaint(stream);
+            this.paintSequence[i] = SerialUtils.readPaint(stream);
         }
 
         int outlinePaintCount = stream.readInt();
         this.outlinePaintSequence = new Paint[outlinePaintCount];
         for (int i = 0; i < outlinePaintCount; i++) {
-            this.outlinePaintSequence[i] = SerialUtilities.readPaint(stream);
+            this.outlinePaintSequence[i] = SerialUtils.readPaint(stream);
         }
 
         int strokeCount = stream.readInt();
         this.strokeSequence = new Stroke[strokeCount];
         for (int i = 0; i < strokeCount; i++) {
-            this.strokeSequence[i] = SerialUtilities.readStroke(stream);
+            this.strokeSequence[i] = SerialUtils.readStroke(stream);
         }
 
         int outlineStrokeCount = stream.readInt();
         this.outlineStrokeSequence = new Stroke[outlineStrokeCount];
         for (int i = 0; i < outlineStrokeCount; i++) {
-            this.outlineStrokeSequence[i] = SerialUtilities.readStroke(stream);
+            this.outlineStrokeSequence[i] = SerialUtils.readStroke(stream);
         }
 
         int shapeCount = stream.readInt();
         this.shapeSequence = new Shape[shapeCount];
         for (int i = 0; i < shapeCount; i++) {
-            this.shapeSequence[i] = SerialUtilities.readShape(stream);
+            this.shapeSequence[i] = SerialUtils.readShape(stream);
         }
 
     }
@@ -540,6 +541,7 @@ public class DefaultDrawingSupplier implements DrawingSupplier, Cloneable,
      * @throws CloneNotSupportedException if a component of the supplier does
      *                                    not support cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultDrawingSupplier clone = (DefaultDrawingSupplier) super.clone();
         return clone;

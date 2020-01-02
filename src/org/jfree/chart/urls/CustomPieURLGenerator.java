@@ -2,7 +2,7 @@
  * JFreeChart : a free Java chart library
  * ======================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * CustomPieURLGenerator.java
@@ -37,7 +37,6 @@
  * 04-Feb-2004 : Version 1, contributed by David Basten based on
  *               CustomXYURLGenerator by Richard Atkinson (added to main source
  *               tree on 25-May-2004);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -52,7 +51,7 @@ import java.util.Set;
 
 import org.jfree.chart.plot.MultiplePiePlot;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.data.pie.PieDataset;
+import org.jfree.data.general.PieDataset;
 
 /**
  * A custom URL generator for pie charts.
@@ -67,7 +66,7 @@ public class CustomPieURLGenerator implements PieURLGenerator,
     private ArrayList urls;
 
     /**
-     * Creates a new <code>CustomPieURLGenerator</code> instance, initially
+     * Creates a new {@code CustomPieURLGenerator} instance, initially
      * empty.  Call {@link #addURLs(Map)} to specify the URL fragments to be
      * used.
      */
@@ -86,6 +85,7 @@ public class CustomPieURLGenerator implements PieURLGenerator,
      *
      * @see #getURL(Comparable, int)
      */
+    @Override
     public String generateURL(PieDataset dataset, Comparable key,
                               int pieIndex) {
         return getURL(key, pieIndex);
@@ -141,15 +141,15 @@ public class CustomPieURLGenerator implements PieURLGenerator,
     }
 
     /**
-     * Adds a map containing <code>(key, URL)</code> mappings where each
-     * <code>key</code> is an instance of <code>Comparable</code>
+     * Adds a map containing {@code (key, URL)} mappings where each
+     * {@code key} is an instance of {@code Comparable}
      * (corresponding to the key for an item in a pie dataset) and each
-     * <code>URL</code> is a <code>String</code> representing a URL fragment.
+     * {@code URL} is a {@code String} representing a URL fragment.
      * <br><br>
      * The map is appended to an internal list...you can add multiple maps
      * if you are working with, say, a {@link MultiplePiePlot}.
      *
-     * @param urlMap  the URLs (<code>null</code> permitted).
+     * @param urlMap  the URLs ({@code null} permitted).
      */
     public void addURLs(Map urlMap) {
         this.urls.add(urlMap);
@@ -162,6 +162,7 @@ public class CustomPieURLGenerator implements PieURLGenerator,
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object o) {
 
         if (o == this) {
@@ -200,6 +201,7 @@ public class CustomPieURLGenerator implements PieURLGenerator,
      *
      * @throws CloneNotSupportedException if cloning is not supported.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         CustomPieURLGenerator urlGen = new CustomPieURLGenerator();
         Map map;
@@ -216,7 +218,6 @@ public class CustomPieURLGenerator implements PieURLGenerator,
             }
 
             urlGen.addURLs(newMap);
-            newMap = null;
         }
 
         return urlGen;

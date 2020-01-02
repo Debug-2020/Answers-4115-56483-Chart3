@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * ShipNeedle.java
  * ---------------
- * (C) Copyright 2002-2008, by the Australian Antarctic Division and
+ * (C) Copyright 2002-2016, by the Australian Antarctic Division and
  *                          Contributors.
  *
  * Original Author:  Bryan Scott (for the Australian Antarctic Division);
@@ -56,8 +56,7 @@ import java.io.Serializable;
  * A needle in the shape of a ship, for use with the
  * {@link org.jfree.chart.plot.CompassPlot} class.
  */
-public class ShipNeedle extends MeterNeedle
-                        implements Cloneable, Serializable {
+public class ShipNeedle extends MeterNeedle implements Cloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = 149554868169435612L;
@@ -70,8 +69,9 @@ public class ShipNeedle extends MeterNeedle
      * @param rotate  the rotation point.
      * @param angle  the angle.
      */
+    @Override
     protected void drawNeedle(Graphics2D g2, Rectangle2D plotArea,
-                              Point2D rotate, double angle) {
+            Point2D rotate, double angle) {
 
         GeneralPath shape = new GeneralPath();
         shape.append(new Arc2D.Double(-9.0, -7.0, 10, 14, 0.0, 25.5,
@@ -99,6 +99,7 @@ public class ShipNeedle extends MeterNeedle
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object object) {
         if (object == null) {
             return false;
@@ -117,6 +118,7 @@ public class ShipNeedle extends MeterNeedle
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
@@ -126,9 +128,10 @@ public class ShipNeedle extends MeterNeedle
      *
      * @return A clone.
      *
-     * @throws CloneNotSupportedException if the <code>ShipNeedle</code>
+     * @throws CloneNotSupportedException if the {@code ShipNeedle}
      *     cannot be cloned (in theory, this should not happen).
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

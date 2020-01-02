@@ -1,21 +1,28 @@
-/* ------------
- * TextBox.java
- * ------------
- * (C) Copyright 2004-2008, by Object Refinery Limited and Contributors.
+/* ===========================================================
+ * JFreeChart : a free chart library for the Java(tm) platform
+ * ===========================================================
  *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
- * Changes
- * -------
- * 09-Mar-2004 : Version 1 (DG);
- * 22-Mar-2004 : Added equals() method and implemented Serializable (DG);
- * 09-Nov-2004 : Renamed getAdjustedHeight() --> calculateExtendedHeight() in
- *               Spacer class (DG);
- * 22-Feb-2005 : Replaced Spacer with RectangleInsets (DG);
- * 20-Jun-2007 : Copied from JCommon (DG);
- * 14-Feb-2008 : Fixed alignment of text content with respect to insets - see
- *               bug report 1892707 (DG);
+ * Project Info:  http://www.jfree.org/jfreechart/index.html
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or
+ * (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ *
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -32,12 +39,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.RectangleAnchor;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A box containing a text block.
@@ -87,8 +93,8 @@ public class TextBox implements Serializable {
         this((TextBlock) null);
         if (text != null) {
             this.textBlock = new TextBlock();
-            this.textBlock.addLine(text, new Font("Tahoma", Font.PLAIN, 10),
-                    Color.black);
+            this.textBlock.addLine(text, new Font("SansSerif", Font.PLAIN, 10),
+                    Color.BLACK);
         }
     }
 
@@ -98,11 +104,11 @@ public class TextBox implements Serializable {
      * @param block  the text block.
      */
     public TextBox(TextBlock block) {
-        this.outlinePaint = Color.black;
+        this.outlinePaint = Color.BLACK;
         this.outlineStroke = new BasicStroke(1.0f);
         this.interiorGap = new RectangleInsets(1.0, 3.0, 1.0, 3.0);
         this.backgroundPaint = new Color(255, 255, 192);
-        this.shadowPaint = Color.gray;
+        this.shadowPaint = Color.GRAY;
         this.shadowXOffset = 2.0;
         this.shadowYOffset = 2.0;
         this.textBlock = block;
@@ -261,18 +267,19 @@ public class TextBox implements Serializable {
      * @param anchor  the anchor point.
      */
     public void draw(Graphics2D g2, float x, float y, RectangleAnchor anchor) {
-        Size2D d1 = this.textBlock.calculateDimensions(g2);
-        double w = this.interiorGap.extendWidth(d1.getWidth());
-        double h = this.interiorGap.extendHeight(d1.getHeight());
-        Size2D d2 = new Size2D(w, h);
-        Rectangle2D bounds = RectangleAnchor.createRectangle(d2, x, y, anchor);
+        final Size2D d1 = this.textBlock.calculateDimensions(g2);
+        final double w = this.interiorGap.extendWidth(d1.getWidth());
+        final double h = this.interiorGap.extendHeight(d1.getHeight());
+        final Size2D d2 = new Size2D(w, h);
+        final Rectangle2D bounds
+                = RectangleAnchor.createRectangle(d2, x, y, anchor);
         double xx = bounds.getX();
         double yy = bounds.getY();
 
         if (this.shadowPaint != null) {
-            Rectangle2D shadow = new Rectangle2D.Double(
-                    xx + this.shadowXOffset, yy + this.shadowYOffset,
-                    bounds.getWidth(), bounds.getHeight());
+            final Rectangle2D shadow = new Rectangle2D.Double(
+                xx + this.shadowXOffset, yy + this.shadowYOffset,
+                bounds.getWidth(), bounds.getHeight());
             g2.setPaint(this.shadowPaint);
             g2.fill(shadow);
         }
@@ -302,14 +309,14 @@ public class TextBox implements Serializable {
      * @return The height (in Java2D units).
      */
     public double getHeight(Graphics2D g2) {
-        Size2D d = this.textBlock.calculateDimensions(g2);
+        final Size2D d = this.textBlock.calculateDimensions(g2);
         return this.interiorGap.extendHeight(d.getHeight());
     }
 
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
@@ -321,20 +328,20 @@ public class TextBox implements Serializable {
             return false;
         }
         final TextBox that = (TextBox) obj;
-        if (!ObjectUtilities.equal(this.outlinePaint, that.outlinePaint)) {
+        if (!ObjectUtils.equal(this.outlinePaint, that.outlinePaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.outlineStroke, that.outlineStroke)) {
+        if (!ObjectUtils.equal(this.outlineStroke, that.outlineStroke)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.interiorGap, that.interiorGap)) {
+        if (!ObjectUtils.equal(this.interiorGap, that.interiorGap)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.backgroundPaint,
+        if (!ObjectUtils.equal(this.backgroundPaint,
                 that.backgroundPaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.shadowPaint, that.shadowPaint)) {
+        if (!ObjectUtils.equal(this.shadowPaint, that.shadowPaint)) {
             return false;
         }
         if (this.shadowXOffset != that.shadowXOffset) {
@@ -343,7 +350,7 @@ public class TextBox implements Serializable {
         if (this.shadowYOffset != that.shadowYOffset) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.textBlock, that.textBlock)) {
+        if (!ObjectUtils.equal(this.textBlock, that.textBlock)) {
             return false;
         }
 
@@ -385,13 +392,12 @@ public class TextBox implements Serializable {
      *
      * @throws IOException  if there is an I/O error.
      */
-    private void writeObject(ObjectOutputStream stream)
-            throws IOException {
+    private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.outlinePaint, stream);
-        SerialUtilities.writeStroke(this.outlineStroke, stream);
-        SerialUtilities.writePaint(this.backgroundPaint, stream);
-        SerialUtilities.writePaint(this.shadowPaint, stream);
+        SerialUtils.writePaint(this.outlinePaint, stream);
+        SerialUtils.writeStroke(this.outlineStroke, stream);
+        SerialUtils.writePaint(this.backgroundPaint, stream);
+        SerialUtils.writePaint(this.shadowPaint, stream);
     }
 
     /**
@@ -402,14 +408,14 @@ public class TextBox implements Serializable {
      * @throws IOException  if there is an I/O error.
      * @throws ClassNotFoundException  if there is a classpath problem.
      */
-    private void readObject(ObjectInputStream stream)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream stream) throws IOException, 
+            ClassNotFoundException {
         stream.defaultReadObject();
-        this.outlinePaint = SerialUtilities.readPaint(stream);
-        this.outlineStroke = SerialUtilities.readStroke(stream);
-        this.backgroundPaint = SerialUtilities.readPaint(stream);
-        this.shadowPaint = SerialUtilities.readPaint(stream);
+        this.outlinePaint = SerialUtils.readPaint(stream);
+        this.outlineStroke = SerialUtils.readStroke(stream);
+        this.backgroundPaint = SerialUtils.readPaint(stream);
+        this.shadowPaint = SerialUtils.readPaint(stream);
     }
 
-
 }
+

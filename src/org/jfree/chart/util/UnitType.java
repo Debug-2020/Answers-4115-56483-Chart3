@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,45 +21,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * -------------
- * UnitType.java
- * -------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes:
- * --------
- * 11-Feb-2004 : Version 1 (DG);
- * 21-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
 package org.jfree.chart.util;
 
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-
 /**
  * Used to indicate absolute or relative units.
  */
-public final class UnitType implements Serializable {
-
-    /** For serialization. */
-    private static final long serialVersionUID = 6531925392288519884L;
+public enum UnitType {
 
     /** Absolute. */
-    public static final UnitType ABSOLUTE = new UnitType("UnitType.ABSOLUTE");
+    ABSOLUTE("UnitType.ABSOLUTE"),
 
     /** Relative. */
-    public static final UnitType RELATIVE = new UnitType("UnitType.RELATIVE");
+    RELATIVE("UnitType.RELATIVE");
 
     /** The name. */
-    private String name;
+    private final String name;
 
     /**
      * Private constructor.
@@ -75,56 +56,8 @@ public final class UnitType implements Serializable {
      *
      * @return The string.
      */
+    @Override
     public String toString() {
         return this.name;
-    }
-
-    /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
-     *
-     * @param obj  the other object.
-     *
-     * @return A boolean.
-     */
-    public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (!(obj instanceof UnitType)) {
-            return false;
-        }
-        UnitType that = (UnitType) obj;
-        if (!this.name.equals(that.name)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Returns a hash code value for the object.
-     *
-     * @return The hashcode
-     */
-    public int hashCode() {
-        return this.name.hashCode();
-    }
-
-    /**
-     * Ensures that serialization returns the unique instances.
-     *
-     * @return The object.
-     *
-     * @throws ObjectStreamException if there is a problem.
-     */
-    private Object readResolve() throws ObjectStreamException {
-        if (this.equals(UnitType.ABSOLUTE)) {
-            return UnitType.ABSOLUTE;
-        }
-        else if (this.equals(UnitType.RELATIVE)) {
-            return UnitType.RELATIVE;
-        }
-        return null;
-    }
-
+    }    
 }

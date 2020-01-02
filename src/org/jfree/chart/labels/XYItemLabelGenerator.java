@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * XYItemLabelGenerator.java
@@ -60,11 +60,11 @@ public interface XYItemLabelGenerator {
      * Generates a label for the specified item. The label is typically a
      * formatted version of the data value, but any text can be used.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
     public String generateLabel(XYDataset dataset, int series, int item);
 

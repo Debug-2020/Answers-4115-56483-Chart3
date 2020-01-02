@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------------
  * StandardXYZToolTipGenerator.java
  * --------------------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,7 +36,7 @@
  * -------
  * 11-May-2003 : Version 1, split from StandardXYZItemLabelGenerator (DG);
  * 15-Jul-2004 : Switched getZ() and getZValue() methods (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -46,8 +46,9 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 
-import org.jfree.chart.util.ObjectUtilities;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYZDataset;
 
@@ -94,21 +95,17 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
      * formatters.
      *
      * @param formatString  the format string.
-     * @param xFormat  the format object for the x values (<code>null</code>
+     * @param xFormat  the format object for the x values ({@code null}
      *                 not permitted).
-     * @param yFormat  the format object for the y values (<code>null</code>
+     * @param yFormat  the format object for the y values ({@code null}
      *                 not permitted).
-     * @param zFormat  the format object for the z values (<code>null</code>
+     * @param zFormat  the format object for the z values ({@code null}
      *                 not permitted).
      */
-    public StandardXYZToolTipGenerator(String formatString,
-                                       NumberFormat xFormat,
-                                       NumberFormat yFormat,
-                                       NumberFormat zFormat) {
+    public StandardXYZToolTipGenerator(String formatString, 
+            NumberFormat xFormat, NumberFormat yFormat, NumberFormat zFormat) {
         super(formatString, xFormat, yFormat);
-        if (zFormat == null) {
-            throw new IllegalArgumentException("Null 'zFormat' argument.");
-        }
+        Args.nullNotPermitted(zFormat, "zFormat");
         this.zFormat = zFormat;
     }
 
@@ -116,21 +113,17 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
      * Constructs a new tool tip generator using the specified date formatters.
      *
      * @param formatString  the format string.
-     * @param xFormat  the format object for the x values (<code>null</code>
+     * @param xFormat  the format object for the x values ({@code null}
      *                 not permitted).
-     * @param yFormat  the format object for the y values (<code>null</code>
+     * @param yFormat  the format object for the y values ({@code null}
      *                 not permitted).
-     * @param zFormat  the format object for the z values (<code>null</code>
+     * @param zFormat  the format object for the z values ({@code null}
      *                 not permitted).
      */
-    public StandardXYZToolTipGenerator(String formatString,
-                                       DateFormat xFormat,
-                                       DateFormat yFormat,
-                                       DateFormat zFormat) {
+    public StandardXYZToolTipGenerator(String formatString, DateFormat xFormat,
+            DateFormat yFormat, DateFormat zFormat) {
         super(formatString, xFormat, yFormat);
-        if (zFormat == null) {
-            throw new IllegalArgumentException("Null 'zFormat' argument.");
-        }
+        Args.nullNotPermitted(zFormat, "zFormat");
         this.zDateFormat = zFormat;
     }
 
@@ -139,7 +132,7 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
     /**
      * Returns the number formatter for the z-values.
      *
-     * @return The number formatter (possibly <code>null</code>).
+     * @return The number formatter (possibly {@code null}).
      */
     public NumberFormat getZFormat() {
         return this.zFormat;
@@ -148,7 +141,7 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
     /**
      * Returns the date formatter for the z-values.
      *
-     * @return The date formatter (possibly <code>null</code>).
+     * @return The date formatter (possibly {@code null}).
      */
     public DateFormat getZDateFormat() {
         return this.zDateFormat;
@@ -157,12 +150,13 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
     /**
      * Generates a tool tip text item for a particular item within a series.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
      *
-     * @return The tooltip text (possibly <code>null</code>).
+     * @return The tooltip text (possibly {@code null}).
      */
+    @Override
     public String generateToolTip(XYZDataset dataset, int series, int item) {
         return generateLabelString(dataset, series, item);
     }
@@ -170,14 +164,15 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
     /**
      * Generates a label string for an item in the dataset.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
+    @Override
     public String generateLabelString(XYDataset dataset, int series, int item) {
-        String result = null;
+        String result;
         Object[] items = createItemArray((XYZDataset) dataset, series, item);
         result = MessageFormat.format(getFormatString(), items);
         return result;
@@ -187,11 +182,11 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
      * Creates the array of items that can be passed to the
      * {@link MessageFormat} class for creating labels.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return The items (never <code>null</code>).
+     * @return The items (never {@code null}).
      */
     protected Object[] createItemArray(XYZDataset dataset,
                                        int series, int item) {
@@ -232,10 +227,11 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -247,10 +243,10 @@ public class StandardXYZToolTipGenerator extends StandardXYToolTipGenerator
             return false;
         }
         StandardXYZToolTipGenerator that = (StandardXYZToolTipGenerator) obj;
-        if (!ObjectUtilities.equal(this.zFormat, that.zFormat)) {
+        if (!ObjectUtils.equal(this.zFormat, that.zFormat)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.zDateFormat, that.zDateFormat)) {
+        if (!ObjectUtils.equal(this.zDateFormat, that.zDateFormat)) {
             return false;
         }
         return true;

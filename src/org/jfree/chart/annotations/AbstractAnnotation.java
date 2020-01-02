@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,16 +21,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * AbstractAnnotation.java
  * -----------------------
- * (C) Copyright 2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2009-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  Peter Kolb (see patch 2809117);
- * Contributor(s):   ;
+ * Contributor(s):   -;
  *
  * Changes:
  * --------
@@ -86,6 +86,7 @@ public abstract class AbstractAnnotation implements Annotation, Cloneable,
      *
      * @see #removeChangeListener(AnnotationChangeListener)
      */
+    @Override
     public void addChangeListener(AnnotationChangeListener listener) {
         this.listenerList.add(AnnotationChangeListener.class, listener);
     }
@@ -98,12 +99,13 @@ public abstract class AbstractAnnotation implements Annotation, Cloneable,
      *
      * @see #addChangeListener(AnnotationChangeListener)
      */
+    @Override
     public void removeChangeListener(AnnotationChangeListener listener) {
         this.listenerList.remove(AnnotationChangeListener.class, listener);
     }
 
     /**
-     * Returns <code>true</code> if the specified object is registered with
+     * Returns {@code true} if the specified object is registered with
      * the annotation as a listener.  Most applications won't need to call this
      * method, it exists mainly for use by unit testing code.
      *
@@ -152,7 +154,7 @@ public abstract class AbstractAnnotation implements Annotation, Cloneable,
     }
 
     /**
-     * Returns a flag that indicates whether listeners should be
+     * Returns a flag that indicates whether listeners should be 
      * notified about changes to the annotation.
      *
      * @return  the flag.
@@ -179,7 +181,7 @@ public abstract class AbstractAnnotation implements Annotation, Cloneable,
     }
 
     /**
-     * Returns a clone of the annotation. The cloned annotation will NOT
+     * Returns a clone of the annotation. The cloned annotation will NOT 
      * include the {@link AnnotationChangeListener} references that have been
      * registered with this annotation.
      *
@@ -188,6 +190,7 @@ public abstract class AbstractAnnotation implements Annotation, Cloneable,
      * @throws CloneNotSupportedException  if the annotation does not support
      *                                     cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         AbstractAnnotation clone = (AbstractAnnotation) super.clone();
         clone.listenerList = new EventListenerList();

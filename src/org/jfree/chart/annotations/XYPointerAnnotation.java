@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------
  * XYPointerAnnotation.java
  * ------------------------
- * (C) Copyright 2003-2009, by Object Refinery Limited.
+ * (C) Copyright 2003-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (patch 2809117);
@@ -49,6 +49,7 @@
  *               outline (DG);
  * 18-May-2009 : Fixed typo in hashCode() method (DG);
  * 24-Jun-2009 : Fire change events (see patch 2809117 by PK) (DG);
+ * 02-Jul-2016 : Use ParamChecks (DG);
  *
  */
 
@@ -68,17 +69,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.AnnotationChangeEvent;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * An arrow and label that can be placed on an {@link XYPlot}.  The arrow is
@@ -91,7 +94,6 @@ import org.jfree.chart.util.SerialUtilities;
  * outer circle defined by the base radius.  Now, draw the arrow starting at
  * some point on the outer circle (the point is determined by the angle), with
  * the arrow tip being drawn at a corresponding point on the inner circle.
- *
  */
 public class XYPointerAnnotation extends XYTextAnnotation
         implements Cloneable, PublicCloneable, Serializable {
@@ -147,7 +149,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
     /**
      * Creates a new label and arrow annotation.
      *
-     * @param label  the label (<code>null</code> permitted).
+     * @param label  the label ({@code null} permitted).
      * @param x  the x-coordinate (measured against the chart's domain axis).
      * @param y  the y-coordinate (measured against the chart's range axis).
      * @param angle  the angle of the arrow's line (in radians).
@@ -162,7 +164,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
         this.arrowWidth = DEFAULT_ARROW_WIDTH;
         this.labelOffset = DEFAULT_LABEL_OFFSET;
         this.arrowStroke = new BasicStroke(1.0f);
-        this.arrowPaint = Color.black;
+        this.arrowPaint = Color.BLACK;
 
     }
 
@@ -314,7 +316,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
     /**
      * Returns the stroke used to draw the arrow line.
      *
-     * @return The arrow stroke (never <code>null</code>).
+     * @return The arrow stroke (never {@code null}).
      *
      * @see #setArrowStroke(Stroke)
      */
@@ -326,14 +328,12 @@ public class XYPointerAnnotation extends XYTextAnnotation
      * Sets the stroke used to draw the arrow line and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      *
      * @see #getArrowStroke()
      */
     public void setArrowStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' not permitted.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.arrowStroke = stroke;
         fireAnnotationChanged();
     }
@@ -341,7 +341,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
     /**
      * Returns the paint used for the arrow.
      *
-     * @return The arrow paint (never <code>null</code>).
+     * @return The arrow paint (never {@code null}).
      *
      * @see #setArrowPaint(Paint)
      */
@@ -353,14 +353,12 @@ public class XYPointerAnnotation extends XYTextAnnotation
      * Sets the paint used for the arrow and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param paint  the arrow paint (<code>null</code> not permitted).
+     * @param paint  the arrow paint ({@code null} not permitted).
      *
      * @see #getArrowPaint()
      */
     public void setArrowPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.arrowPaint = paint;
         fireAnnotationChanged();
     }
@@ -376,10 +374,10 @@ public class XYPointerAnnotation extends XYTextAnnotation
      * @param rendererIndex  the renderer index.
      * @param info  the plot rendering info.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
-                     ValueAxis domainAxis, ValueAxis rangeAxis,
-                     int rendererIndex,
-                     PlotRenderingInfo info) {
+            ValueAxis domainAxis, ValueAxis rangeAxis, int rendererIndex, 
+            PlotRenderingInfo info) {
 
         PlotOrientation orientation = plot.getOrientation();
         RectangleEdge domainEdge = Plot.resolveDomainAxisLocation(
@@ -430,7 +428,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
         double labelY = j2DY + Math.sin(this.angle) * (this.baseRadius
                 + this.labelOffset);
         g2.setFont(getFont());
-        Shape hotspot = TextUtilities.calculateRotatedStringBounds(
+        Shape hotspot = TextUtils.calculateRotatedStringBounds(
                 getText(), g2, (float) labelX, (float) labelY, getTextAnchor(),
                 getRotationAngle(), getRotationAnchor());
         if (getBackgroundPaint() != null) {
@@ -438,7 +436,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
             g2.fill(hotspot);
         }
         g2.setPaint(getPaint());
-        TextUtilities.drawRotatedString(getText(), g2, (float) labelX,
+        TextUtils.drawRotatedString(getText(), g2, (float) labelX,
                 (float) labelY, getTextAnchor(), getRotationAngle(),
                 getRotationAnchor());
         if (isOutlineVisible()) {
@@ -458,10 +456,11 @@ public class XYPointerAnnotation extends XYTextAnnotation
     /**
      * Tests this annotation for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -488,7 +487,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
         if (!this.arrowPaint.equals(that.arrowPaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.arrowStroke, that.arrowStroke)) {
+        if (!ObjectUtils.equal(this.arrowStroke, that.arrowStroke)) {
             return false;
         }
         if (this.labelOffset != that.labelOffset) {
@@ -502,6 +501,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = super.hashCode();
         long temp = Double.doubleToLongBits(this.angle);
@@ -514,7 +514,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
         result = 37 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(this.arrowWidth);
         result = 37 * result + (int) (temp ^ (temp >>> 32));
-        result = result * 37 + HashUtilities.hashCodeForPaint(this.arrowPaint);
+        result = result * 37 + HashUtils.hashCodeForPaint(this.arrowPaint);
         result = result * 37 + this.arrowStroke.hashCode();
         temp = Double.doubleToLongBits(this.labelOffset);
         result = 37 * result + (int) (temp ^ (temp >>> 32));
@@ -528,6 +528,7 @@ public class XYPointerAnnotation extends XYTextAnnotation
      *
      * @throws CloneNotSupportedException  if the annotation can't be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -541,8 +542,8 @@ public class XYPointerAnnotation extends XYTextAnnotation
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.arrowPaint, stream);
-        SerialUtilities.writeStroke(this.arrowStroke, stream);
+        SerialUtils.writePaint(this.arrowPaint, stream);
+        SerialUtils.writeStroke(this.arrowStroke, stream);
     }
 
     /**
@@ -556,8 +557,8 @@ public class XYPointerAnnotation extends XYTextAnnotation
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.arrowPaint = SerialUtilities.readPaint(stream);
-        this.arrowStroke = SerialUtilities.readStroke(stream);
+        this.arrowPaint = SerialUtils.readPaint(stream);
+        this.arrowStroke = SerialUtils.readStroke(stream);
     }
 
 }

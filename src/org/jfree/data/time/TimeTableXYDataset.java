@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * TimeTableXYDataset.java
  * -----------------------
- * (C) Copyright 2004-2009, by Andreas Schroeder and Contributors.
+ * (C) Copyright 2004-2016, by Andreas Schroeder and Contributors.
  *
  * Original Author:  Andreas Schroeder;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -47,10 +47,11 @@
  *               release (DG);
  * 27-Jan-2005 : Modified to use TimePeriod rather than RegularTimePeriod (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 25-Jul-2007 : Added clear() method by Rob Eden, see patch 1752205 (DG);
  * 04-Jun-2008 : Updated Javadocs (DG);
  * 26-May-2009 : Peg to time zone if RegularTimePeriod is used (DG);
+ * 02-Nov-2009 : Changed String to Comparable in add methods (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -60,13 +61,13 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import org.jfree.chart.event.DatasetChangeInfo;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.DefaultKeyedValues2D;
 import org.jfree.data.DomainInfo;
 import org.jfree.data.Range;
-import org.jfree.data.event.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.xy.AbstractIntervalXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.TableXYDataset;
@@ -75,11 +76,11 @@ import org.jfree.data.xy.TableXYDataset;
  * A dataset for regular time periods that implements the
  * {@link TableXYDataset} interface.  Note that the {@link TableXYDataset}
  * interface requires all series to share the same set of x-values.  When
- * adding a new item <code>(x, y)</code> to one series, all other series
- * automatically get a new item <code>(x, null)</code> unless a non-null item
+ * adding a new item {@code (x, y)} to one series, all other series
+ * automatically get a new item {@code (x, null)} unless a non-null item
  * has already been specified.
  *
- * @see TableXYDataset
+ * @see org.jfree.data.xy.TableXYDataset
  */
 public class TimeTableXYDataset extends AbstractIntervalXYDataset
         implements Cloneable, PublicCloneable, IntervalXYDataset, DomainInfo,
@@ -122,7 +123,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
     /**
      * Creates a new dataset with the given time zone.
      *
-     * @param zone  the time zone to use (<code>null</code> not permitted).
+     * @param zone  the time zone to use ({@code null} not permitted).
      */
     public TimeTableXYDataset(TimeZone zone) {
         // defer argument checking
@@ -132,16 +133,12 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
     /**
      * Creates a new dataset with the given time zone and locale.
      *
-     * @param zone  the time zone to use (<code>null</code> not permitted).
-     * @param locale  the locale to use (<code>null</code> not permitted).
+     * @param zone  the time zone to use ({@code null} not permitted).
+     * @param locale  the locale to use ({@code null} not permitted).
      */
     public TimeTableXYDataset(TimeZone zone, Locale locale) {
-        if (zone == null) {
-            throw new IllegalArgumentException("Null 'zone' argument.");
-        }
-        if (locale == null) {
-            throw new IllegalArgumentException("Null 'locale' argument.");
-        }
+        Args.nullNotPermitted(zone, "zone");
+        Args.nullNotPermitted(locale, "locale");
         this.values = new DefaultKeyedValues2D(true);
         this.workingCalendar = Calendar.getInstance(zone, locale);
         this.xPosition = TimePeriodAnchor.START;
@@ -175,15 +172,14 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      */
     public void setDomainIsPointsInTime(boolean flag) {
         this.domainIsPointsInTime = flag;
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        notifyListeners(new DatasetChangeEvent(this, this));
     }
 
     /**
      * Returns the position within each time period that is used for the X
      * value.
      *
-     * @return The anchor position (never <code>null</code>).
+     * @return The anchor position (never {@code null}).
      *
      * @see #setXPosition(TimePeriodAnchor)
      */
@@ -195,17 +191,14 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      * Sets the position within each time period that is used for the X values,
      * then sends a {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param anchor  the anchor position (<code>null</code> not permitted).
+     * @param anchor  the anchor position ({@code null} not permitted).
      *
      * @see #getXPosition()
      */
     public void setXPosition(TimePeriodAnchor anchor) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(anchor, "anchor");
         this.xPosition = anchor;
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        notifyListeners(new DatasetChangeEvent(this, this));
     }
 
     /**
@@ -216,9 +209,9 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      * @param y  the value for this period.
      * @param seriesName  the name of the series to add the value.
      *
-     * @see #remove(TimePeriod, String)
+     * @see #remove(TimePeriod, Comparable)
      */
-    public void add(TimePeriod period, double y, String seriesName) {
+    public void add(TimePeriod period, double y, Comparable seriesName) {
         add(period, new Double(y), seriesName, true);
     }
 
@@ -226,15 +219,15 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      * Adds a new data item to the dataset and, if requested, sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param period  the time period (<code>null</code> not permitted).
-     * @param y  the value for this period (<code>null</code> permitted).
+     * @param period  the time period ({@code null} not permitted).
+     * @param y  the value for this period ({@code null} permitted).
      * @param seriesName  the name of the series to add the value
-     *                    (<code>null</code> not permitted).
+     *                    ({@code null} not permitted).
      * @param notify  whether dataset listener are notified or not.
      *
-     * @see #remove(TimePeriod, String, boolean)
+     * @see #remove(TimePeriod, Comparable, boolean)
      */
-    public void add(TimePeriod period, Number y, String seriesName,
+    public void add(TimePeriod period, Number y, Comparable seriesName,
                     boolean notify) {
         // here's a quirk - the API has been defined in terms of a plain
         // TimePeriod, which cannot make use of the timezone and locale
@@ -246,8 +239,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
         }
         this.values.addValue(y, period, seriesName);
         if (notify) {
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
@@ -255,13 +247,13 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      * Removes an existing data item from the dataset.
      *
      * @param period  the (existing!) time period of the value to remove
-     *                (<code>null</code> not permitted).
+     *                ({@code null} not permitted).
      * @param seriesName  the (existing!) series name to remove the value
-     *                    (<code>null</code> not permitted).
+     *                    ({@code null} not permitted).
      *
-     * @see #add(TimePeriod, double, String)
+     * @see #add(TimePeriod, double, Comparable)
      */
-    public void remove(TimePeriod period, String seriesName) {
+    public void remove(TimePeriod period, Comparable seriesName) {
         remove(period, seriesName, true);
     }
 
@@ -270,18 +262,18 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      * sends a {@link DatasetChangeEvent} to all registered listeners.
      *
      * @param period  the (existing!) time period of the value to remove
-     *                (<code>null</code> not permitted).
+     *                ({@code null} not permitted).
      * @param seriesName  the (existing!) series name to remove the value
-     *                    (<code>null</code> not permitted).
+     *                    ({@code null} not permitted).
      * @param notify  whether dataset listener are notified or not.
      *
-     * @see #add(TimePeriod, double, String)
+     * @see #add(TimePeriod, double, Comparable)
      */
-    public void remove(TimePeriod period, String seriesName, boolean notify) {
+    public void remove(TimePeriod period, Comparable seriesName,
+            boolean notify) {
         this.values.removeValue(period, seriesName);
         if (notify) {
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
@@ -294,8 +286,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
     public void clear() {
         if (this.values.getRowCount() > 0) {
             this.values.clear();
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
@@ -303,7 +294,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      * Returns the time period for the specified item.  Bear in mind that all
      * series share the same set of time periods.
      *
-     * @param item  the item index (0 <= i <= {@link #getItemCount()}).
+     * @param item  the item index (0 &lt;= i &lt;= {@link #getItemCount()}).
      *
      * @return The time period.
      */
@@ -316,6 +307,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount() {
         return this.values.getRowCount();
     }
@@ -329,6 +321,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The number of items within the series.
      */
+    @Override
     public int getItemCount(int series) {
         return getItemCount();
     }
@@ -338,6 +331,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The series count.
      */
+    @Override
     public int getSeriesCount() {
         return this.values.getColumnCount();
     }
@@ -349,6 +343,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The key for the series.
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         return this.values.getColumnKey(series);
     }
@@ -363,6 +358,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The x-value.
      */
+    @Override
     public Number getX(int series, int item) {
         return new Double(getXValue(series, item));
     }
@@ -375,6 +371,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public double getXValue(int series, int item) {
         TimePeriod period = (TimePeriod) this.values.getRowKey(item);
         return getXValue(period);
@@ -390,6 +387,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @see #getStartXValue(int, int)
      */
+    @Override
     public Number getStartX(int series, int item) {
         return new Double(getStartXValue(series, item));
     }
@@ -403,6 +401,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public double getStartXValue(int series, int item) {
         TimePeriod period = (TimePeriod) this.values.getRowKey(item);
         return period.getStart().getTime();
@@ -418,6 +417,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @see #getEndXValue(int, int)
      */
+    @Override
     public Number getEndX(int series, int item) {
         return new Double(getEndXValue(series, item));
     }
@@ -431,6 +431,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public double getEndXValue(int series, int item) {
         TimePeriod period = (TimePeriod) this.values.getRowKey(item);
         return period.getEnd().getTime();
@@ -442,8 +443,9 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return The y-value (possibly <code>null</code>).
+     * @return The y-value (possibly {@code null}).
      */
+    @Override
     public Number getY(int series, int item) {
         return this.values.getValue(item, series);
     }
@@ -456,6 +458,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The starting Y value for the specified series and item.
      */
+    @Override
     public Number getStartY(int series, int item) {
         return getY(series, item);
     }
@@ -468,6 +471,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The ending Y value for the specified series and item.
      */
+    @Override
     public Number getEndY(int series, int item) {
         return getY(series, item);
     }
@@ -503,6 +507,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The minimum value.
      */
+    @Override
     public double getDomainLowerBound(boolean includeInterval) {
         double result = Double.NaN;
         Range r = getDomainBounds(includeInterval);
@@ -520,6 +525,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The maximum value.
      */
+    @Override
     public double getDomainUpperBound(boolean includeInterval) {
         double result = Double.NaN;
         Range r = getDomainBounds(includeInterval);
@@ -537,6 +543,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The range.
      */
+    @Override
     public Range getDomainBounds(boolean includeInterval) {
         List keys = this.values.getRowKeys();
         if (keys.isEmpty()) {
@@ -558,10 +565,11 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
     /**
      * Tests this dataset for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -594,6 +602,7 @@ public class TimeTableXYDataset extends AbstractIntervalXYDataset
      *
      * @throws CloneNotSupportedException if the dataset cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         TimeTableXYDataset clone = (TimeTableXYDataset) super.clone();
         clone.values = (DefaultKeyedValues2D) this.values.clone();

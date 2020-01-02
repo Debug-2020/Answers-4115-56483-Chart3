@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * PieDatasetHandler.java
@@ -32,16 +32,16 @@
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
  *
- * Changes (from 21-Jun-2001)
- * --------------------------
+ * Changes
+ * -------
  * 23-Jan-2003 : Version 1 (DG);
  *
  */
 
 package org.jfree.data.xml;
 
-import org.jfree.data.pie.DefaultPieDataset;
-import org.jfree.data.pie.PieDataset;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -90,6 +90,7 @@ public class PieDatasetHandler extends RootHandler implements DatasetTags {
      *
      * @throws SAXException for errors.
      */
+    @Override
     public void startElement(String namespaceURI,
                              String localName,
                              String qName,
@@ -119,6 +120,7 @@ public class PieDatasetHandler extends RootHandler implements DatasetTags {
      *
      * @throws SAXException for errors.
      */
+    @Override
     public void endElement(String namespaceURI,
                            String localName,
                            String qName) throws SAXException {

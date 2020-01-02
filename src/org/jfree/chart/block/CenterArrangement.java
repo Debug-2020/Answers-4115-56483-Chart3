@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * CenterArrangement.java
@@ -37,7 +37,6 @@
  * 08-Mar-2005 : Version 1 (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 20-Jul-2006 : Set bounds of contained block when arranging (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -47,8 +46,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.List;
-
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.ui.Size2D;
 
 /**
  * Arranges a block in the center of its container.  This class is immutable.
@@ -72,6 +70,7 @@ public class CenterArrangement implements Arrangement, Serializable {
      * @param block  the block.
      * @param key  a key that controls the position of the block.
      */
+    @Override
     public void add(Block block, Object key) {
         // since the flow layout is relatively straightforward,
         // no information needs to be recorded here
@@ -79,7 +78,7 @@ public class CenterArrangement implements Arrangement, Serializable {
 
     /**
      * Calculates and sets the bounds of all the items in the specified
-     * container, subject to the given constraint.  The <code>Graphics2D</code>
+     * container, subject to the given constraint.  The {@code Graphics2D}
      * can be used by some items (particularly items containing text) to
      * calculate sizing parameters.
      *
@@ -89,6 +88,7 @@ public class CenterArrangement implements Arrangement, Serializable {
      *
      * @return The size of the container after arrangement of the contents.
      */
+    @Override
     public Size2D arrange(BlockContainer container, Graphics2D g2,
                           RectangleConstraint constraint) {
 
@@ -306,6 +306,7 @@ public class CenterArrangement implements Arrangement, Serializable {
     /**
      * Clears any cached information.
      */
+    @Override
     public void clear() {
         // no action required.
     }
@@ -313,10 +314,11 @@ public class CenterArrangement implements Arrangement, Serializable {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * CategoryTextAnnotation.java
  * ---------------------------
- * (C) Copyright 2003-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2017, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (patch 2809117);
@@ -43,10 +43,9 @@
  *               --> TextUtilities (DG);
  * ------------- JFREECHART 1.0.x -------------------------------------------
  * 06-Mar-2007 : Implemented hashCode() (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
- * 06-Jul-2007 : Updated for changes to CategoryAnnotation interface (DG);
  * 23-Apr-2008 : Implemented PublicCloneable (DG);
  * 24-Jun-2009 : Fire change events (see patch 2809117 by PK) (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -59,13 +58,14 @@ import java.io.Serializable;
 import org.jfree.chart.axis.CategoryAnchor;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.AnnotationChangeEvent;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.text.TextUtilities;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
 import org.jfree.data.category.CategoryDataset;
 
 /**
@@ -90,16 +90,14 @@ public class CategoryTextAnnotation extends TextAnnotation
     /**
      * Creates a new annotation to be displayed at the given location.
      *
-     * @param text  the text (<code>null</code> not permitted).
-     * @param category  the category (<code>null</code> not permitted).
+     * @param text  the text ({@code null} not permitted).
+     * @param category  the category ({@code null} not permitted).
      * @param value  the value.
      */
     public CategoryTextAnnotation(String text, Comparable category,
                                   double value) {
         super(text);
-        if (category == null) {
-            throw new IllegalArgumentException("Null 'category' argument.");
-        }
+        Args.nullNotPermitted(category, "category");
         this.category = category;
         this.value = value;
         this.categoryAnchor = CategoryAnchor.MIDDLE;
@@ -108,7 +106,7 @@ public class CategoryTextAnnotation extends TextAnnotation
     /**
      * Returns the category.
      *
-     * @return The category (never <code>null</code>).
+     * @return The category (never {@code null}).
      *
      * @see #setCategory(Comparable)
      */
@@ -117,17 +115,17 @@ public class CategoryTextAnnotation extends TextAnnotation
     }
 
     /**
-     * Sets the category that the annotation attaches to.
+     * Sets the category that the annotation attaches to and sends an
+     * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param category  the category (<code>null</code> not permitted).
+     * @param category  the category ({@code null} not permitted).
      *
      * @see #getCategory()
      */
     public void setCategory(Comparable category) {
-        if (category == null) {
-            throw new IllegalArgumentException("Null 'category' argument.");
-        }
+        Args.nullNotPermitted(category, "category");
         this.category = category;
+        fireAnnotationChanged();
     }
 
     /**
@@ -145,14 +143,12 @@ public class CategoryTextAnnotation extends TextAnnotation
      * Sets the category anchor point and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param anchor  the anchor point (<code>null</code> not permitted).
+     * @param anchor  the anchor point ({@code null} not permitted).
      *
      * @see #getCategoryAnchor()
      */
     public void setCategoryAnchor(CategoryAnchor anchor) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(anchor, "anchor");
         this.categoryAnchor = anchor;
         fireAnnotationChanged();
     }
@@ -189,12 +185,10 @@ public class CategoryTextAnnotation extends TextAnnotation
      * @param dataArea  the data area.
      * @param domainAxis  the domain axis.
      * @param rangeAxis  the range axis.
-     * @param rendererIndex  the renderer index.
-     * @param info  the plot info (<code>null</code> permitted).
      */
+    @Override
     public void draw(Graphics2D g2, CategoryPlot plot, Rectangle2D dataArea,
-            CategoryAxis domainAxis, ValueAxis rangeAxis,
-            int rendererIndex, PlotRenderingInfo info) {
+            CategoryAxis domainAxis, ValueAxis rangeAxis) {
 
         CategoryDataset dataset = plot.getDataset();
         int catIndex = dataset.getColumnIndex(this.category);
@@ -224,7 +218,7 @@ public class CategoryTextAnnotation extends TextAnnotation
         }
         g2.setFont(getFont());
         g2.setPaint(getPaint());
-        TextUtilities.drawRotatedString(getText(), g2, anchorX, anchorY,
+        TextUtils.drawRotatedString(getText(), g2, anchorX, anchorY,
                 getTextAnchor(), getRotationAngle(), getRotationAnchor());
 
     }
@@ -232,10 +226,11 @@ public class CategoryTextAnnotation extends TextAnnotation
     /**
      * Tests this object for equality with another.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -264,6 +259,7 @@ public class CategoryTextAnnotation extends TextAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = super.hashCode();
         result = 37 * result + this.category.hashCode();
@@ -281,6 +277,7 @@ public class CategoryTextAnnotation extends TextAnnotation
      * @throws CloneNotSupportedException  this class will not throw this
      *         exception, but subclasses (if any) might.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

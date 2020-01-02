@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------------
  * CategoryToolTipGenerator.java
@@ -36,13 +36,11 @@
  * -------
  * 15-Apr-2004 : Separated tool tip method from CategoryItemLabelGenerator
  *               interface (DG);
- * 21-Jun-2007 : Removed JCommon dependency (DG);
  *
  */
 
 package org.jfree.chart.labels;
 
-import org.jfree.chart.util.PublicCloneable;
 import org.jfree.data.category.CategoryDataset;
 
 /**
@@ -52,7 +50,8 @@ import org.jfree.data.category.CategoryDataset;
  * items in a {@link org.jfree.chart.plot.CategoryPlot}.
  * <p>
  * To assist with cloning charts, classes that implement this interface should
- * also implement the {@link PublicCloneable} interface.
+ * also implement the {@code org.jfree.util.PublicCloneable} interface (in
+ * JCommon).
  */
 public interface CategoryToolTipGenerator {
 
@@ -61,11 +60,11 @@ public interface CategoryToolTipGenerator {
      * current dataset implementation, each row is a series, and each column
      * contains values for a particular category.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The tooltip text (possibly <code>null</code>).
+     * @return The tooltip text (possibly {@code null}).
      */
     public String generateToolTip(CategoryDataset dataset, int row, int column);
 

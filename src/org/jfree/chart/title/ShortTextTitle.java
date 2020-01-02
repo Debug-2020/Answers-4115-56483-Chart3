@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * ShortTextTitle.java
  * -------------------
- * (C) Copyright 2008, by Object Refinery Limited.
+ * (C) Copyright 2008-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -46,9 +46,9 @@ import java.awt.geom.Rectangle2D;
 
 import org.jfree.chart.block.LengthConstraintType;
 import org.jfree.chart.block.RectangleConstraint;
-import org.jfree.chart.text.TextAnchor;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.Range;
 
 /**
@@ -65,7 +65,7 @@ public class ShortTextTitle extends TextTitle {
     /**
      * Creates a new title.
      *
-     * @param text  the text (<code>null</code> not permitted).
+     * @param text  the text ({@code null} not permitted).
      */
     public ShortTextTitle(String text) {
         setText(text);
@@ -82,6 +82,7 @@ public class ShortTextTitle extends TextTitle {
      *
      * @return The dimensions for the title.
      */
+    @Override
     public Size2D arrange(Graphics2D g2, RectangleConstraint constraint) {
         RectangleConstraint cc = toContentConstraint(constraint);
         LengthConstraintType w = cc.getWidthConstraintType();
@@ -121,6 +122,7 @@ public class ShortTextTitle extends TextTitle {
                 throw new RuntimeException("Not yet implemented.");
             }
         }
+        assert contentSize != null;
         if (contentSize.width <= 0.0 || contentSize.height <= 0.0) {
             return new Size2D(0.0, 0.0);
         }
@@ -138,6 +140,7 @@ public class ShortTextTitle extends TextTitle {
      *
      * @return The content size.
      */
+    @Override
     protected Size2D arrangeNN(Graphics2D g2) {
         Range max = new Range(0.0, Float.MAX_VALUE);
         return arrangeRR(g2, max, max);
@@ -152,6 +155,7 @@ public class ShortTextTitle extends TextTitle {
      *
      * @return The content size.
      */
+    @Override
     protected Size2D arrangeRN(Graphics2D g2, Range widthRange) {
         Size2D s = arrangeNN(g2);
         if (widthRange.contains(s.getWidth())) {
@@ -172,10 +176,11 @@ public class ShortTextTitle extends TextTitle {
      *
      * @return The content size.
      */
+    @Override
     protected Size2D arrangeFN(Graphics2D g2, double w) {
         g2.setFont(getFont());
         FontMetrics fm = g2.getFontMetrics(getFont());
-        Rectangle2D bounds = TextUtilities.getTextBounds(getText(), g2, fm);
+        Rectangle2D bounds = TextUtils.getTextBounds(getText(), g2, fm);
         if (bounds.getWidth() <= w) {
             return new Size2D(w, bounds.getHeight());
         }
@@ -193,12 +198,13 @@ public class ShortTextTitle extends TextTitle {
      *
      * @return The content size.
      */
+    @Override
     protected Size2D arrangeRR(Graphics2D g2, Range widthRange,
             Range heightRange) {
 
         g2.setFont(getFont());
         FontMetrics fm = g2.getFontMetrics(getFont());
-        Rectangle2D bounds = TextUtilities.getTextBounds(getText(), g2, fm);
+        Rectangle2D bounds = TextUtils.getTextBounds(getText(), g2, fm);
         if (bounds.getWidth() <= widthRange.getUpperBound()
                 && bounds.getHeight() <= heightRange.getUpperBound()) {
             return new Size2D(bounds.getWidth(), bounds.getHeight());
@@ -215,8 +221,9 @@ public class ShortTextTitle extends TextTitle {
      * @param area  the title area.
      * @param params  optional parameters (ignored here).
      *
-     * @return <code>null</code>.
+     * @return {@code null}.
      */
+    @Override
     public Object draw(Graphics2D g2, Rectangle2D area, Object params) {
         if (area.isEmpty()) {
             return null;
@@ -227,9 +234,8 @@ public class ShortTextTitle extends TextTitle {
         area = trimPadding(area);
         g2.setFont(getFont());
         g2.setPaint(getPaint());
-        TextUtilities.drawAlignedString(getText(), g2, (float) area.getMinX(),
+        TextUtils.drawAlignedString(getText(), g2, (float) area.getMinX(),
                 (float) area.getMinY(), TextAnchor.TOP_LEFT);
-
         return null;
     }
 

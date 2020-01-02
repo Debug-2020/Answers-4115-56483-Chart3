@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * SamplingXYLineRenderer.java
  * ---------------------------
- * (C) Copyright 2008, 2009, by Object Refinery Limited.
+ * (C) Copyright 2008-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,6 +39,7 @@
  *               getLegendLine() and setLegendLine() - these methods
  *               are unnecessary because a mechanism already exists in the
  *               superclass for specifying a custom legend shape (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -54,21 +55,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.RendererChangeEvent;
 import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.ShapeUtilities;
+import org.jfree.chart.util.SerialUtils;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.data.xy.XYDataset;
 
 /**
  * A renderer that draws line charts.  The renderer doesn't necessarily plot
  * every data item - instead, it tries to plot only those data items that
- * make a difference to the visual output (the other data items are skipped).
+ * make a difference to the visual output (the other data items are skipped).  
  * This renderer is designed for use with the {@link XYPlot} class.
  *
  * @since 1.0.13
@@ -84,10 +88,9 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
      */
     public SamplingXYLineRenderer() {
         this.legendLine = new Line2D.Double(-7.0, 0.0, 7.0, 0.0);
-        setBaseLegendShape(this.legendLine);
+        setDefaultLegendShape(this.legendLine);
         setTreatLegendShapeAsLine(true);
     }
-
 
     /**
      * Returns the number of passes through the data that the renderer requires
@@ -96,6 +99,7 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
      *
      * @return The pass count.
      */
+    @Override
     public int getPassCount() {
         return 1;
     }
@@ -163,6 +167,7 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
          * @param pass  the current pass index.
          * @param passCount  the number of passes.
          */
+        @Override
         public void startSeriesPass(XYDataset dataset, int series,
                 int firstItem, int lastItem, int pass, int passCount) {
             this.seriesPath.reset();
@@ -190,6 +195,7 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
      *
      * @return The renderer state.
      */
+    @Override
     public XYItemRendererState initialise(Graphics2D g2,
             Rectangle2D dataArea, XYPlot plot, XYDataset data,
             PlotRenderingInfo info) {
@@ -212,6 +218,7 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
      * @param g2  the graphics device.
      * @param state  the renderer state.
      * @param dataArea  the area within which the data is being drawn.
+     * @param info  collects information about the drawing.
      * @param plot  the plot (can be used to obtain standard color
      *              information etc).
      * @param domainAxis  the domain axis.
@@ -219,12 +226,15 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
      * @param dataset  the dataset.
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
+     * @param crosshairState  crosshair information for the plot
+     *                        ({@code null} permitted).
      * @param pass  the pass index.
      */
-    public void drawItem(Graphics2D g2, XYItemRendererState state,
-            Rectangle2D dataArea, XYPlot plot, ValueAxis domainAxis,
-            ValueAxis rangeAxis, XYDataset dataset, int series, int item,
-            boolean selected,int pass) {
+    @Override
+    public void drawItem(Graphics2D g2, XYItemRendererState state, 
+            Rectangle2D dataArea, PlotRenderingInfo info, XYPlot plot,
+            ValueAxis domainAxis, ValueAxis rangeAxis, XYDataset dataset,
+            int series, int item, CrosshairState crosshairState, int pass) {
 
         // do nothing if item is not visible
         if (!getItemVisible(series, item)) {
@@ -290,8 +300,8 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
                 count++;
                 pi.next();
             }
-            g2.setStroke(getItemStroke(series, item, selected));
-            g2.setPaint(getItemPaint(series, item, selected));
+            g2.setStroke(getItemStroke(series, item));
+            g2.setPaint(getItemPaint(series, item));
             g2.draw(s.seriesPath);
             g2.draw(s.intervalPath);
         }
@@ -304,10 +314,11 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
      *
      * @throws CloneNotSupportedException if the clone cannot be created.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         SamplingXYLineRenderer clone = (SamplingXYLineRenderer) super.clone();
         if (this.legendLine != null) {
-            clone.legendLine = ShapeUtilities.clone(this.legendLine);
+            clone.legendLine = ShapeUtils.clone(this.legendLine);
         }
         return clone;
     }
@@ -315,10 +326,11 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
     /**
      * Tests this renderer for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -330,7 +342,7 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
             return false;
         }
         SamplingXYLineRenderer that = (SamplingXYLineRenderer) obj;
-        if (!ShapeUtilities.equal(this.legendLine, that.legendLine)) {
+        if (!ShapeUtils.equal(this.legendLine, that.legendLine)) {
             return false;
         }
         return true;
@@ -347,7 +359,7 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
     private void readObject(ObjectInputStream stream)
             throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.legendLine = SerialUtilities.readShape(stream);
+        this.legendLine = SerialUtils.readShape(stream);
     }
 
     /**
@@ -359,7 +371,7 @@ public class SamplingXYLineRenderer extends AbstractXYItemRenderer
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeShape(this.legendLine, stream);
+        SerialUtils.writeShape(this.legendLine, stream);
     }
 
 }

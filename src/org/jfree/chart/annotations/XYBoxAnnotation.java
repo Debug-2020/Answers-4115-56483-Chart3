@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * XYBoxAnnotation.java
  * --------------------
- * (C) Copyright 2005-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2005-2017, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (see patch 2809117);
@@ -36,7 +36,6 @@
  * --------
  * 19-Jan-2005 : Version 1 (DG);
  * 06-Jun-2005 : Fixed equals() method to handle GradientPaint (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -58,11 +57,11 @@ import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A box annotation that can be placed on an {@link XYPlot}.  The
@@ -105,19 +104,19 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
      * @param y1  the upper y-coordinate of the box (in data space).
      */
     public XYBoxAnnotation(double x0, double y0, double x1, double y1) {
-        this(x0, y0, x1, y1, new BasicStroke(1.0f), Color.black);
+        this(x0, y0, x1, y1, new BasicStroke(1.0f), Color.BLACK);
     }
 
     /**
      * Creates a new annotation where the box is drawn as an outline using
-     * the specified <code>stroke</code> and <code>outlinePaint</code>.
+     * the specified {@code stroke} and {@code outlinePaint}.
      *
      * @param x0  the lower x-coordinate of the box (in data space).
      * @param y0  the lower y-coordinate of the box (in data space).
      * @param x1  the upper x-coordinate of the box (in data space).
      * @param y1  the upper y-coordinate of the box (in data space).
-     * @param stroke  the shape stroke (<code>null</code> permitted).
-     * @param outlinePaint  the shape color (<code>null</code> permitted).
+     * @param stroke  the shape stroke ({@code null} permitted).
+     * @param outlinePaint  the shape color ({@code null} permitted).
      */
     public XYBoxAnnotation(double x0, double y0, double x1, double y1,
                            Stroke stroke, Paint outlinePaint) {
@@ -131,9 +130,9 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
      * @param y0  the lower y-coordinate of the box (in data space).
      * @param x1  the upper x-coordinate of the box (in data space).
      * @param y1  the upper y-coordinate of the box (in data space).
-     * @param stroke  the shape stroke (<code>null</code> permitted).
-     * @param outlinePaint  the shape color (<code>null</code> permitted).
-     * @param fillPaint  the paint used to fill the shape (<code>null</code>
+     * @param stroke  the shape stroke ({@code null} permitted).
+     * @param outlinePaint  the shape color ({@code null} permitted).
+     * @param fillPaint  the paint used to fill the shape ({@code null}
      *                   permitted).
      */
     public XYBoxAnnotation(double x0, double y0, double x1, double y1,
@@ -160,6 +159,7 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
      * @param rendererIndex  the renderer index.
      * @param info  the plot rendering info.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                      ValueAxis domainAxis, ValueAxis rangeAxis,
                      int rendererIndex, PlotRenderingInfo info) {
@@ -204,10 +204,11 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
     /**
      * Tests this annotation for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -232,13 +233,13 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
         if (!(this.y1 == that.y1)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.stroke, that.stroke)) {
+        if (!ObjectUtils.equal(this.stroke, that.stroke)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.outlinePaint, that.outlinePaint)) {
+        if (!PaintUtils.equal(this.outlinePaint, that.outlinePaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.fillPaint, that.fillPaint)) {
+        if (!PaintUtils.equal(this.fillPaint, that.fillPaint)) {
             return false;
         }
         // seem to be the same
@@ -250,6 +251,7 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         long temp;
@@ -272,6 +274,7 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
      * @throws CloneNotSupportedException not thrown by this class, but may be
      *                                    by subclasses.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -279,21 +282,21 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
     /**
      * Provides serialization support.
      *
-     * @param stream  the output stream (<code>null</code> not permitted).
+     * @param stream  the output stream ({@code null} not permitted).
      *
      * @throws IOException if there is an I/O error.
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeStroke(this.stroke, stream);
-        SerialUtilities.writePaint(this.outlinePaint, stream);
-        SerialUtilities.writePaint(this.fillPaint, stream);
+        SerialUtils.writeStroke(this.stroke, stream);
+        SerialUtils.writePaint(this.outlinePaint, stream);
+        SerialUtils.writePaint(this.fillPaint, stream);
     }
 
     /**
      * Provides serialization support.
      *
-     * @param stream  the input stream (<code>null</code> not permitted).
+     * @param stream  the input stream ({@code null} not permitted).
      *
      * @throws IOException  if there is an I/O error.
      * @throws ClassNotFoundException  if there is a classpath problem.
@@ -302,9 +305,9 @@ public class XYBoxAnnotation extends AbstractXYAnnotation
         throws IOException, ClassNotFoundException {
 
         stream.defaultReadObject();
-        this.stroke = SerialUtilities.readStroke(stream);
-        this.outlinePaint = SerialUtilities.readPaint(stream);
-        this.fillPaint = SerialUtilities.readPaint(stream);
+        this.stroke = SerialUtils.readStroke(stream);
+        this.outlinePaint = SerialUtils.readPaint(stream);
+        this.fillPaint = SerialUtils.readPaint(stream);
     }
 
 }

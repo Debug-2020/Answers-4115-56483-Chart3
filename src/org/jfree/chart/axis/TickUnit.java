@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------
  * TickUnit.java
@@ -32,8 +32,8 @@
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
  *
- * Changes (from 19-Dec-2001)
- * --------------------------
+ * Changes
+ * -------
  * 19-Dec-2001 : Added standard header (DG);
  * 01-May-2002 : Changed the unit size from Number to double (DG);
  * 26-Sep-2002 : Fixed errors reported by Checkstyle (DG);
@@ -135,10 +135,11 @@ public abstract class TickUnit implements Comparable, Serializable {
      *
      * @param object  the object to compare against.
      *
-     * @return <code>1</code> if the size of the other object is less than this,
-     *      <code>0</code> if both have the same size and <code>-1</code> this
+     * @return {@code 1} if the size of the other object is less than this,
+     *      {@code 0} if both have the same size and {@code -1} this
      *      size is less than the others.
      */
+    @Override
     public int compareTo(Object object) {
 
         if (object instanceof TickUnit) {
@@ -164,8 +165,9 @@ public abstract class TickUnit implements Comparable, Serializable {
      *
      * @param obj  the object.
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -188,6 +190,7 @@ public abstract class TickUnit implements Comparable, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         long temp = this.size != +0.0d ? Double.doubleToLongBits(this.size)
                 : 0L;

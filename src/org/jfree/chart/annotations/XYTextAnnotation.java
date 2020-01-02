@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * XYTextAnnotation.java
  * ---------------------
- * (C) Copyright 2002-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2002-2017, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (patch 2809117);
@@ -47,7 +47,6 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 26-Jan-2006 : Fixed equals() method (bug 1415480) (DG);
  * 06-Mar-2007 : Added argument checks, re-implemented hashCode() method (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 12-Feb-2009 : Added background paint and outline paint/stroke (DG);
  * 01-Apr-2009 : Fixed bug in hotspot calculation (DG);
  * 24-Jun-2009 : Fire change events (see patch 2809117) (DG);
@@ -69,18 +68,20 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.AnnotationChangeEvent;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.text.TextAnchor;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A text annotation that can be placed at a particular (x, y) location on an
@@ -93,10 +94,11 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     private static final long serialVersionUID = -2946063342782506328L;
 
     /** The default font. */
-    public static final Font DEFAULT_FONT = new Font("Tahoma", Font.PLAIN, 10);
+    public static final Font DEFAULT_FONT = new Font("SansSerif", Font.PLAIN,
+            10);
 
     /** The default paint. */
-    public static final Paint DEFAULT_PAINT = Color.black;
+    public static final Paint DEFAULT_PAINT = Color.BLACK;
 
     /** The default text anchor. */
     public static final TextAnchor DEFAULT_TEXT_ANCHOR = TextAnchor.CENTER;
@@ -164,15 +166,13 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * coordinates are specified in data space (they will be converted to
      * Java2D space for display).
      *
-     * @param text  the text (<code>null</code> not permitted).
+     * @param text  the text ({@code null} not permitted).
      * @param x  the x-coordinate (in data space).
      * @param y  the y-coordinate (in data space).
      */
     public XYTextAnnotation(String text, double x, double y) {
         super();
-        if (text == null) {
-            throw new IllegalArgumentException("Null 'text' argument.");
-        }
+        Args.nullNotPermitted(text, "text");
         this.text = text;
         this.font = DEFAULT_FONT;
         this.paint = DEFAULT_PAINT;
@@ -185,14 +185,14 @@ public class XYTextAnnotation extends AbstractXYAnnotation
         // by default the outline and background won't be visible
         this.backgroundPaint = null;
         this.outlineVisible = false;
-        this.outlinePaint = Color.black;
+        this.outlinePaint = Color.BLACK;
         this.outlineStroke = new BasicStroke(0.5f);
     }
 
     /**
      * Returns the text for the annotation.
      *
-     * @return The text (never <code>null</code>).
+     * @return The text (never {@code null}).
      *
      * @see #setText(String)
      */
@@ -203,21 +203,20 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Sets the text for the annotation.
      *
-     * @param text  the text (<code>null</code> not permitted).
+     * @param text  the text ({@code null} not permitted).
      *
      * @see #getText()
      */
     public void setText(String text) {
-        if (text == null) {
-            throw new IllegalArgumentException("Null 'text' argument.");
-        }
+        Args.nullNotPermitted(text, "text");
         this.text = text;
+        fireAnnotationChanged();
     }
 
     /**
      * Returns the font for the annotation.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setFont(Font)
      */
@@ -229,14 +228,12 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * Sets the font for the annotation and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getFont()
      */
     public void setFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.font = font;
         fireAnnotationChanged();
     }
@@ -244,7 +241,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Returns the paint for the annotation.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setPaint(Paint)
      */
@@ -256,14 +253,12 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * Sets the paint for the annotation and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPaint()
      */
     public void setPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.paint = paint;
         fireAnnotationChanged();
     }
@@ -271,7 +266,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Returns the text anchor.
      *
-     * @return The text anchor (never <code>null</code>).
+     * @return The text anchor (never {@code null}).
      *
      * @see #setTextAnchor(TextAnchor)
      */
@@ -284,14 +279,12 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * aligned to the (x, y) coordinate of the annotation) and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param anchor  the anchor point (<code>null</code> not permitted).
+     * @param anchor  the anchor point ({@code null} not permitted).
      *
      * @see #getTextAnchor()
      */
     public void setTextAnchor(TextAnchor anchor) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(anchor, "anchor");
         this.textAnchor = anchor;
         fireAnnotationChanged();
     }
@@ -299,7 +292,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Returns the rotation anchor.
      *
-     * @return The rotation anchor point (never <code>null</code>).
+     * @return The rotation anchor point (never {@code null}).
      *
      * @see #setRotationAnchor(TextAnchor)
      */
@@ -311,14 +304,12 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * Sets the rotation anchor point and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param anchor  the anchor (<code>null</code> not permitted).
+     * @param anchor  the anchor ({@code null} not permitted).
      *
      * @see #getRotationAnchor()
      */
     public void setRotationAnchor(TextAnchor anchor) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(anchor, "anchor");
         this.rotationAnchor = anchor;
         fireAnnotationChanged();
     }
@@ -402,7 +393,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Returns the background paint for the annotation.
      *
-     * @return The background paint (possibly <code>null</code>).
+     * @return The background paint (possibly {@code null}).
      *
      * @see #setBackgroundPaint(Paint)
      *
@@ -416,7 +407,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * Sets the background paint for the annotation and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      *
      * @see #getBackgroundPaint()
      *
@@ -430,7 +421,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Returns the outline paint for the annotation.
      *
-     * @return The outline paint (never <code>null</code>).
+     * @return The outline paint (never {@code null}).
      *
      * @see #setOutlinePaint(Paint)
      *
@@ -444,16 +435,14 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * Sets the outline paint for the annotation and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getOutlinePaint()
      *
      * @since 1.0.13
      */
     public void setOutlinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.outlinePaint = paint;
         fireAnnotationChanged();
     }
@@ -461,7 +450,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Returns the outline stroke for the annotation.
      *
-     * @return The outline stroke (never <code>null</code>).
+     * @return The outline stroke (never {@code null}).
      *
      * @see #setOutlineStroke(Stroke)
      *
@@ -475,16 +464,14 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * Sets the outline stroke for the annotation and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      *
      * @see #getOutlineStroke()
      *
      * @since 1.0.13
      */
     public void setOutlineStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.outlineStroke = stroke;
         fireAnnotationChanged();
     }
@@ -525,10 +512,10 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      * @param info  an optional info object that will be populated with
      *              entity information.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                      ValueAxis domainAxis, ValueAxis rangeAxis,
-                     int rendererIndex,
-                     PlotRenderingInfo info) {
+                     int rendererIndex, PlotRenderingInfo info) {
 
         PlotOrientation orientation = plot.getOrientation();
         RectangleEdge domainEdge = Plot.resolveDomainAxisLocation(
@@ -548,7 +535,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
         }
 
         g2.setFont(getFont());
-        Shape hotspot = TextUtilities.calculateRotatedStringBounds(
+        Shape hotspot = TextUtils.calculateRotatedStringBounds(
                 getText(), g2, anchorX, anchorY, getTextAnchor(),
                 getRotationAngle(), getRotationAnchor());
         if (this.backgroundPaint != null) {
@@ -556,7 +543,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
             g2.fill(hotspot);
         }
         g2.setPaint(getPaint());
-        TextUtilities.drawRotatedString(getText(), g2, anchorX, anchorY,
+        TextUtils.drawRotatedString(getText(), g2, anchorX, anchorY,
                 getTextAnchor(), getRotationAngle(), getRotationAnchor());
         if (this.outlineVisible) {
             g2.setStroke(this.outlineStroke);
@@ -575,10 +562,11 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     /**
      * Tests this annotation for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -599,7 +587,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
         if (!this.font.equals(that.font)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.paint, that.paint)) {
+        if (!PaintUtils.equal(this.paint, that.paint)) {
             return false;
         }
         if (!this.rotationAnchor.equals(that.rotationAnchor)) {
@@ -614,10 +602,10 @@ public class XYTextAnnotation extends AbstractXYAnnotation
         if (this.outlineVisible != that.outlineVisible) {
             return false;
         }
-        if (!PaintUtilities.equal(this.backgroundPaint, that.backgroundPaint)) {
+        if (!PaintUtils.equal(this.backgroundPaint, that.backgroundPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.outlinePaint, that.outlinePaint)) {
+        if (!PaintUtils.equal(this.outlinePaint, that.outlinePaint)) {
             return false;
         }
         if (!(this.outlineStroke.equals(that.outlineStroke))) {
@@ -631,11 +619,12 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
-        result = 37 * this.text.hashCode();
-        result = 37 * this.font.hashCode();
-        result = 37 * result + HashUtilities.hashCodeForPaint(this.paint);
+        result = 37 * result + this.text.hashCode();
+        result = 37 * result + this.font.hashCode();
+        result = 37 * result + HashUtils.hashCodeForPaint(this.paint);
         long temp = Double.doubleToLongBits(this.x);
         result = 37 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(this.y);
@@ -654,6 +643,7 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      *
      * @throws CloneNotSupportedException  if the annotation can't be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -667,10 +657,10 @@ public class XYTextAnnotation extends AbstractXYAnnotation
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
-        SerialUtilities.writePaint(this.backgroundPaint, stream);
-        SerialUtilities.writePaint(this.outlinePaint, stream);
-        SerialUtilities.writeStroke(this.outlineStroke, stream);
+        SerialUtils.writePaint(this.paint, stream);
+        SerialUtils.writePaint(this.backgroundPaint, stream);
+        SerialUtils.writePaint(this.outlinePaint, stream);
+        SerialUtils.writeStroke(this.outlineStroke, stream);
     }
 
     /**
@@ -684,10 +674,10 @@ public class XYTextAnnotation extends AbstractXYAnnotation
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
-        this.backgroundPaint = SerialUtilities.readPaint(stream);
-        this.outlinePaint = SerialUtilities.readPaint(stream);
-        this.outlineStroke = SerialUtilities.readStroke(stream);
+        this.paint = SerialUtils.readPaint(stream);
+        this.backgroundPaint = SerialUtils.readPaint(stream);
+        this.outlinePaint = SerialUtils.readPaint(stream);
+        this.outlineStroke = SerialUtils.readStroke(stream);
     }
 
 }

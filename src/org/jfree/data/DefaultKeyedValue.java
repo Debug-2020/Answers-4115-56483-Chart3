@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * DefaultKeyedValue.java
  * ----------------------
- * (C) Copyright 2002-2008, by Object Refinery Limited.
+ * (C) Copyright 2002-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -41,16 +41,16 @@
  * 15-Sep-2004 : Added PublicCloneable interface (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 11-Jun-2007 : Added toString() method to help with debugging (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 15-Feb-2008 : Prevent null key (DG);
  * 07-Apr-2008 : Removed to-do item (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.data;
 
 import java.io.Serializable;
-
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -72,14 +72,12 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
     /**
      * Creates a new (key, value) item.
      *
-     * @param key  the key (should be immutable, <code>null</code> not
+     * @param key  the key (should be immutable, {@code null} not
      *         permitted).
-     * @param value  the value (<code>null</code> permitted).
+     * @param value  the value ({@code null} permitted).
      */
     public DefaultKeyedValue(Comparable key, Number value) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         this.key = key;
         this.value = value;
     }
@@ -87,8 +85,9 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
     /**
      * Returns the key.
      *
-     * @return The key (never <code>null</code>).
+     * @return The key (never {@code null}).
      */
+    @Override
     public Comparable getKey() {
         return this.key;
     }
@@ -96,8 +95,9 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
     /**
      * Returns the value.
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      */
+    @Override
     public Number getValue() {
         return this.value;
     }
@@ -105,7 +105,7 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
     /**
      * Sets the value.
      *
-     * @param value  the value (<code>null</code> permitted).
+     * @param value  the value ({@code null} permitted).
      */
     public synchronized void setValue(Number value) {
         this.value = value;
@@ -114,10 +114,11 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
     /**
      * Tests this key-value pair for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -142,6 +143,7 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         result = (this.key != null ? this.key.hashCode() : 0);
@@ -159,9 +161,9 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
      * @throws CloneNotSupportedException Not thrown by this class, but
      *         subclasses (if any) might.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
-        DefaultKeyedValue clone = (DefaultKeyedValue) super.clone();
-        return clone;
+        return (DefaultKeyedValue) super.clone();
     }
 
     /**
@@ -170,6 +172,7 @@ public class DefaultKeyedValue implements KeyedValue, Cloneable,
      *
      * @return A string.
      */
+    @Override
     public String toString() {
         return "(" + this.key.toString() + ", " + this.value.toString() + ")";
     }

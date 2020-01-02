@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------
  * ImageEncoderFactory.java
  * ------------------------
- * (C) Copyright 2004-2008, by Richard Atkinson and Contributors.
+ * (C) Copyright 2004-2012, by Richard Atkinson and Contributors.
  *
  * Original Author:  Richard Atkinson;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -39,19 +39,23 @@
  *               dependency on com.sun.* which isn't available on all
  *               implementations (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- *
+ * 06-Jul-2008 : Remove encoder only used in JDK 1.3 (DG);
+ * 
  */
 
 package org.jfree.chart.encoders;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Factory class for returning {@link ImageEncoder}s for different
  * {@link ImageFormat}s.
  */
 public class ImageEncoderFactory {
-    private static Hashtable encoders = null;
+
+    /** Storage for the encoders. */
+    private static Map encoders = null;
 
     static {
         init();
@@ -62,22 +66,9 @@ public class ImageEncoderFactory {
      * SunPNGEncoderAdapter class is available).
      */
     private static void init() {
-        encoders = new Hashtable();
+        encoders = new HashMap();
         encoders.put("jpeg", "org.jfree.chart.encoders.SunJPEGEncoderAdapter");
-        try {
-            //  Test for being run under JDK 1.4+
-            Class.forName("javax.imageio.ImageIO");
-            //  Test for JFreeChart being compiled under JDK 1.4+
-            Class.forName("org.jfree.chart.encoders.SunPNGEncoderAdapter");
-            encoders.put("png",
-                    "org.jfree.chart.encoders.SunPNGEncoderAdapter");
-            encoders.put("jpeg",
-                    "org.jfree.chart.encoders.SunJPEGEncoderAdapter");
-        }
-        catch (ClassNotFoundException e) {
-            encoders.put("png",
-                    "org.jfree.chart.encoders.KeypointPNGEncoderAdapter");
-        }
+        encoders.put("png", "org.jfree.chart.encoders.SunPNGEncoderAdapter");
     }
 
     /**
@@ -96,7 +87,7 @@ public class ImageEncoderFactory {
      *
      * @param format  The image format required.
      *
-     * @return The ImageEncoder or <code>null</code> if none available.
+     * @return The ImageEncoder or {@code null} if none available.
      */
     public static ImageEncoder newInstance(String format) {
         ImageEncoder imageEncoder = null;
@@ -121,7 +112,7 @@ public class ImageEncoderFactory {
      * @param format  The image format required.
      * @param quality  The quality to be set before returning.
      *
-     * @return The ImageEncoder or <code>null</code> if none available.
+     * @return The ImageEncoder or {@code null} if none available.
      */
     public static ImageEncoder newInstance(String format, float quality) {
         ImageEncoder imageEncoder = newInstance(format);
@@ -135,7 +126,7 @@ public class ImageEncoderFactory {
      * @param format  The image format required.
      * @param encodingAlpha  Sets whether alpha transparency should be encoded.
      *
-     * @return The ImageEncoder or <code>null</code> if none available.
+     * @return The ImageEncoder or {@code null} if none available.
      */
     public static ImageEncoder newInstance(String format,
                                            boolean encodingAlpha) {
@@ -151,7 +142,7 @@ public class ImageEncoderFactory {
      * @param quality  The quality to be set before returning.
      * @param encodingAlpha  Sets whether alpha transparency should be encoded.
      *
-     * @return The ImageEncoder or <code>null</code> if none available.
+     * @return The ImageEncoder or {@code null} if none available.
      */
     public static ImageEncoder newInstance(String format, float quality,
                                            boolean encodingAlpha) {

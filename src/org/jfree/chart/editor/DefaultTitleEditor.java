@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * DefaultTitleEditor.java
@@ -36,7 +36,8 @@
  * Changes
  * -------
  * 24-Nov-2005 : Version 1, based on TitlePropertyEditPanel.java (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
+ *               Jess Thrysoee (DG);
  *
  */
 
@@ -205,6 +206,7 @@ class DefaultTitleEditor extends JPanel implements ActionListener {
      *
      * @param event  the event
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
 
         String command = event.getActionCommand();
@@ -248,7 +250,7 @@ class DefaultTitleEditor extends JPanel implements ActionListener {
      */
     public void attemptPaintSelection() {
         Paint p = this.titlePaint.getPaint();
-        Color defaultColor = (p instanceof Color ? (Color) p : Color.blue);
+        Color defaultColor = (p instanceof Color ? (Color) p : Color.BLUE);
         Color c = JColorChooser.showDialog(
             this, localizationResources.getString("Title_Color"), defaultColor
         );

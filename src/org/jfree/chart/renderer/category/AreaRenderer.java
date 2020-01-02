@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * AreaRenderer.java
  * -----------------
- * (C) Copyright 2002-2009, by Jon Iles and Contributors.
+ * (C) Copyright 2002-2016, by Jon Iles and Contributors.
  *
  * Original Author:  Jon Iles;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -64,10 +64,12 @@
  * 20-Apr-2007 : Updated getLegendItem() for renderer change (DG);
  * 17-May-2007 : Set datasetIndex and seriesIndex in getLegendItem() (DG);
  * 18-May-2007 : Set dataset and seriesKey for LegendItem (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 17-Jun-2008 : Apply legend shape, font and paint attributes (DG);
  * 26-Jun-2008 : Added crosshair support (DG);
- *
+ * 26-May-2009 : Support AreaRendererEndType.LEVEL (DG);
+ * 27-May-2009 : Fixed item label anchor for horizontal orientation (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
+ * 
  */
 
 package org.jfree.chart.renderer.category;
@@ -88,18 +90,19 @@ import org.jfree.chart.event.RendererChangeEvent;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.AreaRendererEndType;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
 import org.jfree.data.category.CategoryDataset;
 
 /**
  * A category item renderer that draws area charts.  You can use this renderer
  * with the {@link CategoryPlot} class.  The example shown here is generated
- * by the <code>AreaChartDemo1.java</code> program included in the JFreeChart
+ * by the {@code AreaChartDemo1.java} program included in the JFreeChart
  * Demo Collection:
  * <br><br>
  * <img src="../../../../../images/AreaRendererSample.png"
- * alt="AreaRendererSample.png" />
+ * alt="AreaRendererSample.png">
  */
 public class AreaRenderer extends AbstractCategoryItemRenderer
         implements Cloneable, PublicCloneable, Serializable {
@@ -116,14 +119,14 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
     public AreaRenderer() {
         super();
         this.endType = AreaRendererEndType.TAPER;
-        setBaseLegendShape(new Rectangle2D.Double(-4.0, -4.0, 8.0, 8.0));
+        setDefaultLegendShape(new Rectangle2D.Double(-4.0, -4.0, 8.0, 8.0));
     }
 
     /**
      * Returns a token that controls how the renderer draws the end points.
      * The default value is {@link AreaRendererEndType#TAPER}.
      *
-     * @return The end type (never <code>null</code>).
+     * @return The end type (never {@code null}).
      *
      * @see #setEndType
      */
@@ -135,14 +138,12 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
      * Sets a token that controls how the renderer draws the end points, and
      * sends a {@link RendererChangeEvent} to all registered listeners.
      *
-     * @param type  the end type (<code>null</code> not permitted).
+     * @param type  the end type ({@code null} not permitted).
      *
      * @see #getEndType()
      */
     public void setEndType(AreaRendererEndType type) {
-        if (type == null) {
-            throw new IllegalArgumentException("Null 'type' argument.");
-        }
+        Args.nullNotPermitted(type, "type");
         this.endType = type;
         fireChangeEvent();
     }
@@ -155,6 +156,7 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
      *
      * @return The legend item.
      */
+    @Override
     public LegendItem getLegendItem(int datasetIndex, int series) {
 
         // if there is no plot, there is no dataset to access...
@@ -214,15 +216,13 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
      * @param dataset  the dataset.
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
-     * @param selected  is the item selected?
      * @param pass  the pass index.
-     *
-     * @since 1.2.0
      */
+    @Override
     public void drawItem(Graphics2D g2, CategoryItemRendererState state,
             Rectangle2D dataArea, CategoryPlot plot, CategoryAxis domainAxis,
             ValueAxis rangeAxis, CategoryDataset dataset, int row, int column,
-            boolean selected, int pass) {
+            int pass) {
 
         // do nothing if item is not visible or null
         if (!getItemVisible(row, column)) {
@@ -286,8 +286,8 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
         float yz = (float) rangeAxis.valueToJava2D(0.0, dataArea, edge);
         double labelXX = x1;
         double labelYY = y1;
-        g2.setPaint(getItemPaint(row, column, selected));
-        g2.setStroke(getItemStroke(row, column, selected));
+        g2.setPaint(getItemPaint(row, column));
+        g2.setStroke(getItemStroke(row, column));
 
         GeneralPath area = new GeneralPath();
 
@@ -310,25 +310,25 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
         }
         area.closePath();
 
-        g2.setPaint(getItemPaint(row, column, selected));
+        g2.setPaint(getItemPaint(row, column));
         g2.fill(area);
 
         // draw the item labels if there are any...
-        if (isItemLabelVisible(row, column, selected)) {
-            drawItemLabel(g2, orientation, dataset, row, column, selected, 
-                    labelXX, labelYY, (value.doubleValue() < 0.0));
+        if (isItemLabelVisible(row, column)) {
+            drawItemLabel(g2, orientation, dataset, row, column, labelXX,
+                    labelYY, (value.doubleValue() < 0.0));
         }
 
         // submit the current data point as a crosshair candidate
         int datasetIndex = plot.indexOf(dataset);
-        updateCrosshairValues(state.getCrosshairState(),
+        updateCrosshairValues(state.getCrosshairState(), 
                 dataset.getRowKey(row), dataset.getColumnKey(column), yy1,
                 datasetIndex, x1, y1, orientation);
 
         // add an item entity, if this information is being collected
         EntityCollection entities = state.getEntityCollection();
         if (entities != null) {
-            addEntity(entities, area, dataset, row, column, selected);
+            addItemEntity(entities, dataset, row, column, area);
         }
 
     }
@@ -336,10 +336,11 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object to test (<code>null</code> permitted).
+     * @param obj  the object to test ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -361,6 +362,7 @@ public class AreaRenderer extends AbstractCategoryItemRenderer
      *
      * @throws CloneNotSupportedException  should not happen.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

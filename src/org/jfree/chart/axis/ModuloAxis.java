@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * ModuloAxis.java
  * ---------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,7 +35,6 @@
  * Changes
  * -------
  * 13-Aug-2004 : Version 1 (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 13-Nov-2007 : Implemented equals() (DG);
  *
  */
@@ -45,7 +44,7 @@ package org.jfree.chart.axis;
 import java.awt.geom.Rectangle2D;
 
 import org.jfree.chart.event.AxisChangeEvent;
-import org.jfree.chart.util.RectangleEdge;
+import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.Range;
 
 /**
@@ -61,7 +60,7 @@ public class ModuloAxis extends NumberAxis {
     private Range fixedRange;
 
     /**
-     * The display start value (this will sometimes be > displayEnd, in which
+     * The display start value (this will sometimes be &gt; displayEnd, in which
      * case the axis wraps around at some point in the middle of the axis).
      */
     private double displayStart;
@@ -74,8 +73,8 @@ public class ModuloAxis extends NumberAxis {
     /**
      * Creates a new axis.
      *
-     * @param label  the axis label (<code>null</code> permitted).
-     * @param fixedRange  the fixed range (<code>null</code> not permitted).
+     * @param label  the axis label ({@code null} permitted).
+     * @param fixedRange  the fixed range ({@code null} not permitted).
      */
     public ModuloAxis(String label, Range fixedRange) {
         super(label);
@@ -126,6 +125,7 @@ public class ModuloAxis extends NumberAxis {
      * This method should calculate a range that will show all the data values.
      * For now, it just sets the axis range to the fixedRange.
      */
+    @Override
     protected void autoAdjustRange() {
         setRange(this.fixedRange, false, false);
     }
@@ -139,9 +139,10 @@ public class ModuloAxis extends NumberAxis {
      *
      * @return A Java2D coordinate.
      */
+    @Override
     public double valueToJava2D(double value, Rectangle2D area,
                                 RectangleEdge edge) {
-        double result = 0.0;
+        double result;
         double v = mapValueToFixedRange(value);
         if (this.displayStart < this.displayEnd) {  // regular number axis
             result = trans(v, area, edge);
@@ -297,8 +298,9 @@ public class ModuloAxis extends NumberAxis {
      *
      * @return The Java2D coordinate.
      */
+    @Override
     public double java2DToValue(double java2DValue, Rectangle2D area,
-                                RectangleEdge edge) {
+            RectangleEdge edge) {
         double result = 0.0;
         if (this.displayStart < this.displayEnd) {  // regular number axis
             result = super.java2DToValue(java2DValue, area, edge);
@@ -330,9 +332,8 @@ public class ModuloAxis extends NumberAxis {
      * @return The central value.
      */
     private double getDisplayCentralValue() {
-        return mapValueToFixedRange(
-            this.displayStart + (getDisplayLength() / 2)
-        );
+        return mapValueToFixedRange(this.displayStart 
+                + (getDisplayLength() / 2));
     }
 
     /**
@@ -345,6 +346,7 @@ public class ModuloAxis extends NumberAxis {
      *
      * @param percent  the resize factor.
      */
+    @Override
     public void resizeRange(double percent) {
         resizeRange(percent, getDisplayCentralValue());
     }
@@ -360,6 +362,7 @@ public class ModuloAxis extends NumberAxis {
      * @param percent  the resize factor.
      * @param anchorValue  the new central value after the resize.
      */
+    @Override
     public void resizeRange(double percent, double anchorValue) {
 
         if (percent > 0.0) {
@@ -382,6 +385,7 @@ public class ModuloAxis extends NumberAxis {
      *
      * @return The length in Java2D coordinates.
      */
+    @Override
     public double lengthToJava2D(double length, Rectangle2D area,
                                  RectangleEdge edge) {
         double axisLength = 0.0;
@@ -392,7 +396,7 @@ public class ModuloAxis extends NumberAxis {
             axisLength = (this.fixedRange.getUpperBound() - this.displayStart)
                 + (this.displayEnd - this.fixedRange.getLowerBound());
         }
-        double areaLength = 0.0;
+        double areaLength;
         if (RectangleEdge.isLeftOrRight(edge)) {
             areaLength = area.getHeight();
         }
@@ -405,10 +409,11 @@ public class ModuloAxis extends NumberAxis {
     /**
      * Tests this axis for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

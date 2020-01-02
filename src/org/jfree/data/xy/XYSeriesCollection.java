@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * XYSeriesCollection.java
  * -----------------------
- * (C) Copyright 2001-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2001-2013, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Aaron Metzger;
@@ -50,7 +50,6 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 27-Nov-2006 : Added clone() override (DG);
  * 08-May-2007 : Added indexOf(XYSeries) method (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 03-Dec-2007 : Added getSeries(Comparable) method (DG);
  * 22-Apr-2008 : Implemented PublicCloneable (DG);
  * 27-Feb-2009 : Overridden getDomainOrder() to detect when all series are
@@ -58,37 +57,41 @@
  * 06-Mar-2009 : Implemented RangeInfo (DG);
  * 06-Mar-2009 : Fixed equals() implementation (DG);
  * 10-Jun-2009 : Simplified code in getX() and getY() methods (DG);
- * 29-Jun-2009 : Implemented XYDatasetSelectionState and
- *               SelectableXYDataset (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
+ * 21-Nov-2013 : Fixed bug where removeSeries(int) was not deregistering 
+ *               vetoable listener (DG);
  *
  */
 
 package org.jfree.data.xy;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jfree.chart.event.DatasetChangeInfo;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 import org.jfree.data.DomainInfo;
 import org.jfree.data.DomainOrder;
 import org.jfree.data.Range;
 import org.jfree.data.RangeInfo;
 import org.jfree.data.UnknownKeyException;
-import org.jfree.data.event.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.Series;
 
 /**
  * Represents a collection of {@link XYSeries} objects that can be used as a
  * dataset.
  */
 public class XYSeriesCollection extends AbstractIntervalXYDataset
-        implements IntervalXYDataset, DomainInfo, RangeInfo,
-        XYDatasetSelectionState, SelectableXYDataset, PublicCloneable,
-        Serializable {
+        implements IntervalXYDataset, DomainInfo, RangeInfo, 
+        VetoableChangeListener, PublicCloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -7590013825931496766L;
@@ -109,7 +112,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
     /**
      * Constructs a dataset and populates it with a single series.
      *
-     * @param series  the series (<code>null</code> ignored).
+     * @param series  the series ({@code null} ignored).
      */
     public XYSeriesCollection(XYSeries series) {
         this.data = new java.util.ArrayList();
@@ -118,8 +121,8 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
         if (series != null) {
             this.data.add(series);
             series.addChangeListener(this);
+            series.addVetoableChangeListener(this);
         }
-        setSelectionState(this);
     }
 
     /**
@@ -127,6 +130,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The domain order.
      */
+    @Override
     public DomainOrder getDomainOrder() {
         int seriesCount = getSeriesCount();
         for (int i = 0; i < seriesCount; i++) {
@@ -142,16 +146,22 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      * Adds a series to the collection and sends a {@link DatasetChangeEvent}
      * to all registered listeners.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
+     * 
+     * @throws IllegalArgumentException if the key for the series is null or
+     *     not unique within the dataset.
      */
     public void addSeries(XYSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
+        Args.nullNotPermitted(series, "series");
+        if (getSeriesIndex(series.getKey()) >= 0) {
+            throw new IllegalArgumentException(
+                "This dataset already contains a series with the key " 
+                + series.getKey());
         }
         this.data.add(series);
         series.addChangeListener(this);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        series.addVetoableChangeListener(this);
+        fireDatasetChanged();
     }
 
     /**
@@ -164,30 +174,25 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
         if ((series < 0) || (series >= getSeriesCount())) {
             throw new IllegalArgumentException("Series index out of bounds.");
         }
-
-        // fetch the series, remove the change listener, then remove the series.
-        XYSeries ts = (XYSeries) this.data.get(series);
-        ts.removeChangeListener(this);
-        this.data.remove(series);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        XYSeries s = (XYSeries) this.data.get(series);
+        if (s != null) {
+            removeSeries(s);
+        }
     }
 
     /**
      * Removes a series from the collection and sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      */
     public void removeSeries(XYSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
+        Args.nullNotPermitted(series, "series");
         if (this.data.contains(series)) {
             series.removeChangeListener(this);
+            series.removeVetoableChangeListener(this);
             this.data.remove(series);
-            fireDatasetChanged(new DatasetChangeInfo());
-            // TODO: fill in real change details
+            fireDatasetChanged();
         }
     }
 
@@ -201,12 +206,12 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
         for (int i = 0; i < this.data.size(); i++) {
           XYSeries series = (XYSeries) this.data.get(i);
           series.removeChangeListener(this);
+          series.removeVetoableChangeListener(this);
         }
 
         // Remove all the series from the collection and notify listeners.
         this.data.clear();
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        fireDatasetChanged();
     }
 
     /**
@@ -214,6 +219,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The series count.
      */
+    @Override
     public int getSeriesCount() {
         return this.data.size();
     }
@@ -231,16 +237,14 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      * Returns the index of the specified series, or -1 if that series is not
      * present in the dataset.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      *
      * @return The series index.
      *
      * @since 1.0.6
      */
     public int indexOf(XYSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
+        Args.nullNotPermitted(series, "series");
         return this.data.indexOf(series);
     }
 
@@ -251,8 +255,8 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The series.
      *
-     * @throws IllegalArgumentException if <code>series</code> is not in the
-     *     range <code>0</code> to <code>getSeriesCount() - 1</code>.
+     * @throws IllegalArgumentException if {@code series} is not in the
+     *     range {@code 0} to {@code getSeriesCount() - 1}.
      */
     public XYSeries getSeries(int series) {
         if ((series < 0) || (series >= getSeriesCount())) {
@@ -264,19 +268,17 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
     /**
      * Returns a series from the collection.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The series with the specified key.
      *
-     * @throws UnknownKeyException if <code>key</code> is not found in the
+     * @throws UnknownKeyException if {@code key} is not found in the
      *         collection.
      *
      * @since 1.0.9
      */
     public XYSeries getSeries(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         Iterator iterator = this.data.iterator();
         while (iterator.hasNext()) {
             XYSeries series = (XYSeries) iterator.next();
@@ -290,17 +292,40 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
     /**
      * Returns the key for a series.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
      *
      * @return The key for a series.
      *
-     * @throws IllegalArgumentException if <code>series</code> is not in the
+     * @throws IllegalArgumentException if {@code series} is not in the
      *     specified range.
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         // defer argument checking
         return getSeries(series).getKey();
+    }
+
+    /**
+     * Returns the index of the series with the specified key, or -1 if no
+     * series has that key.
+     * 
+     * @param key  the key ({@code null} not permitted).
+     * 
+     * @return The index.
+     * 
+     * @since 1.0.14
+     */
+    public int getSeriesIndex(Comparable key) {
+        Args.nullNotPermitted(key, "key");
+        int seriesCount = getSeriesCount();
+        for (int i = 0; i < seriesCount; i++) {
+            XYSeries series = (XYSeries) this.data.get(i);
+            if (key.equals(series.getKey())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -310,9 +335,10 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The item count.
      *
-     * @throws IllegalArgumentException if <code>series</code> is not in the
-     *     range <code>0</code> to <code>getSeriesCount() - 1</code>.
+     * @throws IllegalArgumentException if {@code series} is not in the
+     *     range {@code 0} to {@code getSeriesCount() - 1}.
      */
+    @Override
     public int getItemCount(int series) {
         // defer argument checking
         return getSeries(series).getItemCount();
@@ -326,6 +352,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public Number getX(int series, int item) {
         XYSeries s = (XYSeries) this.data.get(series);
         return s.getX(item);
@@ -339,6 +366,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The starting X value.
      */
+    @Override
     public Number getStartX(int series, int item) {
         return this.intervalDelegate.getStartX(series, item);
     }
@@ -351,6 +379,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The ending X value.
      */
+    @Override
     public Number getEndX(int series, int item) {
         return this.intervalDelegate.getEndX(series, item);
     }
@@ -361,8 +390,9 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      * @param series  the series (zero-based index).
      * @param index  the index of the item of interest (zero-based).
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      */
+    @Override
     public Number getY(int series, int index) {
         XYSeries s = (XYSeries) this.data.get(series);
         return s.getY(index);
@@ -376,6 +406,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The starting Y value.
      */
+    @Override
     public Number getStartY(int series, int item) {
         return getY(series, item);
     }
@@ -388,95 +419,19 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The ending Y value.
      */
+    @Override
     public Number getEndY(int series, int item) {
         return getY(series, item);
     }
 
     /**
-     * Returns the selection state for the specified data item.
-     *
-     * @param series  the series index.
-     * @param item  the item index.
-     *
-     * @return <code>true</code> if the item is selected, and
-     *     <code>false</code> otherwise.
-     *
-     * @since 1.2.0
-     */
-    public boolean isSelected(int series, int item) {
-        XYSeries s = getSeries(series);
-        XYDataItem i = s.getRawDataItem(item);
-        return i.isSelected();
-    }
-
-    /**
-     * Sets the selection state for the specified data item and
-     * sends a {@link DatasetChangeEvent} to all registered listeners.
-     *
-     * @param series  the series index.
-     * @param item  the item index.
-     * @param selected  the selection state.
-     *
-     * @since 1.2.0
-     */
-    public void setSelected(int series, int item, boolean selected) {
-        setSelected(series, item, selected, true);
-    }
-
-    /**
-     * Sets the selection state for the specified data item and, if requested,
-     * sends a {@link DatasetChangeEvent} to all registered listeners.
-     *
-     * @param series  the series index.
-     * @param item  the item index.
-     * @param selected  the selection state.
-     * @param notify  notify listeners?
-     *
-     * @since 1.2.0
-     */
-    public void setSelected(int series, int item, boolean selected,
-            boolean notify) {
-        XYSeries s = getSeries(series);
-        XYDataItem i = s.getRawDataItem(item);
-        i.setSelected(selected);
-        if (notify) {
-            fireSelectionEvent();
-        }
-    }
-
-    /**
-     * Clears the selection state for all data items.
-     *
-     * @since 1.2.0
-     */
-    public void clearSelection() {
-        int seriesCount = getSeriesCount();
-        for (int s = 0; s < seriesCount; s++) {
-            int itemCount = getItemCount(s);
-            for (int i = 0; i < itemCount; i++) {
-                setSelected(s, i, false, false);
-            }
-        }
-    }
-
-    /**
-     * Fires an event to signal that the selection changed.
-     *
-     * @since 1.2.0
-     */
-    public void fireSelectionEvent() {
-        // TODO: should this be a separate event type.
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
-    }
-
-    /**
      * Tests this collection for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -488,7 +443,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
         if (!this.intervalDelegate.equals(that.intervalDelegate)) {
             return false;
         }
-        return ObjectUtilities.equal(this.data, that.data);
+        return ObjectUtils.equal(this.data, that.data);
     }
 
     /**
@@ -498,9 +453,10 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @throws CloneNotSupportedException if there is a problem.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         XYSeriesCollection clone = (XYSeriesCollection) super.clone();
-        clone.data = (List) ObjectUtilities.deepClone(this.data);
+        clone.data = (List) ObjectUtils.deepClone(this.data);
         clone.intervalDelegate
                 = (IntervalXYDelegate) this.intervalDelegate.clone();
         return clone;
@@ -511,10 +467,11 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int hash = 5;
-        hash = HashUtilities.hashCode(hash, this.intervalDelegate);
-        hash = HashUtilities.hashCode(hash, this.data);
+        hash = HashUtils.hashCode(hash, this.intervalDelegate);
+        hash = HashUtils.hashCode(hash, this.data);
         return hash;
     }
 
@@ -526,27 +483,26 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The minimum value.
      */
+    @Override
     public double getDomainLowerBound(boolean includeInterval) {
         if (includeInterval) {
             return this.intervalDelegate.getDomainLowerBound(includeInterval);
         }
-        else {
-            double result = Double.NaN;
-            int seriesCount = getSeriesCount();
-            for (int s = 0; s < seriesCount; s++) {
-                XYSeries series = getSeries(s);
-                double lowX = series.getMinX();
-                if (Double.isNaN(result)) {
-                    result = lowX;
-                }
-                else {
-                    if (!Double.isNaN(lowX)) {
-                        result = Math.min(result, lowX);
-                    }
+        double result = Double.NaN;
+        int seriesCount = getSeriesCount();
+        for (int s = 0; s < seriesCount; s++) {
+            XYSeries series = getSeries(s);
+            double lowX = series.getMinX();
+            if (Double.isNaN(result)) {
+                result = lowX;
+            }
+            else {
+                if (!Double.isNaN(lowX)) {
+                    result = Math.min(result, lowX);
                 }
             }
-            return result;
         }
+        return result;
     }
 
     /**
@@ -557,6 +513,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The maximum value.
      */
+    @Override
     public double getDomainUpperBound(boolean includeInterval) {
         if (includeInterval) {
             return this.intervalDelegate.getDomainUpperBound(includeInterval);
@@ -586,9 +543,10 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      * @param includeInterval  a flag that determines whether or not the
      *                         x-interval is taken into account.
      *
-     * @return The range (or <code>null</code> if the dataset contains no
+     * @return The range (or {@code null} if the dataset contains no
      *     values).
      */
+    @Override
     public Range getDomainBounds(boolean includeInterval) {
         if (includeInterval) {
             return this.intervalDelegate.getDomainBounds(includeInterval);
@@ -638,8 +596,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
             throw new IllegalArgumentException("Negative 'width' argument.");
         }
         this.intervalDelegate.setFixedIntervalWidth(width);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        fireDatasetChanged();
     }
 
     /**
@@ -660,8 +617,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      */
     public void setIntervalPositionFactor(double factor) {
         this.intervalDelegate.setIntervalPositionFactor(factor);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        fireDatasetChanged();
     }
 
     /**
@@ -674,15 +630,14 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
     }
 
     /**
-     * Sets the flag that indicates wether the interval width is automatically
+     * Sets the flag that indicates whether the interval width is automatically
      * calculated or not.
      *
      * @param b  a boolean.
      */
     public void setAutoWidth(boolean b) {
         this.intervalDelegate.setAutoWidth(b);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        fireDatasetChanged();
     }
 
     /**
@@ -690,9 +645,10 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @param includeInterval  ignored.
      *
-     * @return The range (or <code>null</code> if the dataset contains no
+     * @return The range (or {@code null} if the dataset contains no
      *     values).
      */
+    @Override
     public Range getRangeBounds(boolean includeInterval) {
         double lower = Double.POSITIVE_INFINITY;
         double upper = Double.NEGATIVE_INFINITY;
@@ -724,6 +680,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The minimum value.
      */
+    @Override
     public double getRangeLowerBound(boolean includeInterval) {
         double result = Double.NaN;
         int seriesCount = getSeriesCount();
@@ -750,6 +707,7 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
      *
      * @return The maximum value.
      */
+    @Override
     public double getRangeUpperBound(boolean includeInterval) {
         double result = Double.NaN;
         int seriesCount = getSeriesCount();
@@ -766,6 +724,37 @@ public class XYSeriesCollection extends AbstractIntervalXYDataset
             }
         }
         return result;
+    }
+
+    /**
+     * Receives notification that the key for one of the series in the 
+     * collection has changed, and vetos it if the key is already present in 
+     * the collection.
+     * 
+     * @param e  the event.
+     * 
+     * @since 1.0.14
+     */
+    @Override
+    public void vetoableChange(PropertyChangeEvent e)
+            throws PropertyVetoException {
+        // if it is not the series name, then we have no interest
+        if (!"Key".equals(e.getPropertyName())) {
+            return;
+        }
+        
+        // to be defensive, let's check that the source series does in fact
+        // belong to this collection
+        Series s = (Series) e.getSource();
+        if (getSeriesIndex(s.getKey()) == -1) {
+            throw new IllegalStateException("Receiving events from a series " +
+                    "that does not belong to this collection.");
+        }
+        // check if the new series name already exists for another series
+        Comparable key = (Comparable) e.getNewValue();
+        if (getSeriesIndex(key) >= 0) {
+            throw new PropertyVetoException("Duplicate key2", e);
+        }
     }
 
 }

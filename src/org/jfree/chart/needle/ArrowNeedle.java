@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * ArrowNeedle.java
  * ----------------
- * (C) Copyright 2002-2008, by the Australian Antarctic Division and
+ * (C) Copyright 2002-2016, by the Australian Antarctic Division and
  *                          Contributors.
  *
  * Original Author:  Bryan Scott (for the Australian Antarctic Division);
@@ -53,13 +53,13 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
 
 /**
  * A needle in the shape of an arrow.
  */
-public class ArrowNeedle extends MeterNeedle
-                         implements Cloneable, Serializable {
+public class ArrowNeedle extends MeterNeedle implements Cloneable, 
+        Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -5334056511213782357L;
@@ -74,7 +74,7 @@ public class ArrowNeedle extends MeterNeedle
      * Constructs a new arrow needle.
      *
      * @param isArrowAtTop  a flag that controls whether or not there is an
-     *                      arrow at the top of the needle.
+     *     arrow at the top of the needle.
      */
     public ArrowNeedle(boolean isArrowAtTop) {
         this.isArrowAtTop = isArrowAtTop;
@@ -88,13 +88,14 @@ public class ArrowNeedle extends MeterNeedle
      * @param rotate  the rotation point.
      * @param angle  the angle.
      */
+    @Override
     protected void drawNeedle(Graphics2D g2, Rectangle2D plotArea,
-                              Point2D rotate, double angle) {
+            Point2D rotate, double angle) {
 
         Line2D shape = new Line2D.Float();
-        Shape d = null;
+        Shape d;
 
-        float x = (float) (plotArea.getMinX() +  (plotArea.getWidth() / 2));
+        float x = (float) (plotArea.getMinX() + (plotArea.getWidth() / 2));
         float minY = (float) plotArea.getMinY();
         float maxY = (float) plotArea.getMaxY();
         shape.setLine(x, minY, x, maxY);
@@ -103,8 +104,7 @@ public class ArrowNeedle extends MeterNeedle
         if (this.isArrowAtTop) {
             shape1.moveTo(x, minY);
             minY += 4 * getSize();
-        }
-        else {
+        } else {
             shape1.moveTo(x, maxY);
             minY = maxY - 4 * getSize();
         }
@@ -115,16 +115,14 @@ public class ArrowNeedle extends MeterNeedle
         if ((rotate != null) && (angle != 0)) {
             getTransform().setToRotation(angle, rotate.getX(), rotate.getY());
             d = getTransform().createTransformedShape(shape);
-        }
-        else {
+        } else {
             d = shape;
         }
         defaultDisplay(g2, d);
 
         if ((rotate != null) && (angle != 0)) {
             d = getTransform().createTransformedShape(shape1);
-        }
-        else {
+        } else {
             d = shape1;
         }
         defaultDisplay(g2, d);
@@ -134,10 +132,11 @@ public class ArrowNeedle extends MeterNeedle
     /**
      * Tests another object for equality with this object.
      *
-     * @param obj  the object to test (<code>null</code> permitted).
+     * @param obj  the object to test ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -160,9 +159,10 @@ public class ArrowNeedle extends MeterNeedle
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = HashUtilities.hashCode(result, this.isArrowAtTop);
+        result = HashUtils.hashCode(result, this.isArrowAtTop);
         return result;
     }
 
@@ -171,9 +171,10 @@ public class ArrowNeedle extends MeterNeedle
      *
      * @return A clone.
      *
-     * @throws CloneNotSupportedException if the <code>ArrowNeedle</code>
+     * @throws CloneNotSupportedException if the {@code ArrowNeedle}
      *     cannot be cloned (in theory, this should not happen).
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

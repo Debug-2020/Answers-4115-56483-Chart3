@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * ItemLabelAnchor.java
  * --------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -173,34 +173,32 @@ public final class ItemLabelAnchor implements Serializable {
      *
      * @return The string.
      */
+    @Override
     public String toString() {
         return this.name;
     }
 
     /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
+     * Returns {@code true} if this object is equal to the specified
+     * object, and {@code false} otherwise.
      *
-     * @param o  the other object.
+     * @param obj  the other object.
      *
      * @return A boolean.
      */
-    public boolean equals(Object o) {
-
-        if (this == o) {
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof ItemLabelAnchor)) {
+        if (!(obj instanceof ItemLabelAnchor)) {
             return false;
         }
-
-        ItemLabelAnchor order = (ItemLabelAnchor) o;
-        if (!this.name.equals(order.toString())) {
+        ItemLabelAnchor that = (ItemLabelAnchor) obj;
+        if (!this.name.equals(that.toString())) {
             return false;
         }
-
         return true;
-
     }
 
     /**

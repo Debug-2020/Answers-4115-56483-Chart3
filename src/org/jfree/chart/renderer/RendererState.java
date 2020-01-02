@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * RendererState.java
  * ------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -53,6 +53,13 @@ public class RendererState {
 
     /** The plot rendering info. */
     private PlotRenderingInfo info;
+    
+    /** 
+     * A flag that indicates whether or not rendering hints should be added to
+     * identify chart elements.  It is initialised from the corresponding flag
+     * in the JFreeChart instance.
+     */
+    private boolean elementHinting;
 
     /**
      * Creates a new state object.
@@ -61,6 +68,30 @@ public class RendererState {
      */
     public RendererState(PlotRenderingInfo info) {
         this.info = info;
+        this.elementHinting = false;
+    }
+    
+    /**
+     * Returns the flag that controls whether or not the renderer should 
+     * add rendering hints to the output that identify chart elements.
+     * 
+     * @return A boolean.
+     * 
+     * @since 1.0.20
+     */
+    public boolean getElementHinting() {
+        return this.elementHinting;
+    }
+    
+    /**
+     * Sets the elementHinting flag.
+     * 
+     * @param hinting  the new flag value.
+     * 
+     * @since 1.0.20
+     */
+    public void setElementHinting(boolean hinting) {
+        this.elementHinting = hinting;
     }
 
     /**
@@ -74,10 +105,10 @@ public class RendererState {
 
     /**
      * A convenience method that returns a reference to the entity
-     * collection (may be <code>null</code>) being used to record
+     * collection (may be {@code null}) being used to record
      * chart entities.
      *
-     * @return The entity collection (possibly <code>null</code>).
+     * @return The entity collection (possibly {@code null}).
      */
     public EntityCollection getEntityCollection() {
         EntityCollection result = null;

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * MovingAverage.java
  * ------------------
- * (C) Copyright 2003-2009, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Benoit Xhenseval;
@@ -44,11 +44,13 @@
  * 11-Jan-2005 : Removed deprecated code in preparation for the 1.0.0
  *               release (DG);
  * 09-Jun-2009 : Tidied up some calls to TimeSeries (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.data.time;
 
+import org.jfree.chart.util.Args;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -75,9 +77,7 @@ public class MovingAverage {
             TimeSeriesCollection source, String suffix, int periodCount,
             int skip) {
 
-        if (source == null) {
-            throw new IllegalArgumentException("Null 'source' argument.");
-        }
+        Args.nullNotPermitted(source, "source");
         if (periodCount < 1) {
             throw new IllegalArgumentException("periodCount must be greater "
                     + "than or equal to 1.");
@@ -110,13 +110,10 @@ public class MovingAverage {
     public static TimeSeries createMovingAverage(TimeSeries source,
             String name, int periodCount, int skip) {
 
-        if (source == null) {
-            throw new IllegalArgumentException("Null source.");
-        }
+        Args.nullNotPermitted(source, "source");
         if (periodCount < 1) {
-            throw new IllegalArgumentException("periodCount must be greater "
+            throw new IllegalArgumentException("periodCount must be greater " 
                     + "than or equal to 1.");
-
         }
 
         TimeSeries result = new TimeSeries(name);
@@ -194,11 +191,9 @@ public class MovingAverage {
     public static TimeSeries createPointMovingAverage(TimeSeries source,
             String name, int pointCount) {
 
-        if (source == null) {
-            throw new IllegalArgumentException("Null 'source'.");
-        }
+        Args.nullNotPermitted(source, "source");
         if (pointCount < 2) {
-            throw new IllegalArgumentException("periodCount must be greater "
+            throw new IllegalArgumentException("periodCount must be greater " 
                     + "than or equal to 2.");
         }
 
@@ -228,7 +223,7 @@ public class MovingAverage {
 
     /**
      * Creates a new {@link XYDataset} containing the moving averages of each
-     * series in the <code>source</code> dataset.
+     * series in the {@code source} dataset.
      *
      * @param source  the source dataset.
      * @param suffix  the string to append to source series names to create
@@ -249,7 +244,7 @@ public class MovingAverage {
 
     /**
      * Creates a new {@link XYDataset} containing the moving averages of each
-     * series in the <code>source</code> dataset.
+     * series in the {@code source} dataset.
      *
      * @param source  the source dataset.
      * @param suffix  the string to append to source series names to create
@@ -262,25 +257,19 @@ public class MovingAverage {
     public static XYDataset createMovingAverage(XYDataset source,
             String suffix, double period, double skip) {
 
-        if (source == null) {
-            throw new IllegalArgumentException("Null source (XYDataset).");
-        }
-
+        Args.nullNotPermitted(source, "source");
         XYSeriesCollection result = new XYSeriesCollection();
-
         for (int i = 0; i < source.getSeriesCount(); i++) {
             XYSeries s = createMovingAverage(source, i, source.getSeriesKey(i)
                     + suffix, period, skip);
             result.addSeries(s);
         }
-
         return result;
-
     }
 
     /**
      * Creates a new {@link XYSeries} containing the moving averages of one
-     * series in the <code>source</code> dataset.
+     * series in the {@code source} dataset.
      *
      * @param source  the source dataset.
      * @param series  the series index (zero based).
@@ -293,9 +282,7 @@ public class MovingAverage {
     public static XYSeries createMovingAverage(XYDataset source,
             int series, String name, double period, double skip) {
 
-        if (source == null) {
-            throw new IllegalArgumentException("Null source (XYDataset).");
-        }
+        Args.nullNotPermitted(source, "source");
         if (period < Double.MIN_VALUE) {
             throw new IllegalArgumentException("period must be positive.");
         }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------------------
  * StandardXYSeriesLabelGenerator.java
  * -----------------------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -37,8 +37,8 @@
  * 16-Nov-2004 : Version 1 (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 24-Nov-2006 : Fixed equals() method and updated API docs (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 31-Mar-2008 : Added hashCode() method to appease FindBugs (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -47,15 +47,16 @@ package org.jfree.chart.labels;
 import java.io.Serializable;
 import java.text.MessageFormat;
 
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 import org.jfree.data.xy.XYDataset;
 
 /**
  * A standard series label generator for plots that use data from
- * an {@link XYDataset}.
+ * an {@link org.jfree.data.xy.XYDataset}.
  * <br><br>
- * This class implements <code>PublicCloneable</code> by mistake but we retain
+ * This class implements {@code PublicCloneable} by mistake but we retain
  * this for the sake of backward compatibility.
  */
 public class StandardXYSeriesLabelGenerator implements XYSeriesLabelGenerator,
@@ -81,12 +82,10 @@ public class StandardXYSeriesLabelGenerator implements XYSeriesLabelGenerator,
     /**
      * Creates a new series label generator.
      *
-     * @param format  the format pattern (<code>null</code> not permitted).
+     * @param format  the format pattern ({@code null} not permitted).
      */
     public StandardXYSeriesLabelGenerator(String format) {
-        if (format == null) {
-            throw new IllegalArgumentException("Null 'format' argument.");
-        }
+        Args.nullNotPermitted(format, "format");
         this.formatPattern = format;
     }
 
@@ -94,15 +93,14 @@ public class StandardXYSeriesLabelGenerator implements XYSeriesLabelGenerator,
      * Generates a label for the specified series.  This label will be
      * used for the chart legend.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series.
      *
      * @return A series label.
      */
+    @Override
     public String generateLabel(XYDataset dataset, int series) {
-        if (dataset == null) {
-            throw new IllegalArgumentException("Null 'dataset' argument.");
-        }
+        Args.nullNotPermitted(dataset, "dataset");
         String label = MessageFormat.format(
             this.formatPattern, createItemArray(dataset, series)
         );
@@ -113,10 +111,10 @@ public class StandardXYSeriesLabelGenerator implements XYSeriesLabelGenerator,
      * Creates the array of items that can be passed to the
      * {@link MessageFormat} class for creating labels.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series (zero-based index).
      *
-     * @return The items (never <code>null</code>).
+     * @return The items (never {@code null}).
      */
     protected Object[] createItemArray(XYDataset dataset, int series) {
         Object[] result = new Object[1];
@@ -133,6 +131,7 @@ public class StandardXYSeriesLabelGenerator implements XYSeriesLabelGenerator,
      *
      * @throws CloneNotSupportedException if cloning is not supported.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -140,10 +139,11 @@ public class StandardXYSeriesLabelGenerator implements XYSeriesLabelGenerator,
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -164,9 +164,10 @@ public class StandardXYSeriesLabelGenerator implements XYSeriesLabelGenerator,
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 127;
-        result = HashUtilities.hashCode(result, this.formatPattern);
+        result = HashUtils.hashCode(result, this.formatPattern);
         return result;
     }
 

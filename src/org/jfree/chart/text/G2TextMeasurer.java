@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,21 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * -------------------
- * G2TextMeasurer.java
- * -------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited and Contributors.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes
- * -------
- * 07-Jan-2004 : Version 1 (DG);
- * 20-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -52,10 +39,10 @@ public class G2TextMeasurer implements TextMeasurer {
 
     /** The graphics device. */
     private Graphics2D g2;
-
+    
     /**
      * Creates a new text measurer.
-     *
+     * 
      * @param g2  the graphics device.
      */
     public G2TextMeasurer(Graphics2D g2) {
@@ -64,20 +51,21 @@ public class G2TextMeasurer implements TextMeasurer {
 
     /**
      * Returns the string width.
-     *
+     * 
      * @param text  the text.
      * @param start  the index of the first character to measure.
      * @param end  the index of the last character to measure.
-     *
+     * 
      * @return The string width.
      */
+    @Override
     public float getStringWidth(String text, int start, int end) {
         FontMetrics fm = this.g2.getFontMetrics();
-        Rectangle2D bounds = TextUtilities.getTextBounds(text.substring(start,
-                end), this.g2, fm);
+        Rectangle2D bounds = TextUtils.getTextBounds(text.substring(start, end),
+                this.g2, fm);
         float result = (float) bounds.getWidth();
         return result;
     }
-
+    
 }
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * IntervalXYDelegate.java
  * -----------------------
- * (C) Copyright 2004-2009, by Andreas Schroeder and Contributors.
+ * (C) Copyright 2004-2013, by Andreas Schroeder and Contributors.
  *
  * Original Author:  Andreas Schroeder;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -46,8 +46,8 @@
  * 06-Oct-2005 : Implemented DatasetChangeListener to recalculate
  *               autoIntervalWidth (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 06-Mar-2009 : Implemented hashCode() (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -55,14 +55,15 @@ package org.jfree.data.xy;
 
 import java.io.Serializable;
 
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 import org.jfree.data.DomainInfo;
 import org.jfree.data.Range;
 import org.jfree.data.RangeInfo;
-import org.jfree.data.event.DatasetChangeEvent;
-import org.jfree.data.event.DatasetChangeListener;
-import org.jfree.data.general.DatasetUtilities;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeListener;
+import org.jfree.data.general.DatasetUtils;
 
 /**
  * A delegate that handles the specification or automatic calculation of the
@@ -116,7 +117,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
     /**
      * Creates a new delegate that.
      *
-     * @param dataset  the underlying dataset (<code>null</code> not permitted).
+     * @param dataset  the underlying dataset ({@code null} not permitted).
      */
     public IntervalXYDelegate(XYDataset dataset) {
         this(dataset, true);
@@ -125,14 +126,12 @@ public class IntervalXYDelegate implements DatasetChangeListener,
     /**
      * Creates a new delegate for the specified dataset.
      *
-     * @param dataset  the underlying dataset (<code>null</code> not permitted).
+     * @param dataset  the underlying dataset ({@code null} not permitted).
      * @param autoWidth  a flag that controls whether the interval width is
      *                   calculated automatically.
      */
     public IntervalXYDelegate(XYDataset dataset, boolean autoWidth) {
-        if (dataset == null) {
-            throw new IllegalArgumentException("Null 'dataset' argument.");
-        }
+        Args.nullNotPermitted(dataset, "dataset");
         this.dataset = dataset;
         this.autoWidth = autoWidth;
         this.intervalPositionFactor = 0.5;
@@ -141,8 +140,8 @@ public class IntervalXYDelegate implements DatasetChangeListener,
     }
 
     /**
-     * Returns <code>true</code> if the interval width is automatically
-     * calculated, and <code>false</code> otherwise.
+     * Returns {@code true} if the interval width is automatically
+     * calculated, and {@code false} otherwise.
      *
      * @return A boolean.
      */
@@ -152,7 +151,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
 
     /**
      * Sets the flag that indicates whether the interval width is automatically
-     * calculated.  If the flag is set to <code>true</code>, the interval is
+     * calculated.  If the flag is set to {@code true}, the interval is
      * recalculated.
      * <p>
      * Note: recalculating the interval amounts to changing the data values
@@ -191,7 +190,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      * appropriate {@link DatasetChangeEvent}.
      *
      * @param d  the new interval position factor (in the range
-     *           <code>0.0</code> to <code>1.0</code> inclusive).
+     *           {@code 0.0} to {@code 1.0} inclusive).
      */
     public void setIntervalPositionFactor(double d) {
         if (d < 0.0 || 1.0 < d) {
@@ -212,8 +211,8 @@ public class IntervalXYDelegate implements DatasetChangeListener,
 
     /**
      * Sets the fixed interval width and, as a side effect, sets the
-     * <code>autoWidth</code> flag to <code>false</code>.
-     *
+     * {@code autoWidth} flag to {@code false}.
+     * <br><br>
      * Note that changing the interval width amounts to changing the data
      * values represented by the dataset.  Therefore, the dataset
      * that is using this delegate is responsible for generating the
@@ -254,7 +253,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      * @param series  the series index.
      * @param item  the item index.
      *
-     * @return The start value of the x-interval (possibly <code>null</code>).
+     * @return The start value of the x-interval (possibly {@code null}).
      *
      * @see #getStartXValue(int, int)
      */
@@ -289,7 +288,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      * @param series  the series index.
      * @param item  the item index.
      *
-     * @return The end value of the x-interval (possibly <code>null</code>).
+     * @return The end value of the x-interval (possibly {@code null}).
      *
      * @see #getEndXValue(int, int)
      */
@@ -326,6 +325,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      *
      * @return The minimum value.
      */
+    @Override
     public double getDomainLowerBound(boolean includeInterval) {
         double result = Double.NaN;
         Range r = getDomainBounds(includeInterval);
@@ -343,6 +343,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      *
      * @return The maximum value.
      */
+    @Override
     public double getDomainUpperBound(boolean includeInterval) {
         double result = Double.NaN;
         Range r = getDomainBounds(includeInterval);
@@ -361,10 +362,11 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      *
      * @return The range.
      */
+    @Override
     public Range getDomainBounds(boolean includeInterval) {
         // first get the range without the interval, then expand it for the
         // interval width
-        Range range = DatasetUtilities.findDomainBounds(this.dataset, false);
+        Range range = DatasetUtils.findDomainBounds(this.dataset, false);
         if (includeInterval && range != null) {
             double lowerAdj = getIntervalWidth() * getIntervalPositionFactor();
             double upperAdj = getIntervalWidth() - lowerAdj;
@@ -380,6 +382,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      *
      * @param e  the event.
      */
+    @Override
     public void datasetChanged(DatasetChangeEvent e) {
         // TODO: by coding the event with some information about what changed
         // in the dataset, we could make the recalculation of the interval
@@ -433,10 +436,11 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      * dataset itself is NOT included in the equality test, because it is just
      * a reference back to the current 'owner' of the delegate).
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -462,6 +466,7 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      *
      * @throws CloneNotSupportedException if the object cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -471,11 +476,12 @@ public class IntervalXYDelegate implements DatasetChangeListener,
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int hash = 5;
-        hash = HashUtilities.hashCode(hash, this.autoWidth);
-        hash = HashUtilities.hashCode(hash, this.intervalPositionFactor);
-        hash = HashUtilities.hashCode(hash, this.fixedIntervalWidth);
+        hash = HashUtils.hashCode(hash, this.autoWidth);
+        hash = HashUtils.hashCode(hash, this.intervalPositionFactor);
+        hash = HashUtils.hashCode(hash, this.fixedIntervalWidth);
         return hash;
     }
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * CategoryAnnotation.java
@@ -36,8 +36,6 @@
  * --------
  * 02-Apr-2003 : Version 1 (DG);
  * 02-Jul-2003 : Eliminated Annotation base interface (DG);
- * ------------- JFREECHART 1.0.x ---------------------------------------------
- * 06-Jul-2007 : Added PlotRenderingInfo parameter to draw() method (DG);
  * 24-Jun-2009 : Now extends Annotation (see patch 2809117 by PK) (DG);
  *
  */
@@ -50,11 +48,12 @@ import java.awt.geom.Rectangle2D;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PlotRenderingInfo;
 
 /**
  * The interface that must be supported by annotations that are to be added to
- * a {@link CategoryPlot}.
+ * a {@link CategoryPlot}. Note that, in JFreeChart 1.0.14, a non-compatible 
+ * change has been made to this interface (it now extends the Annotation
+ * interface to support change notifications).
  */
 public interface CategoryAnnotation extends Annotation {
 
@@ -66,11 +65,8 @@ public interface CategoryAnnotation extends Annotation {
      * @param dataArea  the data area.
      * @param domainAxis  the domain axis.
      * @param rangeAxis  the range axis.
-     * @param rendererIndex  the renderer index.
-     * @param info  the plot info (<code>null</code> permitted).
      */
     public void draw(Graphics2D g2, CategoryPlot plot, Rectangle2D dataArea,
-                     CategoryAxis domainAxis, ValueAxis rangeAxis,
-                     int rendererIndex, PlotRenderingInfo info);
+                     CategoryAxis domainAxis, ValueAxis rangeAxis);
 
 }

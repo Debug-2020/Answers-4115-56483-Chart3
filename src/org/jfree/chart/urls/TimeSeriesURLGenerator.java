@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * TimeSeriesURLGenerator.java
  * ---------------------------
- * (C) Copyright 2002-2008, by Richard Atkinson and Contributors.
+ * (C) Copyright 2002-2016, by Richard Atkinson and Contributors.
  *
  * Original Author:  Richard Atkinson;
  * Contributors:     David Gilbert (for Object Refinery Limited);
@@ -45,7 +45,7 @@
  * 17-Apr-2007 : Added null argument checks to constructor, new accessor
  *               methods, added equals() override and used new URLUtilities
  *               class to encode series key and date (DG);
- * 26-Jun-2007 : Removed URLUtilities dependency (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -57,6 +57,7 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.util.Date;
 
+import org.jfree.chart.util.Args;
 import org.jfree.data.xy.XYDataset;
 
 /**
@@ -89,43 +90,31 @@ public class TimeSeriesURLGenerator implements XYURLGenerator, Serializable {
     /**
      * Construct TimeSeriesURLGenerator overriding defaults.
      *
-     * @param dateFormat  a formatter for the date (<code>null</code> not
+     * @param dateFormat  a formatter for the date ({@code null} not
      *         permitted).
-     * @param prefix  the prefix of the URL (<code>null</code> not permitted).
+     * @param prefix  the prefix of the URL ({@code null} not permitted).
      * @param seriesParameterName  the name of the series parameter in the URL
-     *         (<code>null</code> not permitted).
+     *         ({@code null} not permitted).
      * @param itemParameterName  the name of the item parameter in the URL
-     *         (<code>null</code> not permitted).
+     *         ({@code null} not permitted).
      */
     public TimeSeriesURLGenerator(DateFormat dateFormat, String prefix,
             String seriesParameterName, String itemParameterName) {
 
-        if (dateFormat == null) {
-            throw new IllegalArgumentException("Null 'dateFormat' argument.");
-        }
-        if (prefix == null) {
-            throw new IllegalArgumentException("Null 'prefix' argument.");
-        }
-        if (seriesParameterName == null) {
-            throw new IllegalArgumentException(
-                    "Null 'seriesParameterName' argument.");
-        }
-        if (itemParameterName == null) {
-            throw new IllegalArgumentException(
-                    "Null 'itemParameterName' argument.");
-        }
-
+        Args.nullNotPermitted(dateFormat, "dateFormat");
+        Args.nullNotPermitted(prefix, "prefix");
+        Args.nullNotPermitted(seriesParameterName, "seriesParameterName");
+        Args.nullNotPermitted(itemParameterName, "itemParameterName");
         this.dateFormat = (DateFormat) dateFormat.clone();
         this.prefix = prefix;
         this.seriesParameterName = seriesParameterName;
         this.itemParameterName = itemParameterName;
-
     }
 
     /**
      * Returns a clone of the date format assigned to this URL generator.
      *
-     * @return The date format (never <code>null</code>).
+     * @return The date format (never {@code null}).
      *
      * @since 1.0.6
      */
@@ -136,7 +125,7 @@ public class TimeSeriesURLGenerator implements XYURLGenerator, Serializable {
     /**
      * Returns the prefix string.
      *
-     * @return The prefix string (never <code>null</code>).
+     * @return The prefix string (never {@code null}).
      *
      * @since 1.0.6
      */
@@ -147,7 +136,7 @@ public class TimeSeriesURLGenerator implements XYURLGenerator, Serializable {
     /**
      * Returns the series parameter name.
      *
-     * @return The series parameter name (never <code>null</code>).
+     * @return The series parameter name (never {@code null}).
      *
      * @since 1.0.6
      */
@@ -158,7 +147,7 @@ public class TimeSeriesURLGenerator implements XYURLGenerator, Serializable {
     /**
      * Returns the item parameter name.
      *
-     * @return The item parameter name (never <code>null</code>).
+     * @return The item parameter name (never {@code null}).
      *
      * @since 1.0.6
      */
@@ -169,50 +158,49 @@ public class TimeSeriesURLGenerator implements XYURLGenerator, Serializable {
     /**
      * Generates a URL for a particular item within a series.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series number (zero-based index).
      * @param item  the item number (zero-based index).
      *
      * @return The generated URL.
      */
+    @Override
     public String generateURL(XYDataset dataset, int series, int item) {
         String result = this.prefix;
-        boolean firstParameter = result.indexOf("?") == -1;
+        boolean firstParameter = !result.contains("?");
         Comparable seriesKey = dataset.getSeriesKey(series);
         if (seriesKey != null) {
             result += firstParameter ? "?" : "&amp;";
-            String s = null;
             try {
-                s = URLEncoder.encode(seriesKey.toString(), "UTF-8");
+                result += this.seriesParameterName + "=" + URLEncoder.encode(
+                        seriesKey.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException(ex);
             }
-            catch (UnsupportedEncodingException e) {
-                s = seriesKey.toString();
-            }
-            result += this.seriesParameterName + "=" + s;
             firstParameter = false;
         }
 
         long x = (long) dataset.getXValue(series, item);
         String xValue = this.dateFormat.format(new Date(x));
         result += firstParameter ? "?" : "&amp;";
-        String s = null;
         try {
-            s = URLEncoder.encode(xValue, "UTF-8");
+            result += this.itemParameterName + "=" + URLEncoder.encode(xValue,
+                    "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
         }
-        catch (UnsupportedEncodingException e) {
-            s = xValue;
-        }
-        result += this.itemParameterName + "=" + s;
+
         return result;
     }
 
     /**
      * Tests this generator for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

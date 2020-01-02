@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------------------
  * IntervalCategoryToolTipGenerator.java
@@ -35,7 +35,6 @@
  * Changes
  * -------
  * 11-May-2004 : Version 1, split from IntervalCategoryItemLabelGenerator (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 08-Oct-2008 : Override equals() method (DG);
  *
  */
@@ -72,9 +71,9 @@ public class IntervalCategoryToolTipGenerator
     /**
      * Creates a new generator with the specified number formatter.
      *
-     * @param labelFormat  the label format string (<code>null</code> not
+     * @param labelFormat  the label format string ({@code null} not
      *                     permitted).
-     * @param formatter  the number formatter (<code>null</code> not permitted).
+     * @param formatter  the number formatter ({@code null} not permitted).
      */
     public IntervalCategoryToolTipGenerator(String labelFormat,
                                             NumberFormat formatter) {
@@ -84,9 +83,9 @@ public class IntervalCategoryToolTipGenerator
     /**
      * Creates a new generator with the specified date formatter.
      *
-     * @param labelFormat  the label format string (<code>null</code> not
+     * @param labelFormat  the label format string ({@code null} not
      *                     permitted).
-     * @param formatter  the date formatter (<code>null</code> not permitted).
+     * @param formatter  the date formatter ({@code null} not permitted).
      */
     public IntervalCategoryToolTipGenerator(String labelFormat,
                                             DateFormat formatter) {
@@ -95,14 +94,15 @@ public class IntervalCategoryToolTipGenerator
 
     /**
      * Creates the array of items that can be passed to the
-     * <code>MessageFormat</code> class for creating labels.
+     * {@code MessageFormat} class for creating labels.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The items (never <code>null</code>).
+     * @return The items (never {@code null}).
      */
+    @Override
     protected Object[] createItemArray(CategoryDataset dataset,
                                        int row, int column) {
         Object[] result = new Object[5];
@@ -136,10 +136,11 @@ public class IntervalCategoryToolTipGenerator
      * Tests this tool tip generator for equality with an arbitrary
      * object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

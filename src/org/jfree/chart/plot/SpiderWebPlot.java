@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * SpiderWebPlot.java
  * ------------------
- * (C) Copyright 2005-2008, by Heaps of Flavour Pty Ltd and Contributors.
+ * (C) Copyright 2005-2017, by Heaps of Flavour Pty Ltd and Contributors.
  *
  * Company Info:  http://www.i4-talent.com
  *
@@ -62,10 +62,10 @@
  *               1605202 (DG);
  * 05-Mar-2007 : Restore clip region correctly (see bug 1667750) (DG);
  * 18-May-2007 : Set dataset for LegendItem (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 02-Jun-2008 : Fixed bug with chart entities using TableOrder.BY_COLUMN (DG);
  * 02-Jun-2008 : Fixed bug with null dataset (DG);
  * 01-Jun-2009 : Set series key in getLegendItems() (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -100,24 +100,24 @@ import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.entity.CategoryItemEntity;
 import org.jfree.chart.entity.EntityCollection;
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.labels.CategoryItemLabelGenerator;
 import org.jfree.chart.labels.CategoryToolTipGenerator;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
+import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.urls.CategoryURLGenerator;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
 import org.jfree.chart.util.PaintList;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.RectangleInsets;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.Rotation;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.ShapeUtilities;
+import org.jfree.chart.util.SerialUtils;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.chart.util.StrokeList;
 import org.jfree.chart.util.TableOrder;
 import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.event.DatasetChangeEvent;
-import org.jfree.data.general.DatasetUtilities;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetUtils;
 
 /**
  * A plot that displays data from a {@link CategoryDataset} in the form of a
@@ -145,25 +145,25 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     public static final double DEFAULT_START_ANGLE = 90.0;
 
     /** The default series label font. */
-    public static final Font DEFAULT_LABEL_FONT = new Font("Tahoma",
+    public static final Font DEFAULT_LABEL_FONT = new Font("SansSerif",
             Font.PLAIN, 10);
 
     /** The default series label paint. */
-    public static final Paint  DEFAULT_LABEL_PAINT = Color.black;
+    public static final Paint  DEFAULT_LABEL_PAINT = Color.BLACK;
 
     /** The default series label background paint. */
     public static final Paint  DEFAULT_LABEL_BACKGROUND_PAINT
             = new Color(255, 255, 192);
 
     /** The default series label outline paint. */
-    public static final Paint  DEFAULT_LABEL_OUTLINE_PAINT = Color.black;
+    public static final Paint  DEFAULT_LABEL_OUTLINE_PAINT = Color.BLACK;
 
     /** The default series label outline stroke. */
     public static final Stroke DEFAULT_LABEL_OUTLINE_STROKE
             = new BasicStroke(0.5f);
 
     /** The default series label shadow paint. */
-    public static final Paint  DEFAULT_LABEL_SHADOW_PAINT = Color.lightGray;
+    public static final Paint  DEFAULT_LABEL_SHADOW_PAINT = Color.LIGHT_GRAY;
 
     /**
      * The default maximum value plotted - forces the plot to evaluate
@@ -211,7 +211,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /** The starting angle. */
     private double startAngle;
 
-    /** The direction for drawing the radar axis & plots. */
+    /** The direction for drawing the radar axis and plots. */
     private Rotation direction;
 
     /** The legend item shape. */
@@ -256,10 +256,10 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /** controls if the web polygons are filled or not */
     private boolean webFilled = true;
 
-    /** A tooltip generator for the plot (<code>null</code> permitted). */
+    /** A tooltip generator for the plot ({@code null} permitted). */
     private CategoryToolTipGenerator toolTipGenerator;
 
-    /** A URL generator for the plot (<code>null</code> permitted). */
+    /** A URL generator for the plot ({@code null} permitted). */
     private CategoryURLGenerator urlGenerator;
 
     /**
@@ -273,7 +273,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Creates a new spider web plot with the given dataset, with each row
      * representing a series.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public SpiderWebPlot(CategoryDataset dataset) {
         this(dataset, TableOrder.BY_ROW);
@@ -288,9 +288,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      */
     public SpiderWebPlot(CategoryDataset dataset, TableOrder extract) {
         super();
-        if (extract == null) {
-            throw new IllegalArgumentException("Null 'extract' argument.");
-        }
+        Args.nullNotPermitted(extract, "extract");
         this.dataset = dataset;
         if (dataset != null) {
             dataset.addChangeListener(this);
@@ -299,7 +297,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
         this.dataExtractOrder = extract;
         this.headPercent = DEFAULT_HEAD;
         this.axisLabelGap = DEFAULT_AXIS_LABEL_GAP;
-        this.axisLinePaint = Color.black;
+        this.axisLinePaint = Color.BLACK;
         this.axisLineStroke = new BasicStroke(1.0f);
 
         this.interiorGap = DEFAULT_INTERIOR_GAP;
@@ -331,6 +329,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      *
      * @return The plot type.
      */
+    @Override
     public String getPlotType() {
         // return localizationResources.getString("Radar_Plot");
         return ("Spider Web Plot");
@@ -339,7 +338,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the dataset.
      *
-     * @return The dataset (possibly <code>null</code>).
+     * @return The dataset (possibly {@code null}).
      *
      * @see #setDataset(CategoryDataset)
      */
@@ -351,7 +350,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the dataset used by the plot and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      *
      * @see #getDataset()
      */
@@ -370,9 +369,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
         }
 
         // send a dataset change event to self to trigger plot change event
-        datasetChanged(new DatasetChangeEvent(this, dataset, 
-                new DatasetChangeInfo()));
-        // TODO:  fill in real dataset change type
+        datasetChanged(new DatasetChangeEvent(this, dataset));
     }
 
     /**
@@ -402,7 +399,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the data extract order (by row or by column).
      *
-     * @return The data extract order (never <code>null</code>).
+     * @return The data extract order (never {@code null}).
      *
      * @see #setDataExtractOrder(TableOrder)
      */
@@ -414,17 +411,15 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the data extract order (by row or by column) and sends a
      * {@link PlotChangeEvent}to all registered listeners.
      *
-     * @param order the order (<code>null</code> not permitted).
+     * @param order the order ({@code null} not permitted).
      *
-     * @throws IllegalArgumentException if <code>order</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code order} is
+     *     {@code null}.
      *
      * @see #getDataExtractOrder()
      */
     public void setDataExtractOrder(TableOrder order) {
-        if (order == null) {
-            throw new IllegalArgumentException("Null 'order' argument");
-        }
+        Args.nullNotPermitted(order, "order");
         this.dataExtractOrder = order;
         fireChangeEvent();
     }
@@ -512,7 +507,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Returns the direction in which the radar axes are drawn
      * (clockwise or anti-clockwise).
      *
-     * @return The direction (never <code>null</code>).
+     * @return The direction (never {@code null}).
      *
      * @see #setDirection(Rotation)
      */
@@ -524,14 +519,12 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the direction in which the radar axes are drawn and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param direction  the direction (<code>null</code> not permitted).
+     * @param direction  the direction ({@code null} not permitted).
      *
      * @see #getDirection()
      */
     public void setDirection(Rotation direction) {
-        if (direction == null) {
-            throw new IllegalArgumentException("Null 'direction' argument.");
-        }
+        Args.nullNotPermitted(direction, "direction");
         this.direction = direction;
         fireChangeEvent();
     }
@@ -595,7 +588,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the paint used to draw the axis lines.
      *
-     * @return The paint used to draw the axis lines (never <code>null</code>).
+     * @return The paint used to draw the axis lines (never {@code null}).
      *
      * @see #setAxisLinePaint(Paint)
      * @see #getAxisLineStroke()
@@ -609,15 +602,13 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the paint used to draw the axis lines and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getAxisLinePaint()
      * @since 1.0.4
      */
     public void setAxisLinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.axisLinePaint = paint;
         fireChangeEvent();
     }
@@ -625,7 +616,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the stroke used to draw the axis lines.
      *
-     * @return The stroke used to draw the axis lines (never <code>null</code>).
+     * @return The stroke used to draw the axis lines (never {@code null}).
      *
      * @see #setAxisLineStroke(Stroke)
      * @see #getAxisLinePaint()
@@ -639,15 +630,13 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the stroke used to draw the axis lines and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      *
      * @see #getAxisLineStroke()
      * @since 1.0.4
      */
     public void setAxisLineStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.axisLineStroke = stroke;
         fireChangeEvent();
     }
@@ -657,7 +646,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the paint for ALL series in the plot.
      *
-     * @return The paint (possibly <code>null</code>).
+     * @return The paint (possibly {@code null}).
      *
      * @see #setSeriesPaint(Paint)
      */
@@ -666,11 +655,11 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     }
 
     /**
-     * Sets the paint for ALL series in the plot. If this is set to</code> null
-     * </code>, then a list of paints is used instead (to allow different colors
-     * to be used for each series of the radar group).
+     * Sets the paint for ALL series in the plot.  If this is set to 
+     * {@code null}, then a list of paints is used instead (to allow different 
+     * colors to be used for each series of the radar group).
      *
-     * @param paint the paint (<code>null</code> permitted).
+     * @param paint the paint ({@code null} permitted).
      *
      * @see #getSeriesPaint()
      */
@@ -684,7 +673,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      *
      * @param series  the series index (zero-based).
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setSeriesPaint(int, Paint)
      */
@@ -717,7 +706,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * {@link PlotChangeEvent} to all registered listeners.
      *
      * @param series  the series index (zero-based).
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      *
      * @see #getSeriesPaint(int)
      */
@@ -730,7 +719,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Returns the base series paint. This is used when no other paint is
      * available.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setBaseSeriesPaint(Paint)
      */
@@ -741,14 +730,12 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Sets the base series paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getBaseSeriesPaint()
      */
     public void setBaseSeriesPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.baseSeriesPaint = paint;
         fireChangeEvent();
     }
@@ -758,7 +745,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the outline paint for ALL series in the plot.
      *
-     * @return The paint (possibly <code>null</code>).
+     * @return The paint (possibly {@code null}).
      */
     public Paint getSeriesOutlinePaint() {
         return this.seriesOutlinePaint;
@@ -766,10 +753,10 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
 
     /**
      * Sets the outline paint for ALL series in the plot. If this is set to
-     * </code> null</code>, then a list of paints is used instead (to allow
+     * {@code null}, then a list of paints is used instead (to allow
      * different colors to be used for each series).
      *
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      */
     public void setSeriesOutlinePaint(Paint paint) {
         this.seriesOutlinePaint = paint;
@@ -781,7 +768,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      *
      * @param series  the series index (zero-based).
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      */
     public Paint getSeriesOutlinePaint(int series) {
         // return the override, if there is one...
@@ -801,7 +788,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * {@link PlotChangeEvent} to all registered listeners.
      *
      * @param series  the series index (zero-based).
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      */
     public void setSeriesOutlinePaint(int series, Paint paint) {
         this.seriesOutlinePaintList.setPaint(series, paint);
@@ -812,7 +799,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Returns the base series paint. This is used when no other paint is
      * available.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      */
     public Paint getBaseSeriesOutlinePaint() {
         return this.baseSeriesOutlinePaint;
@@ -821,12 +808,10 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Sets the base series paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      */
     public void setBaseSeriesOutlinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.baseSeriesOutlinePaint = paint;
         fireChangeEvent();
     }
@@ -836,7 +821,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the outline stroke for ALL series in the plot.
      *
-     * @return The stroke (possibly <code>null</code>).
+     * @return The stroke (possibly {@code null}).
      */
     public Stroke getSeriesOutlineStroke() {
         return this.seriesOutlineStroke;
@@ -844,10 +829,10 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
 
     /**
      * Sets the outline stroke for ALL series in the plot. If this is set to
-     * </code> null</code>, then a list of paints is used instead (to allow
+     * {@code null}, then a list of paints is used instead (to allow
      * different colors to be used for each series).
      *
-     * @param stroke  the stroke (<code>null</code> permitted).
+     * @param stroke  the stroke ({@code null} permitted).
      */
     public void setSeriesOutlineStroke(Stroke stroke) {
         this.seriesOutlineStroke = stroke;
@@ -859,7 +844,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      *
      * @param series  the series index (zero-based).
      *
-     * @return The stroke (never <code>null</code>).
+     * @return The stroke (never {@code null}).
      */
     public Stroke getSeriesOutlineStroke(int series) {
 
@@ -882,7 +867,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * {@link PlotChangeEvent} to all registered listeners.
      *
      * @param series  the series index (zero-based).
-     * @param stroke  the stroke (<code>null</code> permitted).
+     * @param stroke  the stroke ({@code null} permitted).
      */
     public void setSeriesOutlineStroke(int series, Stroke stroke) {
         this.seriesOutlineStrokeList.setStroke(series, stroke);
@@ -893,7 +878,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Returns the base series stroke. This is used when no other stroke is
      * available.
      *
-     * @return The stroke (never <code>null</code>).
+     * @return The stroke (never {@code null}).
      */
     public Stroke getBaseSeriesOutlineStroke() {
         return this.baseSeriesOutlineStroke;
@@ -902,12 +887,10 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Sets the base series stroke.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      */
     public void setBaseSeriesOutlineStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.baseSeriesOutlineStroke = stroke;
         fireChangeEvent();
     }
@@ -915,7 +898,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the shape used for legend items.
      *
-     * @return The shape (never <code>null</code>).
+     * @return The shape (never {@code null}).
      *
      * @see #setLegendItemShape(Shape)
      */
@@ -927,14 +910,12 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the shape used for legend items and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param shape  the shape (<code>null</code> not permitted).
+     * @param shape  the shape ({@code null} not permitted).
      *
      * @see #getLegendItemShape()
      */
     public void setLegendItemShape(Shape shape) {
-        if (shape == null) {
-            throw new IllegalArgumentException("Null 'shape' argument.");
-        }
+        Args.nullNotPermitted(shape, "shape");
         this.legendItemShape = shape;
         fireChangeEvent();
     }
@@ -942,7 +923,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the series label font.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setLabelFont(Font)
      */
@@ -954,14 +935,12 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the series label font and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getLabelFont()
      */
     public void setLabelFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.labelFont = font;
         fireChangeEvent();
     }
@@ -969,7 +948,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the series label paint.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setLabelPaint(Paint)
      */
@@ -981,14 +960,12 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the series label paint and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getLabelPaint()
      */
     public void setLabelPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.labelPaint = paint;
         fireChangeEvent();
     }
@@ -996,7 +973,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the label generator.
      *
-     * @return The label generator (never <code>null</code>).
+     * @return The label generator (never {@code null}).
      *
      * @see #setLabelGenerator(CategoryItemLabelGenerator)
      */
@@ -1008,21 +985,19 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the label generator and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param generator  the generator (<code>null</code> not permitted).
+     * @param generator  the generator ({@code null} not permitted).
      *
      * @see #getLabelGenerator()
      */
     public void setLabelGenerator(CategoryItemLabelGenerator generator) {
-        if (generator == null) {
-            throw new IllegalArgumentException("Null 'generator' argument.");
-        }
+        Args.nullNotPermitted(generator, "generator");
         this.labelGenerator = generator;
     }
 
     /**
      * Returns the tool tip generator for the plot.
      *
-     * @return The tool tip generator (possibly <code>null</code>).
+     * @return The tool tip generator (possibly {@code null}).
      *
      * @see #setToolTipGenerator(CategoryToolTipGenerator)
      *
@@ -1036,7 +1011,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the tool tip generator for the plot and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @see #getToolTipGenerator()
      *
@@ -1050,7 +1025,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the URL generator for the plot.
      *
-     * @return The URL generator (possibly <code>null</code>).
+     * @return The URL generator (possibly {@code null}).
      *
      * @see #setURLGenerator(CategoryURLGenerator)
      *
@@ -1064,7 +1039,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * Sets the URL generator for the plot and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @see #getURLGenerator()
      *
@@ -1078,8 +1053,9 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns a collection of legend items for the spider web chart.
      *
-     * @return The legend items (never <code>null</code>).
+     * @return The legend items (never {@code null}).
      */
+    @Override
     public LegendItemCollection getLegendItems() {
         LegendItemCollection result = new LegendItemCollection();
         if (getDataset() == null) {
@@ -1143,10 +1119,11 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      *
      * @param g2  the graphics device.
      * @param area  the area within which the plot should be drawn.
-     * @param anchor  the anchor point (<code>null</code> permitted).
+     * @param anchor  the anchor point ({@code null} permitted).
      * @param parentState  the state from the parent plot, if there is one.
      * @param info  collects info about the drawing.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
             PlotState parentState, PlotRenderingInfo info) {
 
@@ -1169,8 +1146,8 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
                 getForegroundAlpha()));
 
-        if (!DatasetUtilities.isEmptyOrNull(this.dataset)) {
-            int seriesCount = 0, catCount = 0;
+        if (!DatasetUtils.isEmptyOrNull(this.dataset)) {
+            int seriesCount, catCount;
 
             if (this.dataExtractOrder == TableOrder.BY_ROW) {
                 seriesCount = this.dataset.getRowCount();
@@ -1182,8 +1159,9 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
             }
 
             // ensure we have a maximum value to use on the axes
-            if (this.maxValue == DEFAULT_MAX_VALUE)
+            if (this.maxValue == DEFAULT_MAX_VALUE) {
                 calculateMaxValue(seriesCount, catCount);
+            }
 
             // Next, setup the plot area
 
@@ -1246,8 +1224,8 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * @param catCount  the number of categories
      */
     private void calculateMaxValue(int seriesCount, int catCount) {
-        double v = 0;
-        Number nV = null;
+        double v;
+        Number nV;
 
         for (int seriesIndex = 0; seriesIndex < seriesCount; seriesIndex++) {
             for (int catIndex = 0; catIndex < catCount; catIndex++) {
@@ -1334,7 +1312,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
                     g2.draw(head);
 
                     if (entities != null) {
-                        int row = 0; int col = 0;
+                        int row, col;
                         if (this.dataExtractOrder == TableOrder.BY_ROW) {
                             row = series;
                             col = cat;
@@ -1388,16 +1366,16 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the value to be plotted at the interseries of the
+     * Returns the value to be plotted at the intersection of the
      * series and the category.  This allows us to plot
-     * <code>BY_ROW</code> or <code>BY_COLUMN</code> which basically is just
+     * {@code BY_ROW} or {@code BY_COLUMN} which basically is just
      * reversing the definition of the categories and data series being
      * plotted.
      *
      * @param series the series to be plotted.
      * @param cat the category within the series to be plotted.
      *
-     * @return The value to be plotted (possibly <code>null</code>).
+     * @return The value to be plotted (possibly {@code null}).
      *
      * @see #getDataExtractOrder()
      */
@@ -1426,7 +1404,7 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
                              int cat, double startAngle, double extent) {
         FontRenderContext frc = g2.getFontRenderContext();
 
-        String label = null;
+        String label;
         if (this.dataExtractOrder == TableOrder.BY_ROW) {
             // if series are in rows, then the categories are the column keys
             label = this.labelGenerator.generateColumnLabel(this.dataset, cat);
@@ -1498,10 +1476,11 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     /**
      * Tests this plot for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -1537,36 +1516,36 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
         if (this.axisLabelGap != that.axisLabelGap) {
             return false;
         }
-        if (!PaintUtilities.equal(this.axisLinePaint, that.axisLinePaint)) {
+        if (!PaintUtils.equal(this.axisLinePaint, that.axisLinePaint)) {
             return false;
         }
         if (!this.axisLineStroke.equals(that.axisLineStroke)) {
             return false;
         }
-        if (!ShapeUtilities.equal(this.legendItemShape, that.legendItemShape)) {
+        if (!ShapeUtils.equal(this.legendItemShape, that.legendItemShape)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.seriesPaint, that.seriesPaint)) {
+        if (!PaintUtils.equal(this.seriesPaint, that.seriesPaint)) {
             return false;
         }
         if (!this.seriesPaintList.equals(that.seriesPaintList)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.baseSeriesPaint, that.baseSeriesPaint)) {
+        if (!PaintUtils.equal(this.baseSeriesPaint, that.baseSeriesPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.seriesOutlinePaint,
+        if (!PaintUtils.equal(this.seriesOutlinePaint,
                 that.seriesOutlinePaint)) {
             return false;
         }
         if (!this.seriesOutlinePaintList.equals(that.seriesOutlinePaintList)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.baseSeriesOutlinePaint,
+        if (!PaintUtils.equal(this.baseSeriesOutlinePaint,
                 that.baseSeriesOutlinePaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.seriesOutlineStroke,
+        if (!ObjectUtils.equal(this.seriesOutlineStroke,
                 that.seriesOutlineStroke)) {
             return false;
         }
@@ -1581,17 +1560,17 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
         if (!this.labelFont.equals(that.labelFont)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.labelPaint, that.labelPaint)) {
+        if (!PaintUtils.equal(this.labelPaint, that.labelPaint)) {
             return false;
         }
         if (!this.labelGenerator.equals(that.labelGenerator)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.toolTipGenerator,
+        if (!ObjectUtils.equal(this.toolTipGenerator,
                 that.toolTipGenerator)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.urlGenerator,
+        if (!ObjectUtils.equal(this.urlGenerator,
                 that.urlGenerator)) {
             return false;
         }
@@ -1606,9 +1585,10 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
      * @throws CloneNotSupportedException if the plot cannot be cloned for
      *         any reason.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         SpiderWebPlot clone = (SpiderWebPlot) super.clone();
-        clone.legendItemShape = ShapeUtilities.clone(this.legendItemShape);
+        clone.legendItemShape = ShapeUtils.clone(this.legendItemShape);
         clone.seriesPaintList = (PaintList) this.seriesPaintList.clone();
         clone.seriesOutlinePaintList
                 = (PaintList) this.seriesOutlinePaintList.clone();
@@ -1627,16 +1607,16 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
 
-        SerialUtilities.writeShape(this.legendItemShape, stream);
-        SerialUtilities.writePaint(this.seriesPaint, stream);
-        SerialUtilities.writePaint(this.baseSeriesPaint, stream);
-        SerialUtilities.writePaint(this.seriesOutlinePaint, stream);
-        SerialUtilities.writePaint(this.baseSeriesOutlinePaint, stream);
-        SerialUtilities.writeStroke(this.seriesOutlineStroke, stream);
-        SerialUtilities.writeStroke(this.baseSeriesOutlineStroke, stream);
-        SerialUtilities.writePaint(this.labelPaint, stream);
-        SerialUtilities.writePaint(this.axisLinePaint, stream);
-        SerialUtilities.writeStroke(this.axisLineStroke, stream);
+        SerialUtils.writeShape(this.legendItemShape, stream);
+        SerialUtils.writePaint(this.seriesPaint, stream);
+        SerialUtils.writePaint(this.baseSeriesPaint, stream);
+        SerialUtils.writePaint(this.seriesOutlinePaint, stream);
+        SerialUtils.writePaint(this.baseSeriesOutlinePaint, stream);
+        SerialUtils.writeStroke(this.seriesOutlineStroke, stream);
+        SerialUtils.writeStroke(this.baseSeriesOutlineStroke, stream);
+        SerialUtils.writePaint(this.labelPaint, stream);
+        SerialUtils.writePaint(this.axisLinePaint, stream);
+        SerialUtils.writeStroke(this.axisLineStroke, stream);
     }
 
     /**
@@ -1651,16 +1631,16 @@ public class SpiderWebPlot extends Plot implements Cloneable, Serializable {
             ClassNotFoundException {
         stream.defaultReadObject();
 
-        this.legendItemShape = SerialUtilities.readShape(stream);
-        this.seriesPaint = SerialUtilities.readPaint(stream);
-        this.baseSeriesPaint = SerialUtilities.readPaint(stream);
-        this.seriesOutlinePaint = SerialUtilities.readPaint(stream);
-        this.baseSeriesOutlinePaint = SerialUtilities.readPaint(stream);
-        this.seriesOutlineStroke = SerialUtilities.readStroke(stream);
-        this.baseSeriesOutlineStroke = SerialUtilities.readStroke(stream);
-        this.labelPaint = SerialUtilities.readPaint(stream);
-        this.axisLinePaint = SerialUtilities.readPaint(stream);
-        this.axisLineStroke = SerialUtilities.readStroke(stream);
+        this.legendItemShape = SerialUtils.readShape(stream);
+        this.seriesPaint = SerialUtils.readPaint(stream);
+        this.baseSeriesPaint = SerialUtils.readPaint(stream);
+        this.seriesOutlinePaint = SerialUtils.readPaint(stream);
+        this.baseSeriesOutlinePaint = SerialUtils.readPaint(stream);
+        this.seriesOutlineStroke = SerialUtils.readStroke(stream);
+        this.baseSeriesOutlineStroke = SerialUtils.readStroke(stream);
+        this.labelPaint = SerialUtils.readPaint(stream);
+        this.axisLinePaint = SerialUtils.readPaint(stream);
+        this.axisLineStroke = SerialUtils.readStroke(stream);
         if (this.dataset != null) {
             this.dataset.addChangeListener(this);
         }

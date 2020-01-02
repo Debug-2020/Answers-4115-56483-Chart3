@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * DefaultCategoryDataset.java
  * ---------------------------
- * (C) Copyright 2002-2009, by Object Refinery Limited.
+ * (C) Copyright 2002-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -43,7 +43,6 @@
  * 26-Feb-2007 : Updated API docs (DG);
  * 08-Mar-2007 : Implemented clone() (DG);
  * 09-May-2008 : Implemented PublicCloneable (DG);
- * 03-Jul-2009 : Added selection state (DG);
  *
  */
 
@@ -51,36 +50,30 @@ package org.jfree.data.category;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.data.KeyedObjects2D;
-import org.jfree.data.SelectableValue;
+
+import org.jfree.data.DefaultKeyedValues2D;
 import org.jfree.data.UnknownKeyException;
-import org.jfree.data.event.DatasetChangeEvent;
+import org.jfree.data.general.AbstractDataset;
+import org.jfree.data.general.DatasetChangeEvent;
 
 /**
  * A default implementation of the {@link CategoryDataset} interface.
  */
-public class DefaultCategoryDataset extends AbstractCategoryDataset
-        implements CategoryDataset, SelectableCategoryDataset, 
-        CategoryDatasetSelectionState, PublicCloneable, Serializable {
+public class DefaultCategoryDataset extends AbstractDataset
+        implements CategoryDataset, PublicCloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -8168173757291644622L;
 
-    /** 
-     * A storage structure for the data.
-     */
-    private KeyedObjects2D data;
+    /** A storage structure for the data. */
+    private DefaultKeyedValues2D data;
 
     /**
      * Creates a new (empty) dataset.
      */
     public DefaultCategoryDataset() {
-        this.data = new KeyedObjects2D();
-        // FIXME: will need to remove this later, because it should be optional
-        setSelectionState(this);
+        this.data = new DefaultKeyedValues2D();
     }
 
     /**
@@ -90,6 +83,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      *
      * @see #getColumnCount()
      */
+    @Override
     public int getRowCount() {
         return this.data.getRowCount();
     }
@@ -101,6 +95,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      *
      * @see #getRowCount()
      */
+    @Override
     public int getColumnCount() {
         return this.data.getColumnCount();
     }
@@ -111,20 +106,14 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      *
      * @see #addValue(Number, Comparable, Comparable)
      * @see #removeValue(Comparable, Comparable)
      */
+    @Override
     public Number getValue(int row, int column) {
-        SelectableValue sv = (SelectableValue) this.data.getObject(row, 
-                column);
-        if (sv == null) {
-            return null;
-        }
-        else {
-            return sv.getValue();
-        }
+        return this.data.getValue(row, column);
     }
 
     /**
@@ -138,6 +127,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      * @see #getRowKeys()
      * @see #getColumnKey(int)
      */
+    @Override
     public Comparable getRowKey(int row) {
         return this.data.getRowKey(row);
     }
@@ -145,12 +135,13 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
     /**
      * Returns the row index for a given key.
      *
-     * @param key  the row key (<code>null</code> not permitted).
+     * @param key  the row key ({@code null} not permitted).
      *
      * @return The row index.
      *
      * @see #getRowKey(int)
      */
+    @Override
     public int getRowIndex(Comparable key) {
         // defer null argument check
         return this.data.getRowIndex(key);
@@ -163,6 +154,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      *
      * @see #getRowKey(int)
      */
+    @Override
     public List getRowKeys() {
         return this.data.getRowKeys();
     }
@@ -176,6 +168,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      *
      * @see #getColumnIndex(Comparable)
      */
+    @Override
     public Comparable getColumnKey(int column) {
         return this.data.getColumnKey(column);
     }
@@ -183,12 +176,13 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
     /**
      * Returns the column index for a given key.
      *
-     * @param key  the column key (<code>null</code> not permitted).
+     * @param key  the column key ({@code null} not permitted).
      *
      * @return The column index.
      *
      * @see #getColumnKey(int)
      */
+    @Override
     public int getColumnIndex(Comparable key) {
         // defer null argument check
         return this.data.getColumnIndex(key);
@@ -201,6 +195,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      *
      * @see #getColumnKey(int)
      */
+    @Override
     public List getColumnKeys() {
         return this.data.getColumnKeys();
     }
@@ -208,24 +203,18 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
     /**
      * Returns the value for a pair of keys.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      *
      * @throws UnknownKeyException if either key is not defined in the dataset.
      *
      * @see #addValue(Number, Comparable, Comparable)
      */
+    @Override
     public Number getValue(Comparable rowKey, Comparable columnKey) {
-        SelectableValue sv = (SelectableValue) this.data.getObject(rowKey,
-                columnKey);
-        if (sv != null) {
-            return sv.getValue();
-        }
-        else {
-            return null;
-        }
+        return this.data.getValue(rowKey, columnKey);
     }
 
     /**
@@ -240,9 +229,8 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      */
     public void addValue(Number value, Comparable rowKey,
                          Comparable columnKey) {
-        this.data.addObject(new SelectableValue(value), rowKey, columnKey);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        this.data.addValue(value, rowKey, columnKey);
+        fireDatasetChanged();
     }
 
     /**
@@ -263,17 +251,16 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      * Adds or updates a value in the table and sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param value  the value (<code>null</code> permitted).
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param value  the value ({@code null} permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #getValue(Comparable, Comparable)
      */
     public void setValue(Number value, Comparable rowKey,
                          Comparable columnKey) {
-        this.data.setObject(new SelectableValue(value), rowKey, columnKey);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        this.data.setValue(value, rowKey, columnKey);
+        fireDatasetChanged();
     }
 
     /**
@@ -281,8 +268,8 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      * {@link DatasetChangeEvent} to all registered listeners.
      *
      * @param value  the value.
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #getValue(Comparable, Comparable)
      */
@@ -293,11 +280,11 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
 
     /**
      * Adds the specified value to an existing value in the dataset (if the
-     * existing value is <code>null</code>, it is treated as if it were 0.0).
+     * existing value is {@code null}, it is treated as if it were 0.0).
      *
      * @param value  the value.
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @throws UnknownKeyException if either key is not defined in the dataset.
      */
@@ -316,17 +303,14 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      * Removes a value from the dataset and sends a {@link DatasetChangeEvent}
      * to all registered listeners.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key.
+     * @param columnKey  the column key.
      *
      * @see #addValue(Number, Comparable, Comparable)
-     *
-     * @throws UnknownKeyException if either key is not in the dataset.
      */
     public void removeValue(Comparable rowKey, Comparable columnKey) {
-        this.data.removeObject(rowKey, columnKey);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        this.data.removeValue(rowKey, columnKey);
+        fireDatasetChanged();
     }
 
     /**
@@ -339,8 +323,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      */
     public void removeRow(int rowIndex) {
         this.data.removeRow(rowIndex);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        fireDatasetChanged();
     }
 
     /**
@@ -353,8 +336,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      */
     public void removeRow(Comparable rowKey) {
         this.data.removeRow(rowKey);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        fireDatasetChanged();
     }
 
     /**
@@ -367,25 +349,23 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      */
     public void removeColumn(int columnIndex) {
         this.data.removeColumn(columnIndex);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        fireDatasetChanged();
     }
 
     /**
      * Removes a column from the dataset and sends a {@link DatasetChangeEvent}
      * to all registered listeners.
      *
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #removeRow(Comparable)
      *
-     * @throws UnknownKeyException if <code>columnKey</code> is not defined
+     * @throws UnknownKeyException if {@code columnKey} is not defined
      *         in the dataset.
      */
     public void removeColumn(Comparable columnKey) {
         this.data.removeColumn(columnKey);
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        fireDatasetChanged();
     }
 
     /**
@@ -394,17 +374,17 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      */
     public void clear() {
         this.data.clear();
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real change details
+        fireDatasetChanged();
     }
 
     /**
      * Tests this dataset for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -443,6 +423,7 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         return this.data.hashCode();
     }
@@ -455,44 +436,11 @@ public class DefaultCategoryDataset extends AbstractCategoryDataset
      * @throws CloneNotSupportedException if there is a problem cloning the
      *         dataset.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultCategoryDataset clone = (DefaultCategoryDataset) super.clone();
-        clone.data = (KeyedObjects2D) this.data.clone();
+        clone.data = (DefaultKeyedValues2D) this.data.clone();
         return clone;
-    }
-
-    public boolean isSelected(int row, int column) {
-        SelectableValue sv = (SelectableValue) this.data.getObject(row, column);
-        return sv.isSelected();
-    }
-
-    public void setSelected(int row, int column, boolean selected) {
-        setSelected(row, column, selected, true);
-    }
-
-    public void setSelected(int row, int column, boolean selected,
-            boolean notify) {
-        SelectableValue sv = (SelectableValue) this.data.getObject(row, column);
-        sv.setSelected(selected);
-        if (notify) {
-            fireSelectionEvent();
-        }
-    }
-
-    public void clearSelection() {
-        int rowCount = getRowCount();
-        int colCount = getColumnCount();
-        for (int r = 0; r < rowCount; r++) {
-            for (int c = 0; c < colCount; c++) {
-                setSelected(r, c, false, false);
-            }
-        }
-        fireSelectionEvent();
-    }
-
-    public void fireSelectionEvent() {
-        // TODO: this should be a separate event type I think
-        fireDatasetChanged(new DatasetChangeInfo());
     }
 
 }

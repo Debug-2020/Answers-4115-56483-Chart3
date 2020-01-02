@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * TaskSeries.java
  * ---------------
- * (C) Copyright 2002-2008, by Object Refinery Limited.
+ * (C) Copyright 2002-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -40,6 +40,7 @@
  * 10-Jan-2003 : Renamed GanttSeries --> TaskSeries (DG);
  * 30-Jul-2004 : Added equals() method (DG);
  * 09-May-2008 : Fixed cloning bug (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -47,8 +48,9 @@ package org.jfree.data.gantt;
 
 import java.util.Collections;
 import java.util.List;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 
-import org.jfree.chart.util.ObjectUtilities;
 import org.jfree.data.general.Series;
 
 /**
@@ -65,7 +67,7 @@ public class TaskSeries extends Series {
     /**
      * Constructs a new series with the specified name.
      *
-     * @param name  the series name (<code>null</code> not permitted).
+     * @param name  the series name ({@code null} not permitted).
      */
     public TaskSeries(String name) {
         super(name);
@@ -77,12 +79,10 @@ public class TaskSeries extends Series {
      * {@link org.jfree.data.general.SeriesChangeEvent} to all registered
      * listeners.
      *
-     * @param task  the task (<code>null</code> not permitted).
+     * @param task  the task ({@code null} not permitted).
      */
     public void add(Task task) {
-        if (task == null) {
-            throw new IllegalArgumentException("Null 'task' argument.");
-        }
+        Args.nullNotPermitted(task, "task");
         this.tasks.add(task);
         fireSeriesChanged();
     }
@@ -114,6 +114,7 @@ public class TaskSeries extends Series {
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount() {
         return this.tasks.size();
     }
@@ -132,9 +133,9 @@ public class TaskSeries extends Series {
     /**
      * Returns the task in the series that has the specified description.
      *
-     * @param description  the name (<code>null</code> not permitted).
+     * @param description  the name ({@code null} not permitted).
      *
-     * @return The task (possibly <code>null</code>).
+     * @return The task (possibly {@code null}).
      */
     public Task get(String description) {
         Task result = null;
@@ -161,10 +162,11 @@ public class TaskSeries extends Series {
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -190,9 +192,10 @@ public class TaskSeries extends Series {
      * @throws CloneNotSupportedException if there is some problem cloning
      *     the dataset.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         TaskSeries clone = (TaskSeries) super.clone();
-        clone.tasks = (List) ObjectUtilities.deepClone(this.tasks);
+        clone.tasks = (List) ObjectUtils.deepClone(this.tasks);
         return clone;
     }
 

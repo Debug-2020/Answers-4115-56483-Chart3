@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * ExtendedCategoryAxis.java
  * -------------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2017, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,7 +39,7 @@
  * 29-Jan-2004 : Added paint attribute (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 21-Mar-2007 : Implemented equals(), clone() and fixed serialization (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -59,9 +59,10 @@ import org.jfree.chart.event.AxisChangeEvent;
 import org.jfree.chart.text.TextBlock;
 import org.jfree.chart.text.TextFragment;
 import org.jfree.chart.text.TextLine;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * An extended version of the {@link CategoryAxis} class that supports
@@ -89,14 +90,14 @@ public class ExtendedCategoryAxis extends CategoryAxis {
     public ExtendedCategoryAxis(String label) {
         super(label);
         this.sublabels = new HashMap();
-        this.sublabelFont = new Font("Tahoma", Font.PLAIN, 10);
-        this.sublabelPaint = Color.black;
+        this.sublabelFont = new Font("SansSerif", Font.PLAIN, 10);
+        this.sublabelPaint = Color.BLACK;
     }
 
     /**
      * Returns the font for the sublabels.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setSubLabelFont(Font)
      */
@@ -108,14 +109,12 @@ public class ExtendedCategoryAxis extends CategoryAxis {
      * Sets the font for the sublabels and sends an {@link AxisChangeEvent} to
      * all registered listeners.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getSubLabelFont()
      */
     public void setSubLabelFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.sublabelFont = font;
         notifyListeners(new AxisChangeEvent(this));
     }
@@ -123,7 +122,7 @@ public class ExtendedCategoryAxis extends CategoryAxis {
     /**
      * Returns the paint for the sublabels.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setSubLabelPaint(Paint)
      */
@@ -135,14 +134,12 @@ public class ExtendedCategoryAxis extends CategoryAxis {
      * Sets the paint for the sublabels and sends an {@link AxisChangeEvent}
      * to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getSubLabelPaint()
      */
     public void setSubLabelPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.sublabelPaint = paint;
         notifyListeners(new AxisChangeEvent(this));
     }
@@ -168,6 +165,7 @@ public class ExtendedCategoryAxis extends CategoryAxis {
      *
      * @return A label.
      */
+    @Override
     protected TextBlock createLabel(Comparable category, float width,
                                     RectangleEdge edge, Graphics2D g2) {
         TextBlock label = super.createLabel(category, width, edge, g2);
@@ -193,10 +191,11 @@ public class ExtendedCategoryAxis extends CategoryAxis {
     /**
      * Tests this axis for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -208,7 +207,7 @@ public class ExtendedCategoryAxis extends CategoryAxis {
         if (!this.sublabelFont.equals(that.sublabelFont)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.sublabelPaint, that.sublabelPaint)) {
+        if (!PaintUtils.equal(this.sublabelPaint, that.sublabelPaint)) {
             return false;
         }
         if (!this.sublabels.equals(that.sublabels)) {
@@ -224,6 +223,7 @@ public class ExtendedCategoryAxis extends CategoryAxis {
      *
      * @throws CloneNotSupportedException if there is a problem cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         ExtendedCategoryAxis clone = (ExtendedCategoryAxis) super.clone();
         clone.sublabels = new HashMap(this.sublabels);
@@ -239,7 +239,7 @@ public class ExtendedCategoryAxis extends CategoryAxis {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.sublabelPaint, stream);
+        SerialUtils.writePaint(this.sublabelPaint, stream);
     }
 
     /**
@@ -253,7 +253,7 @@ public class ExtendedCategoryAxis extends CategoryAxis {
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.sublabelPaint = SerialUtilities.readPaint(stream);
+        this.sublabelPaint = SerialUtils.readPaint(stream);
     }
 
 }

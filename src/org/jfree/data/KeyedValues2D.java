@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * KeyedValues2D.java
@@ -56,7 +56,7 @@ public interface KeyedValues2D extends Values2D {
      *
      * @return The row key.
      *
-     * @throws IndexOutOfBoundsException if <code>row</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code row} is out of bounds.
      */
     public Comparable getRowKey(int row);
 
@@ -65,7 +65,7 @@ public interface KeyedValues2D extends Values2D {
      *
      * @param key  the row key.
      *
-     * @return The row index, or <code>-1</code> if the key is unrecognised.
+     * @return The row index, or {@code -1} if the key is unrecognised.
      */
     public int getRowIndex(Comparable key);
 
@@ -83,7 +83,7 @@ public interface KeyedValues2D extends Values2D {
      *
      * @return The column key.
      *
-     * @throws IndexOutOfBoundsException if <code>row</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code row} is out of bounds.
      */
     public Comparable getColumnKey(int column);
 
@@ -92,7 +92,7 @@ public interface KeyedValues2D extends Values2D {
      *
      * @param key  the column key.
      *
-     * @return The column index, or <code>-1</code> if the key is unrecognised.
+     * @return The column index, or {@code -1} if the key is unrecognised.
      */
     public int getColumnIndex(Comparable key);
 
@@ -106,8 +106,8 @@ public interface KeyedValues2D extends Values2D {
     /**
      * Returns the value associated with the specified keys.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @return The value.
      *

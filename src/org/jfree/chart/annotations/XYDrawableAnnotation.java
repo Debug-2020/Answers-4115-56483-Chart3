@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * XYDrawableAnnotation.java
  * -------------------------
- * (C) Copyright 2003-2009, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -37,8 +37,8 @@
  * 21-May-2003 : Version 1 (DG);
  * 21-Jan-2004 : Update for renamed method in ValueAxis (DG);
  * 30-Sep-2004 : Added support for tool tips and URLs (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 18-Jun-2008 : Added scaling factor (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -49,15 +49,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 
-import org.jfree.chart.Drawable;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.ui.Drawable;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
 
 /**
  * A general annotation that can be placed on an {@link XYPlot}.
@@ -93,7 +94,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
      * @param y  the y-coordinate for the area.
      * @param width  the width of the area.
      * @param height  the height of the area.
-     * @param drawable  the drawable object (<code>null</code> not permitted).
+     * @param drawable  the drawable object ({@code null} not permitted).
      */
     public XYDrawableAnnotation(double x, double y, double width, double height,
                                 Drawable drawable) {
@@ -102,7 +103,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
 
     /**
      * Creates a new annotation to be displayed within the given area.  If you
-     * specify a <code>drawScaleFactor</code> of 2.0, the <code>drawable</code>
+     * specify a {@code drawScaleFactor} of 2.0, the {@code drawable}
      * will be drawn at twice the requested display size then scaled down to
      * fit the space.
      *
@@ -111,7 +112,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
      * @param displayWidth  the width of the area.
      * @param displayHeight  the height of the area.
      * @param drawScaleFactor  the scaling factor for drawing.
-     * @param drawable  the drawable object (<code>null</code> not permitted).
+     * @param drawable  the drawable object ({@code null} not permitted).
      *
      * @since 1.0.11
      */
@@ -119,9 +120,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
             double displayHeight, double drawScaleFactor, Drawable drawable) {
 
         super();
-        if (drawable == null) {
-            throw new IllegalArgumentException("Null 'drawable' argument.");
-        }
+        Args.nullNotPermitted(drawable, "drawable");
         this.x = x;
         this.y = y;
         this.displayWidth = displayWidth;
@@ -143,6 +142,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
      * @param info  if supplied, this info object will be populated with
      *              entity information.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                      ValueAxis domainAxis, ValueAxis rangeAxis,
                      int rendererIndex,
@@ -188,8 +188,9 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
      *
      * @param obj  the object to test against.
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj == this) { // simple case
@@ -218,7 +219,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
         if (this.drawScaleFactor != that.drawScaleFactor) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.drawable, that.drawable)) {
+        if (!ObjectUtils.equal(this.drawable, that.drawable)) {
             return false;
         }
         // seem to be the same...
@@ -231,6 +232,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         long temp;
@@ -252,6 +254,7 @@ public class XYDrawableAnnotation extends AbstractXYAnnotation
      *
      * @throws CloneNotSupportedException  if the annotation can't be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

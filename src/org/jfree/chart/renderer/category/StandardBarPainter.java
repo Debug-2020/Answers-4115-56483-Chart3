@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * StandardBarPainter.java
  * -----------------------
- * (C) Copyright 2008, 2009, by Object Refinery Limited.
+ * (C) Copyright 2008, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,7 +36,6 @@
  * --------
  * 19-Jun-2008 : Version 1 (DG);
  * 15-Aug-2008 : Use renderer's shadow paint (DG);
- * 25-Jun-2009 : Changed interface for 1.2.0 (DG);
  *
  */
 
@@ -50,9 +49,8 @@ import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.io.Serializable;
-
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.RectangleEdge;
+import org.jfree.chart.ui.GradientPaintTransformer;
+import org.jfree.chart.ui.RectangleEdge;
 
 /**
  * An implementation of the {@link BarPainter} interface that preserves the
@@ -78,16 +76,15 @@ public class StandardBarPainter implements BarPainter, Serializable {
      * @param renderer  the renderer.
      * @param row  the row index.
      * @param column  the column index.
-     * @param selected  is the item selected?
      * @param bar  the bar
      * @param base  indicates which side of the rectangle is the base of the
      *              bar.
      */
+    @Override
     public void paintBar(Graphics2D g2, BarRenderer renderer, int row,
-            int column, boolean selected, RectangularShape bar,
-            RectangleEdge base) {
+            int column, RectangularShape bar, RectangleEdge base) {
 
-        Paint itemPaint = renderer.getItemPaint(row, column, selected);
+        Paint itemPaint = renderer.getItemPaint(row, column);
         GradientPaintTransformer t = renderer.getGradientPaintTransformer();
         if (t != null && itemPaint instanceof GradientPaint) {
             itemPaint = t.transform((GradientPaint) itemPaint, bar);
@@ -98,9 +95,8 @@ public class StandardBarPainter implements BarPainter, Serializable {
         // draw the outline...
         if (renderer.isDrawBarOutline()) {
                // && state.getBarWidth() > BAR_OUTLINE_WIDTH_THRESHOLD) {
-            Stroke stroke = renderer.getItemOutlineStroke(row, column,
-                    selected);
-            Paint paint = renderer.getItemOutlinePaint(row, column, selected);
+            Stroke stroke = renderer.getItemOutlineStroke(row, column);
+            Paint paint = renderer.getItemOutlinePaint(row, column);
             if (stroke != null && paint != null) {
                 g2.setStroke(stroke);
                 g2.setPaint(paint);
@@ -122,13 +118,14 @@ public class StandardBarPainter implements BarPainter, Serializable {
      *              bar.
      * @param pegShadow  peg the shadow to the base of the bar?
      */
+    @Override
     public void paintBarShadow(Graphics2D g2, BarRenderer renderer, int row,
-            int column, boolean selected, RectangularShape bar,
-            RectangleEdge base, boolean pegShadow) {
+            int column, RectangularShape bar, RectangleEdge base,
+            boolean pegShadow) {
 
         // handle a special case - if the bar colour has alpha == 0, it is
         // invisible so we shouldn't draw any shadow
-        Paint itemPaint = renderer.getItemPaint(row, column, selected);
+        Paint itemPaint = renderer.getItemPaint(row, column);
         if (itemPaint instanceof Color) {
             Color c = (Color) itemPaint;
             if (c.getAlpha() == 0) {
@@ -198,10 +195,11 @@ public class StandardBarPainter implements BarPainter, Serializable {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the obj (<code>null</code> permitted).
+     * @param obj  the obj ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -217,6 +215,7 @@ public class StandardBarPainter implements BarPainter, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int hash = 37;
         // no fields to compute...
@@ -224,4 +223,3 @@ public class StandardBarPainter implements BarPainter, Serializable {
     }
 
 }
-

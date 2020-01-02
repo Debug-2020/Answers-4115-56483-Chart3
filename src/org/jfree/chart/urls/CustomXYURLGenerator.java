@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * CustomXYURLGenerator.java
@@ -50,8 +50,8 @@ package org.jfree.chart.urls;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.xy.XYDataset;
 
 /**
@@ -104,7 +104,7 @@ public class CustomXYURLGenerator implements XYURLGenerator, Cloneable,
      * @param series  the series index.
      * @param item  the item index.
      *
-     * @return The URL (possibly <code>null</code>).
+     * @return The URL (possibly {@code null}).
      */
     public String getURL(int series, int item) {
         String result = null;
@@ -126,8 +126,9 @@ public class CustomXYURLGenerator implements XYURLGenerator, Cloneable,
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return A string containing the URL (possibly <code>null</code>).
+     * @return A string containing the URL (possibly {@code null}).
      */
+    @Override
     public String generateURL(XYDataset dataset, int series, int item) {
         return getURL(series, item);
     }
@@ -135,13 +136,13 @@ public class CustomXYURLGenerator implements XYURLGenerator, Cloneable,
     /**
      * Adds a list of URLs.
      *
-     * @param urls  the list of URLs (<code>null</code> permitted, the list
+     * @param urls  the list of URLs ({@code null} permitted, the list
      *     is copied).
      */
     public void addURLSeries(List urls) {
         List listToAdd = null;
         if (urls != null) {
-            listToAdd = new ArrayList(urls);
+            listToAdd = new java.util.ArrayList(urls);
         }
         this.urlSeries.add(listToAdd);
     }
@@ -149,10 +150,11 @@ public class CustomXYURLGenerator implements XYURLGenerator, Cloneable,
     /**
      * Tests this generator for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -199,9 +201,10 @@ public class CustomXYURLGenerator implements XYURLGenerator, Cloneable,
      *
      * @throws CloneNotSupportedException if there is a problem with cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         CustomXYURLGenerator clone = (CustomXYURLGenerator) super.clone();
-        clone.urlSeries = new ArrayList(this.urlSeries);
+        clone.urlSeries = new java.util.ArrayList(this.urlSeries);
         return clone;
     }
 

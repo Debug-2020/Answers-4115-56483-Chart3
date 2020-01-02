@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------
  * Block.java
@@ -38,7 +38,6 @@
  * 08-Feb-2005 : Added ID (DG);
  * 20-Apr-2005 : Added a new draw() method that can accept params
  *               and return results (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -46,9 +45,8 @@ package org.jfree.chart.block;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-
-import org.jfree.chart.Drawable;
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.ui.Drawable;
+import org.jfree.chart.ui.Size2D;
 
 /**
  * A block is an arbitrary item that can be drawn (in Java2D space) within a
@@ -86,9 +84,9 @@ public interface Block extends Drawable {
      * returns the block size.
      *
      * @param g2  the graphics device.
-     * @param constraint  the constraint (<code>null</code> not permitted).
+     * @param constraint  the constraint ({@code null} not permitted).
      *
-     * @return The block size (in Java2D units, never <code>null</code>).
+     * @return The block size (in Java2D units, never {@code null}).
      */
     public Size2D arrange(Graphics2D g2, RectangleConstraint constraint);
 
@@ -108,14 +106,14 @@ public interface Block extends Drawable {
 
     /**
      * Draws the block within the specified area.  Refer to the documentation
-     * for the implementing class for information about the <code>params</code>
+     * for the implementing class for information about the {@code params}
      * and return value supported.
      *
      * @param g2  the graphics device.
      * @param area  the area.
-     * @param params  optional parameters (<code>null</code> permitted).
+     * @param params  optional parameters ({@code null} permitted).
      *
-     * @return An optional return value (possibly <code>null</code>).
+     * @return An optional return value (possibly {@code null}).
      */
     public Object draw(Graphics2D g2, Rectangle2D area, Object params);
 

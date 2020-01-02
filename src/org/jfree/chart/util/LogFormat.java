@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * LogFormat.java
  * --------------
- * (C) Copyright 2007-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2007-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,6 +39,7 @@
  *               attribute as per Feature Request 1886036 (DG);
  * 14-Jan-2009 : Added default constructor, and accessor methods for
  *               exponent formatter (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -92,7 +93,7 @@ public class LogFormat extends NumberFormat {
      * Creates a new instance.
      *
      * @param base  the base.
-     * @param baseLabel  the base label (<code>null</code> not permitted).
+     * @param baseLabel  the base label ({@code null} not permitted).
      * @param showBase  a flag that controls whether or not the base value is
      *                  shown.
      */
@@ -104,8 +105,8 @@ public class LogFormat extends NumberFormat {
      * Creates a new instance.
      *
      * @param base  the base.
-     * @param baseLabel  the base label (<code>null</code> not permitted).
-     * @param powerLabel  the power label (<code>null</code> not permitted).
+     * @param baseLabel  the base label ({@code null} not permitted).
+     * @param powerLabel  the power label ({@code null} not permitted).
      * @param showBase  a flag that controls whether or not the base value is
      *                  shown.
      *
@@ -113,12 +114,8 @@ public class LogFormat extends NumberFormat {
      */
     public LogFormat(double base, String baseLabel, String powerLabel,
             boolean showBase) {
-        if (baseLabel == null) {
-            throw new IllegalArgumentException("Null 'baseLabel' argument.");
-        }
-        if (powerLabel == null) {
-            throw new IllegalArgumentException("Null 'powerLabel' argument.");
-        }
+        Args.nullNotPermitted(baseLabel, "baseLabel");
+        Args.nullNotPermitted(powerLabel, "powerLabel");
         this.base = base;
         this.baseLog = Math.log(this.base);
         this.baseLabel = baseLabel;
@@ -129,7 +126,7 @@ public class LogFormat extends NumberFormat {
     /**
      * Returns the number format used for the exponent.
      *
-     * @return The number format (never <code>null</code>).
+     * @return The number format (never {@code null}).
      *
      * @since 1.0.13.
      */
@@ -140,14 +137,12 @@ public class LogFormat extends NumberFormat {
     /**
      * Sets the number format used for the exponent.
      *
-     * @param format  the formatter (<code>null</code> not permitted).
+     * @param format  the formatter ({@code null} not permitted).
      *
      * @since 1.0.13
      */
     public void setExponentFormat(NumberFormat format) {
-        if (format == null) {
-            throw new IllegalArgumentException("Null 'format' argument.");
-        }
+        Args.nullNotPermitted(format, "format");
         this.formatter = format;
     }
 
@@ -171,6 +166,7 @@ public class LogFormat extends NumberFormat {
      *
      * @return A string buffer containing the formatted value.
      */
+    @Override
     public StringBuffer format(double number, StringBuffer toAppendTo,
             FieldPosition pos) {
         StringBuffer result = new StringBuffer();
@@ -192,12 +188,13 @@ public class LogFormat extends NumberFormat {
      *
      * @return The string buffer.
      */
+    @Override
     public StringBuffer format(long number, StringBuffer toAppendTo,
             FieldPosition pos) {
         StringBuffer result = new StringBuffer();
         if (this.showBase) {
             result.append(this.baseLabel);
-            result.append("^");
+            result.append(this.powerLabel);
         }
         result.append(this.formatter.format(calculateLog(number)));
         return result;
@@ -205,13 +202,14 @@ public class LogFormat extends NumberFormat {
 
     /**
      * Parsing is not implemented, so this method always returns
-     * <code>null</code>.
+     * {@code null}.
      *
      * @param source  ignored.
      * @param parsePosition  ignored.
      *
-     * @return Always <code>null</code>.
+     * @return Always {@code null}.
      */
+    @Override
     public Number parse (String source, ParsePosition parsePosition) {
         return null; // don't bother with parsing
     }
@@ -219,10 +217,11 @@ public class LogFormat extends NumberFormat {
     /**
      * Tests this formatter for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -254,6 +253,7 @@ public class LogFormat extends NumberFormat {
      *
      * @return A clone.
      */
+    @Override
     public Object clone() {
         LogFormat clone = (LogFormat) super.clone();
         clone.formatter = (NumberFormat) this.formatter.clone();

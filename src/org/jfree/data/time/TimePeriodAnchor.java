@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * TimePeriodAnchor.java
@@ -46,7 +46,7 @@ import java.io.Serializable;
 
 /**
  * Used to indicate one of three positions in a time period:
- * <code>START</code>, <code>MIDDLE</code> and <code>END</code>.
+ * {@code START}, {@code MIDDLE} and {@code END}.
  */
 public final class TimePeriodAnchor implements Serializable {
 
@@ -82,18 +82,20 @@ public final class TimePeriodAnchor implements Serializable {
      *
      * @return The string.
      */
+    @Override
     public String toString() {
         return this.name;
     }
 
     /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
+     * Returns {@code true} if this object is equal to the specified
+     * object, and {@code false} otherwise.
      *
      * @param obj  the other object.
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {
@@ -116,6 +118,7 @@ public final class TimePeriodAnchor implements Serializable {
      *
      * @return The hashcode
      */
+    @Override
     public int hashCode() {
         return this.name.hashCode();
     }

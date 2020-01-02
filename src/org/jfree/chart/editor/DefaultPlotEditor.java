@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * DefaultPlotEditor.java
@@ -37,11 +37,10 @@
  * Changes:
  * --------
  * 24-Nov-2005 : Version 1, based on PlotPropertyEditPanel.java (DG);
- * 19-Jun-2007 : Removed DefaultColorBarEditor which has been deprecated (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
  *               Jess Thrysoee (DG);
  * 27-Feb-2009 : Fixed bug 2612649, NullPointerException (DG);
+ * 03-Nov-2011 : Added support for DefaultPolarPlotEditor (MH);
  *
  */
 
@@ -70,6 +69,7 @@ import org.jfree.chart.axis.Axis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.PolarPlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
@@ -77,9 +77,9 @@ import org.jfree.chart.renderer.xy.StandardXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.ui.LCBLayout;
 import org.jfree.chart.ui.PaintSample;
+import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.ui.StrokeChooserPanel;
 import org.jfree.chart.ui.StrokeSample;
-import org.jfree.chart.util.RectangleInsets;
 import org.jfree.chart.util.ResourceBundleWrapper;
 
 /**
@@ -166,6 +166,11 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
      * @param plot  the plot, which should be changed.
      */
     public DefaultPlotEditor(Plot plot) {
+        JPanel panel = createPlotPanel(plot);
+        add(panel);
+    }
+    
+    protected JPanel createPlotPanel(Plot plot) {
         this.plotInsets = plot.getInsets();
         this.backgroundPaintSample = new PaintSample(plot.getBackgroundPaint());
         this.outlineStrokeSample = new StrokeSample(plot.getOutlineStroke());
@@ -180,8 +185,8 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
             CategoryItemRenderer renderer = ((CategoryPlot) plot).getRenderer();
             if (renderer instanceof LineAndShapeRenderer) {
                 LineAndShapeRenderer r = (LineAndShapeRenderer) renderer;
-                this.drawLines = Boolean.valueOf(r.getBaseLinesVisible());
-                this.drawShapes = Boolean.valueOf(r.getBaseShapesVisible());
+                this.drawLines = Boolean.valueOf(r.getDefaultLinesVisible());
+                this.drawShapes = Boolean.valueOf(r.getDefaultShapesVisible());
             }
         }
         else if (plot instanceof XYPlot) {
@@ -297,6 +302,15 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
         appearance.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         appearance.add(general, BorderLayout.NORTH);
 
+        JTabbedPane tabs = createPlotTabs(plot);
+        tabs.add(localizationResources.getString("Appearance"), appearance);
+        panel.add(tabs);
+        
+        return panel;
+    }
+
+    protected JTabbedPane createPlotTabs(Plot plot)
+    {
         JTabbedPane tabs = new JTabbedPane();
         tabs.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 
@@ -323,6 +337,9 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
         else if (plot instanceof XYPlot) {
             rangeAxis = ((XYPlot) plot).getRangeAxis();
         }
+        else if (plot instanceof PolarPlot) {
+            rangeAxis = ((PolarPlot) plot).getAxis();
+        }
 
         this.rangeAxisPropertyPanel = DefaultAxisEditor.getInstance(rangeAxis);
         if (this.rangeAxisPropertyPanel != null) {
@@ -332,10 +349,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
                     this.rangeAxisPropertyPanel);
         }
 
-        tabs.add(localizationResources.getString("Appearance"), appearance);
-        panel.add(tabs);
-
-        add(panel);
+        return tabs;
     }
 
     /**
@@ -362,7 +376,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
     /**
      * Returns the current outline stroke.
      *
-     * @return The current outline stroke (possibly <code>null</code>).
+     * @return The current outline stroke (possibly {@code null}).
      */
     public Stroke getOutlineStroke() {
         return this.outlineStrokeSample.getStroke();
@@ -401,6 +415,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
      * Handles user actions generated within the panel.
      * @param event     the event
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (command.equals("BackgroundPaint")) {
@@ -432,7 +447,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
     private void attemptBackgroundPaintSelection() {
         Color c;
         c = JColorChooser.showDialog(this, localizationResources.getString(
-                "Background_Color"), Color.blue);
+                "Background_Color"), Color.BLUE);
         if (c != null) {
             this.backgroundPaintSample.setPaint(c);
         }
@@ -445,8 +460,8 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
         StrokeChooserPanel panel = new StrokeChooserPanel(
                 this.outlineStrokeSample, this.availableStrokeSamples);
         int result = JOptionPane.showConfirmDialog(this, panel,
-            localizationResources.getString("Stroke_Selection"),
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                localizationResources.getString("Stroke_Selection"),
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
             this.outlineStrokeSample.setStroke(panel.getSelectedStroke());
@@ -460,7 +475,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
     private void attemptOutlinePaintSelection() {
         Color c;
         c = JColorChooser.showDialog(this, localizationResources.getString(
-                "Outline_Color"), Color.blue);
+                "Outline_Color"), Color.BLUE);
         if (c != null) {
             this.outlinePaintSample.setPaint(c);
         }
@@ -555,6 +570,10 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
                 XYPlot p = (XYPlot) plot;
                 rangeAxis = p.getRangeAxis();
             }
+            else if (plot instanceof PolarPlot) {
+                PolarPlot p = (PolarPlot) plot;
+                rangeAxis = p.getAxis();
+            }
             if (rangeAxis != null) {
                 this.rangeAxisPropertyPanel.setAxisProperties(rangeAxis);
             }
@@ -576,7 +595,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
                 CategoryPlot p = (CategoryPlot) plot;
                 CategoryItemRenderer r = p.getRenderer();
                 if (r instanceof LineAndShapeRenderer) {
-                    ((LineAndShapeRenderer) r).setBaseLinesVisible(
+                    ((LineAndShapeRenderer) r).setDefaultLinesVisible(
                             this.drawLines.booleanValue());
                 }
             }
@@ -595,7 +614,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
                 CategoryPlot p = (CategoryPlot) plot;
                 CategoryItemRenderer r = p.getRenderer();
                 if (r instanceof LineAndShapeRenderer) {
-                    ((LineAndShapeRenderer) r).setBaseShapesVisible(
+                    ((LineAndShapeRenderer) r).setDefaultShapesVisible(
                             this.drawShapes.booleanValue());
                 }
             }
@@ -604,7 +623,7 @@ class DefaultPlotEditor extends JPanel implements ActionListener {
                 XYItemRenderer r = p.getRenderer();
                 if (r instanceof StandardXYItemRenderer) {
                     ((StandardXYItemRenderer) r).setBaseShapesVisible(
-                        this.drawShapes.booleanValue());
+                        this.drawShapes);
                 }
             }
         }

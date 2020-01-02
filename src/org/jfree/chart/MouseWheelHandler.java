@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,21 +21,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * MouseWheelHandler.java
  * ----------------------
- * (C) Copyright 2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2009-2016 by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Ulrich Voigt - patch 2686040;
+ *                   Jim Goodwin - bug fix;
  *
  * Changes
  * -------
  * 18-Mar-2009 : Version 1, based on ideas by UV in patch 2686040 (DG);
  * 26-Mar-2009 : Implemented Serializable (DG);
+ * 10-Sep-2009 : Bug fix by Jim Goodwin to respect domain/rangeZoomable flags
+ *               in the ChartPanel (DG);
+ * 04-Nov-2009 : Pass mouse wheel notification to PiePlot (DG);
  *
  */
 
@@ -44,8 +48,9 @@ package org.jfree.chart;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-
 import java.io.Serializable;
+
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.Zoomable;
@@ -64,9 +69,9 @@ class MouseWheelHandler implements MouseWheelListener, Serializable {
     double zoomFactor;
 
     /**
-     * Creates a new instance.
+     * Creates a new instance for the specified chart panel.
      *
-     * @param chartPanel  the chart panel (<code>null</code> not permitted).
+     * @param chartPanel  the chart panel ({@code null} not permitted).
      */
     public MouseWheelHandler(ChartPanel chartPanel) {
         this.chartPanel = chartPanel;
@@ -102,6 +107,7 @@ class MouseWheelHandler implements MouseWheelListener, Serializable {
      *
      * @param e  the event.
      */
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         JFreeChart chart = this.chartPanel.getChart();
         if (chart == null) {
@@ -112,9 +118,10 @@ class MouseWheelHandler implements MouseWheelListener, Serializable {
             Zoomable zoomable = (Zoomable) plot;
             handleZoomable(zoomable, e);
         }
-        // TODO:  here we could handle non-zoomable plots in interesting
-        // ways (for example, the wheel could rotate a PiePlot or just zoom
-        // in on the whole panel).
+        else if (plot instanceof PiePlot) {
+            PiePlot pp = (PiePlot) plot;
+            pp.handleMouseWheelRotation(e.getWheelRotation());
+        }
     }
 
     /**
@@ -124,39 +131,30 @@ class MouseWheelHandler implements MouseWheelListener, Serializable {
      * @param e  the mouse wheel event.
      */
     private void handleZoomable(Zoomable zoomable, MouseWheelEvent e) {
-        Plot plot = (Plot) zoomable;
+        // don't zoom unless the mouse pointer is in the plot's data area
         ChartRenderingInfo info = this.chartPanel.getChartRenderingInfo();
         PlotRenderingInfo pinfo = info.getPlotInfo();
         Point2D p = this.chartPanel.translateScreenToJava2D(e.getPoint());
         if (!pinfo.getDataArea().contains(p)) {
             return;
         }
-        int clicks = e.getWheelRotation();
-        int direction = 0;
-        if (clicks < 0) {
-            direction = -1;
-        }
-        else if (clicks > 0) {
-            direction = 1;
-        }
 
-        boolean old = plot.isNotify();
-
+        Plot plot = (Plot) zoomable;
         // do not notify while zooming each axis
+        boolean notifyState = plot.isNotify();
         plot.setNotify(false);
-        double increment = 1.0 + this.zoomFactor;
-        if (direction > 0) {
-            zoomable.zoomDomainAxes(increment, pinfo, p, true);
-            zoomable.zoomRangeAxes(increment, pinfo, p, true);
+        int clicks = e.getWheelRotation();
+        double zf = 1.0 + this.zoomFactor;
+        if (clicks < 0) {
+            zf = 1.0 / zf;
         }
-        else if (direction < 0) {
-            zoomable.zoomDomainAxes(1.0 / increment, pinfo, p, true);
-            zoomable.zoomRangeAxes(1.0 / increment, pinfo, p, true);
+        if (chartPanel.isDomainZoomable()) {
+            zoomable.zoomDomainAxes(zf, pinfo, p, true);
         }
-        // set the old notify status
-        plot.setNotify(old);
-
+        if (chartPanel.isRangeZoomable()) {
+            zoomable.zoomRangeAxes(zf, pinfo, p, true);
+        }
+        plot.setNotify(notifyState);  // this generates the change event too
     }
 
 }
-

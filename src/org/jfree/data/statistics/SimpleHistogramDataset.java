@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * SimpleHistogramDataset.java
  * ---------------------------
- * (C) Copyright 2005-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2005-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Sergei Ivanov;
@@ -36,10 +36,8 @@
  * -------
  * 10-Jan-2005 : Version 1 (DG);
  * 21-May-2007 : Added clearObservations() and removeAllBins() (SI);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 10-Jul-2007 : Added null argument check to constructor (DG);
- * 29-Jun-2009 : Implemented XYDatasetSelectionState and
- *               SelectableXYDataset (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -50,16 +48,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import org.jfree.chart.event.DatasetChangeInfo;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.DomainOrder;
-import org.jfree.data.event.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.xy.AbstractIntervalXYDataset;
 import org.jfree.data.xy.IntervalXYDataset;
-import org.jfree.data.xy.SelectableXYDataset;
-import org.jfree.data.xy.XYDatasetSelectionState;
 
 /**
  * A dataset used for creating simple histograms with custom defined bins.
@@ -67,8 +63,7 @@ import org.jfree.data.xy.XYDatasetSelectionState;
  * @see HistogramDataset
  */
 public class SimpleHistogramDataset extends AbstractIntervalXYDataset
-        implements IntervalXYDataset, XYDatasetSelectionState,
-            SelectableXYDataset, Cloneable, PublicCloneable,
+        implements IntervalXYDataset, Cloneable, PublicCloneable,
             Serializable {
 
     /** For serialization. */
@@ -88,18 +83,15 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
 
     /**
      * Creates a new histogram dataset.  Note that the
-     * <code>adjustForBinSize</code> flag defaults to <code>true</code>.
+     * {@code adjustForBinSize} flag defaults to {@code true}.
      *
-     * @param key  the series key (<code>null</code> not permitted).
+     * @param key  the series key ({@code null} not permitted).
      */
     public SimpleHistogramDataset(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         this.key = key;
         this.bins = new ArrayList();
         this.adjustForBinSize = true;
-        setSelectionState(this);
     }
 
     /**
@@ -125,8 +117,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      */
     public void setAdjustForBinSize(boolean adjust) {
         this.adjustForBinSize = adjust;
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        notifyListeners(new DatasetChangeEvent(this, this));
     }
 
     /**
@@ -134,18 +125,20 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The series count.
      */
+    @Override
     public int getSeriesCount() {
         return 1;
     }
 
     /**
      * Returns the key for a series.  Since this dataset only stores a single
-     * series, the <code>series</code> argument is ignored.
+     * series, the {@code series} argument is ignored.
      *
      * @param series  the series (zero-based index, ignored in this dataset).
      *
      * @return The key for the series.
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         return this.key;
     }
@@ -153,20 +146,22 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
     /**
      * Returns the order of the domain (or X) values returned by the dataset.
      *
-     * @return The order (never <code>null</code>).
+     * @return The order (never {@code null}).
      */
+    @Override
     public DomainOrder getDomainOrder() {
         return DomainOrder.ASCENDING;
     }
 
     /**
      * Returns the number of items in a series.  Since this dataset only stores
-     * a single series, the <code>series</code> argument is ignored.
+     * a single series, the {@code series} argument is ignored.
      *
      * @param series  the series index (zero-based, ignored in this dataset).
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount(int series) {
         return this.bins.size();
     }
@@ -175,7 +170,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      * Adds a bin to the dataset.  An exception is thrown if the bin overlaps
      * with any existing bin in the dataset.
      *
-     * @param bin  the bin (<code>null</code> not permitted).
+     * @param bin  the bin ({@code null} not permitted).
      *
      * @see #removeAllBins()
      */
@@ -226,8 +221,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
             throw new RuntimeException("No bin.");
         }
         if (notify) {
-            fireDatasetChanged(new DatasetChangeInfo());
-            // TODO: fill in real change details
+            notifyListeners(new DatasetChangeEvent(this, this));
         }
     }
 
@@ -235,7 +229,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      * Adds a set of values to the dataset and sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param values  the values (<code>null</code> not permitted).
+     * @param values  the values ({@code null} not permitted).
      *
      * @see #clearObservations()
      */
@@ -243,8 +237,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
         for (int i = 0; i < values.length; i++) {
             addObservation(values[i], false);
         }
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        notifyListeners(new DatasetChangeEvent(this, this));
     }
 
     /**
@@ -262,8 +255,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
             SimpleHistogramBin bin = (SimpleHistogramBin) iterator.next();
             bin.setItemCount(0);
         }
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        notifyListeners(new DatasetChangeEvent(this, this));
     }
 
     /**
@@ -276,8 +268,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      */
     public void removeAllBins() {
         this.bins = new ArrayList();
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change details
+        notifyListeners(new DatasetChangeEvent(this, this));
     }
 
     /**
@@ -288,8 +279,9 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
      *
-     * @return The x-value (never <code>null</code>).
+     * @return The x-value (never {@code null}).
      */
+    @Override
     public Number getX(int series, int item) {
         return new Double(getXValue(series, item));
     }
@@ -302,6 +294,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The x-value.
      */
+    @Override
     public double getXValue(int series, int item) {
         SimpleHistogramBin bin = (SimpleHistogramBin) this.bins.get(item);
         return (bin.getLowerBound() + bin.getUpperBound()) / 2.0;
@@ -313,8 +306,9 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
      *
-     * @return The y-value (possibly <code>null</code>).
+     * @return The y-value (possibly {@code null}).
      */
+    @Override
     public Number getY(int series, int item) {
         return new Double(getYValue(series, item));
     }
@@ -329,6 +323,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @see #getAdjustForBinSize()
      */
+    @Override
     public double getYValue(int series, int item) {
         SimpleHistogramBin bin = (SimpleHistogramBin) this.bins.get(item);
         if (this.adjustForBinSize) {
@@ -348,6 +343,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public Number getStartX(int series, int item) {
         return new Double(getStartXValue(series, item));
     }
@@ -361,6 +357,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The start x-value.
      */
+    @Override
     public double getStartXValue(int series, int item) {
         SimpleHistogramBin bin = (SimpleHistogramBin) this.bins.get(item);
         return bin.getLowerBound();
@@ -374,6 +371,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public Number getEndX(int series, int item) {
         return new Double(getEndXValue(series, item));
     }
@@ -387,6 +385,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The end x-value.
      */
+    @Override
     public double getEndXValue(int series, int item) {
         SimpleHistogramBin bin = (SimpleHistogramBin) this.bins.get(item);
         return bin.getUpperBound();
@@ -400,6 +399,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public Number getStartY(int series, int item) {
         return getY(series, item);
     }
@@ -413,6 +413,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The start y-value.
      */
+    @Override
     public double getStartYValue(int series, int item) {
         return getYValue(series, item);
     }
@@ -425,6 +426,7 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public Number getEndY(int series, int item) {
         return getY(series, item);
     }
@@ -438,94 +440,19 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      *
      * @return The end y-value.
      */
+    @Override
     public double getEndYValue(int series, int item) {
         return getYValue(series, item);
     }
 
     /**
-     * Returns <code>true</code> if the specified item is selected, and
-     * <code>false</code> otherwise.
-     *
-     * @param series  the series index.
-     * @param item  the item index.
-     *
-     * @since 1.2.0
-     */
-    public boolean isSelected(int series, int item) {
-        SimpleHistogramBin bin = (SimpleHistogramBin) this.bins.get(item);
-        return bin.isSelected();
-    }
-
-    /**
-     * Sets the selection state of the specified item and sends a
-     * {@link DatasetChangeEvent} to all registered listeners.
-     *
-     * @since 1.2.0
-     */
-    public void setSelected(int series, int item, boolean selected) {
-        setSelected(series, item, selected, true);
-    }
-
-    /**
-     * Sets the selection state of the specified item and, if requested, sends
-     * a {@link DatasetChangeEvent} to all registered listeners.
-     *
-     * @param series  the series index.
-     * @param item  the item index.
-     * @param selected  the selection state.
-     * @param notify  notify listeners?
-     *
-     * @since 1.2.0
-     */
-    public void setSelected(int series, int item, boolean selected,
-            boolean notify) {
-        // series is ignored, because this dataset contains just one series
-        SimpleHistogramBin bin = (SimpleHistogramBin) this.bins.get(item);
-        bin.setSelected(selected);
-        if (notify) {
-            fireSelectionEvent();
-        }
-    }
-
-    /**
-     * Clears the selection state of all items in the dataset and sends a
-     * {@link DatasetChangeEvent} to all registered listeners.
-     *
-     * @since 1.2.0
-     */
-    public void clearSelection() {
-        Iterator iterator = this.bins.iterator();
-        boolean changed = false;
-        while (iterator.hasNext()) {
-            SimpleHistogramBin bin = (SimpleHistogramBin) iterator.next();
-            if (bin.isSelected()) {
-                bin.setSelected(false);
-                changed = true;
-            }
-        }
-        if (changed) {
-            fireSelectionEvent();
-        }
-    }
-
-    /**
-     * Sends an event to all registered listeners to indicate that the
-     * selection has changed.
-     *
-     * @since 1.2.0
-     */
-    public void fireSelectionEvent() {
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in real change info
-    }
-    
-    /**
      * Compares the dataset for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -554,9 +481,10 @@ public class SimpleHistogramDataset extends AbstractIntervalXYDataset
      * @throws CloneNotSupportedException not thrown by this class, but maybe
      *         by subclasses (if any).
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         SimpleHistogramDataset clone = (SimpleHistogramDataset) super.clone();
-        clone.bins = (List) ObjectUtilities.deepClone(this.bins);
+        clone.bins = (List) ObjectUtils.deepClone(this.bins);
         return clone;
     }
 

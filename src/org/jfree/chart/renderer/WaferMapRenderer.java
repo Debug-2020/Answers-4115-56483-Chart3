@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * WaferMapRenderer.java
@@ -135,7 +135,7 @@ public class WaferMapRenderer extends AbstractRenderer {
      *
      * @param method  the method.
      *
-     * @return <code>true</code> or </code>false</code>.
+     * @return {@code true} or </code>false</code>.
      */
     private boolean isMethodValid(int method) {
         switch (method) {
@@ -150,6 +150,7 @@ public class WaferMapRenderer extends AbstractRenderer {
      *
      * @return The drawing supplier.
      */
+    @Override
     public DrawingSupplier getDrawingSupplier() {
         DrawingSupplier result = null;
         WaferMapPlot p = getPlot();
@@ -302,7 +303,7 @@ public class WaferMapRenderer extends AbstractRenderer {
                     Shape shape = new Rectangle2D.Double(1d, 1d, 1d, 1d);
                     Paint paint = lookupSeriesPaint(
                             ((Integer) entry.getValue()).intValue());
-                    Paint outlinePaint = Color.black;
+                    Paint outlinePaint = Color.BLACK;
                     Stroke outlineStroke = DEFAULT_STROKE;
 
                     result.add(new LegendItem(label, description, null,
@@ -326,7 +327,7 @@ public class WaferMapRenderer extends AbstractRenderer {
                         Paint paint = getSeriesPaint(
                             ((Integer) entry.getValue()).intValue()
                         );
-                        Paint outlinePaint = Color.black;
+                        Paint outlinePaint = Color.BLACK;
                         Stroke outlineStroke = DEFAULT_STROKE;
 
                         result.add(new LegendItem(label, description,

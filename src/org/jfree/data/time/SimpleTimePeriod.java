@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * SimpleTimePeriod.java
@@ -51,7 +51,7 @@ import java.util.Date;
 
 /**
  * An arbitrary period of time, measured to millisecond precision using
- * <code>java.util.Date</code>.
+ * {@code java.util.Date}.
  * <p>
  * This class is intentionally immutable (that is, once constructed, you cannot
  * alter the start and end attributes).
@@ -84,8 +84,8 @@ public class SimpleTimePeriod implements TimePeriod, Comparable, Serializable {
     /**
      * Creates a new time allocation.
      *
-     * @param start  the start date/time (<code>null</code> not permitted).
-     * @param end  the end date/time (<code>null</code> not permitted).
+     * @param start  the start date/time ({@code null} not permitted).
+     * @param end  the end date/time ({@code null} not permitted).
      */
     public SimpleTimePeriod(Date start, Date end) {
         this(start.getTime(), end.getTime());
@@ -94,8 +94,9 @@ public class SimpleTimePeriod implements TimePeriod, Comparable, Serializable {
     /**
      * Returns the start date/time.
      *
-     * @return The start date/time (never <code>null</code>).
+     * @return The start date/time (never {@code null}).
      */
+    @Override
     public Date getStart() {
         return new Date(this.start);
     }
@@ -114,8 +115,9 @@ public class SimpleTimePeriod implements TimePeriod, Comparable, Serializable {
     /**
      * Returns the end date/time.
      *
-     * @return The end date/time (never <code>null</code>).
+     * @return The end date/time (never {@code null}).
      */
+    @Override
     public Date getEnd() {
         return new Date(this.end);
     }
@@ -136,10 +138,11 @@ public class SimpleTimePeriod implements TimePeriod, Comparable, Serializable {
      * The object is considered equal if it is an instance of {@link TimePeriod}
      * and it has the same start and end dates.
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -161,13 +164,14 @@ public class SimpleTimePeriod implements TimePeriod, Comparable, Serializable {
      * Returns an integer that indicates the relative ordering of two
      * time periods.
      *
-     * @param obj  the object (<code>null</code> not permitted).
+     * @param obj  the object ({@code null} not permitted).
      *
      * @return An integer.
      *
-     * @throws ClassCastException if <code>obj</code> is not an instance of
+     * @throws ClassCastException if {@code obj} is not an instance of
      *                            {@link TimePeriod}.
      */
+    @Override
     public int compareTo(Object obj) {
         TimePeriod that = (TimePeriod) obj;
         long t0 = getStart().getTime();
@@ -207,11 +211,12 @@ public class SimpleTimePeriod implements TimePeriod, Comparable, Serializable {
      * Returns a hash code for this object instance.  The approach described by
      * Joshua Bloch in "Effective Java" has been used here - see:
      * <p>
-     * <code>http://developer.java.sun.com/
-     * developer/Books/effectivejava/Chapter3.pdf</code>
+     * {@code http://developer.java.sun.com/
+     * developer/Books/effectivejava/Chapter3.pdf}
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + (int) this.start;

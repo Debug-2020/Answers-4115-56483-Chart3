@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * DefaultHighLowDataset.java
  * --------------------------
- * (C) Copyright 2002-2008, by Object Refinery Limited.
+ * (C) Copyright 2002-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -43,6 +43,7 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 28-Nov-2006 : Added equals() method override (DG);
  * 22-Apr-2008 : Implemented PublicCloneable (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -50,8 +51,7 @@ package org.jfree.data.xy;
 
 import java.util.Arrays;
 import java.util.Date;
-
-import org.jfree.chart.event.DatasetChangeInfo;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -60,8 +60,7 @@ import org.jfree.chart.util.PublicCloneable;
  * that is very similar.
  */
 public class DefaultHighLowDataset extends AbstractXYDataset
-        implements OHLCDataset, SelectableXYDataset, XYDatasetSelectionState,
-        PublicCloneable {
+        implements OHLCDataset, PublicCloneable {
 
     /** The series key. */
     private Comparable seriesKey;
@@ -84,43 +83,35 @@ public class DefaultHighLowDataset extends AbstractXYDataset
     /** Storage for the volume values. */
     private Number[] volume;
 
-    private boolean[] selected;
-
     /**
      * Constructs a new high/low/open/close dataset.
      * <p>
      * The current implementation allows only one series in the dataset.
      * This may be extended in a future version.
      *
-     * @param seriesKey  the key for the series (<code>null</code> not
+     * @param seriesKey  the key for the series ({@code null} not
      *     permitted).
-     * @param date  the dates (<code>null</code> not permitted).
-     * @param high  the high values (<code>null</code> not permitted).
-     * @param low  the low values (<code>null</code> not permitted).
-     * @param open  the open values (<code>null</code> not permitted).
-     * @param close  the close values (<code>null</code> not permitted).
-     * @param volume  the volume values (<code>null</code> not permitted).
+     * @param date  the dates ({@code null} not permitted).
+     * @param high  the high values ({@code null} not permitted).
+     * @param low  the low values ({@code null} not permitted).
+     * @param open  the open values ({@code null} not permitted).
+     * @param close  the close values ({@code null} not permitted).
+     * @param volume  the volume values ({@code null} not permitted).
      */
     public DefaultHighLowDataset(Comparable seriesKey, Date[] date,
             double[] high, double[] low, double[] open, double[] close,
             double[] volume) {
 
-        if (seriesKey == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
-        if (date == null) {
-            throw new IllegalArgumentException("Null 'date' argument.");
-        }
+        Args.nullNotPermitted(seriesKey, "seriesKey");
+        Args.nullNotPermitted(date, "date");
         this.seriesKey = seriesKey;
         this.date = date;
-        this.selected = new boolean[this.date.length];
         this.high = createNumberArray(high);
         this.low = createNumberArray(low);
         this.open = createNumberArray(open);
         this.close = createNumberArray(close);
         this.volume = createNumberArray(volume);
 
-        setSelectionState(this);
     }
 
     /**
@@ -129,16 +120,17 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      * @param series  the index of the series (ignored, this dataset supports
      *     only one series and this method always returns the key for series 0).
      *
-     * @return The series key (never <code>null</code>).
+     * @return The series key (never {@code null}).
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         return this.seriesKey;
     }
 
     /**
      * Returns the x-value for one item in a series.  The value returned is a
-     * <code>Long</code> instance generated from the underlying
-     * <code>Date</code> object.  To avoid generating a new object instance,
+     * {@code Long} instance generated from the underlying
+     * {@code Date} object.  To avoid generating a new object instance,
      * you might prefer to call {@link #getXValue(int, int)}.
      *
      * @param series  the series (zero-based index).
@@ -149,6 +141,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      * @see #getXValue(int, int)
      * @see #getXDate(int, int)
      */
+    @Override
     public Number getX(int series, int item) {
         return new Long(this.date[item].getTime());
     }
@@ -182,6 +175,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getYValue(int, int)
      */
+    @Override
     public Number getY(int series, int item) {
         return getClose(series, item);
     }
@@ -196,6 +190,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getHighValue(int, int)
      */
+    @Override
     public Number getHigh(int series, int item) {
         return this.high[item];
     }
@@ -211,11 +206,12 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getHigh(int, int)
      */
+    @Override
     public double getHighValue(int series, int item) {
         double result = Double.NaN;
-        Number n = getHigh(series, item);
-        if (n != null) {
-            result = n.doubleValue();
+        Number h = getHigh(series, item);
+        if (h != null) {
+            result = h.doubleValue();
         }
         return result;
     }
@@ -230,6 +226,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getLowValue(int, int)
      */
+    @Override
     public Number getLow(int series, int item) {
         return this.low[item];
     }
@@ -245,11 +242,12 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getLow(int, int)
      */
+    @Override
     public double getLowValue(int series, int item) {
         double result = Double.NaN;
-        Number low = getLow(series, item);
-        if (low != null) {
-            result = low.doubleValue();
+        Number l = getLow(series, item);
+        if (l != null) {
+            result = l.doubleValue();
         }
         return result;
     }
@@ -264,6 +262,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getOpenValue(int, int)
      */
+    @Override
     public Number getOpen(int series, int item) {
         return this.open[item];
     }
@@ -279,6 +278,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getOpen(int, int)
      */
+    @Override
     public double getOpenValue(int series, int item) {
         double result = Double.NaN;
         Number open = getOpen(series, item);
@@ -298,6 +298,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getCloseValue(int, int)
      */
+    @Override
     public Number getClose(int series, int item) {
         return this.close[item];
     }
@@ -313,11 +314,12 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getClose(int, int)
      */
+    @Override
     public double getCloseValue(int series, int item) {
         double result = Double.NaN;
-        Number close = getClose(series, item);
-        if (close != null) {
-            result = close.doubleValue();
+        Number c = getClose(series, item);
+        if (c != null) {
+            result = c.doubleValue();
         }
         return result;
     }
@@ -332,6 +334,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getVolumeValue(int, int)
      */
+    @Override
     public Number getVolume(int series, int item) {
         return this.volume[item];
     }
@@ -347,11 +350,12 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @see #getVolume(int, int)
      */
+    @Override
     public double getVolumeValue(int series, int item) {
         double result = Double.NaN;
-        Number volume = getVolume(series, item);
-        if (volume != null) {
-            result = volume.doubleValue();
+        Number v = getVolume(series, item);
+        if (v != null) {
+            result = v.doubleValue();
         }
         return result;
     }
@@ -363,6 +367,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @return The number of series.
      */
+    @Override
     public int getSeriesCount() {
         return 1;
     }
@@ -374,6 +379,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
      *
      * @return The number of items in the specified series.
      */
+    @Override
     public int getItemCount(int series) {
         return this.date.length;
     }
@@ -381,10 +387,11 @@ public class DefaultHighLowDataset extends AbstractXYDataset
     /**
      * Tests this dataset for equality with an arbitrary instance.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -420,7 +427,7 @@ public class DefaultHighLowDataset extends AbstractXYDataset
     /**
      * Constructs an array of Number objects from an array of doubles.
      *
-     * @param data  the double values to convert (<code>null</code> not
+     * @param data  the double values to convert ({@code null} not
      *     permitted).
      *
      * @return The data as an array of Number objects.
@@ -431,34 +438,6 @@ public class DefaultHighLowDataset extends AbstractXYDataset
             result[i] = new Double(data[i]);
         }
         return result;
-    }
-
-    public boolean isSelected(int series, int item) {
-        return this.selected[item];
-    }
-
-    public void setSelected(int series, int item, boolean selected) {
-        setSelected(series, item, selected, true);
-    }
-
-    public void setSelected(int series, int item, boolean selected,
-            boolean notify) {
-        if (series != 0) {
-            throw new IllegalArgumentException("Invalid series: " + series);
-        }
-        this.selected[item] = selected;
-        if (notify) {
-            fireSelectionEvent();
-        }
-    }
-
-    public void fireSelectionEvent() {
-        fireDatasetChanged(new DatasetChangeInfo());
-    }
-
-    public void clearSelection() {
-        Arrays.fill(this.selected, false);
-        fireSelectionEvent();
     }
 
 }

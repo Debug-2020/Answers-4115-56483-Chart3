@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * OutlierListCollection.java
@@ -56,7 +56,7 @@ import java.util.List;
  * one or more outliers, determined by whether overlaps have
  * occurred. Overlapping outliers are grouped in the same list.
  *
- * @see OutlierList
+ * @see org.jfree.chart.renderer.OutlierList
  */
 public class OutlierListCollection {
 
@@ -86,7 +86,7 @@ public class OutlierListCollection {
      * A flag to indicate the presence of one or more far out values at the
      * top end of the range.
      *
-     * @return A <code>boolean</code>.
+     * @return A {@code boolean}.
      */
     public boolean isHighFarOut() {
         return this.highFarOut;
@@ -106,7 +106,7 @@ public class OutlierListCollection {
      * A flag to indicate the presence of one or more far out values at the
      * bottom end of the range.
      *
-     * @return A <code>boolean</code>.
+     * @return A {@code boolean}.
      */
     public boolean isLowFarOut() {
         return this.lowFarOut;
@@ -122,7 +122,7 @@ public class OutlierListCollection {
         this.lowFarOut = farOut;
     }
     /**
-     * Appends the specified element as a new <code>OutlierList</code> to the
+     * Appends the specified element as a new {@code OutlierList} to the
      * end of this list if it does not overlap an outlier in an existing list.
      *
      * If it does overlap, it is appended to the outlier list which it overlaps

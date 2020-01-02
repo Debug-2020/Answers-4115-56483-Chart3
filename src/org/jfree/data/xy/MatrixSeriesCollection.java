@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * MatrixSeriesCollection.java
  * ---------------------------
- * (C) Copyright 2003-2008, by Barak Naveh and Contributors.
+ * (C) Copyright 2003-2016, by Barak Naveh and Contributors.
  *
  * Original Author:  Barak Naveh;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -40,25 +40,22 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 27-Nov-2006 : Added clone() override (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 22-Apr-2008 : Implemented PublicCloneable (DG);
- *
  */
 
 package org.jfree.data.xy;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.jfree.chart.event.DatasetChangeInfo;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
  * Represents a collection of {@link MatrixSeries} that can be used as a
  * dataset.
  *
- * @see MatrixSeries
+ * @see org.jfree.data.xy.MatrixSeries
  */
 public class MatrixSeriesCollection extends AbstractXYZDataset
         implements XYZDataset, PublicCloneable, Serializable {
@@ -98,6 +95,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return The number of items in the specified series.
      */
+    @Override
     public int getItemCount(int seriesIndex) {
         return getSeries(seriesIndex).getItemCount();
     }
@@ -109,16 +107,12 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      * @param seriesIndex zero-based series index.
      *
      * @return The series.
-     *
-     * @throws IllegalArgumentException
      */
     public MatrixSeries getSeries(int seriesIndex) {
         if ((seriesIndex < 0) || (seriesIndex > getSeriesCount())) {
             throw new IllegalArgumentException("Index outside valid range.");
         }
-
         MatrixSeries series = (MatrixSeries) this.seriesList.get(seriesIndex);
-
         return series;
     }
 
@@ -128,6 +122,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return The number of series in the collection.
      */
+    @Override
     public int getSeriesCount() {
         return this.seriesList.size();
     }
@@ -140,6 +135,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return The key for a series.
      */
+    @Override
     public Comparable getSeriesKey(int seriesIndex) {
         return getSeries(seriesIndex).getKey();
     }
@@ -154,8 +150,9 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return The j index value for the specified matrix item.
      *
-     * @see XYDataset#getXValue(int, int)
+     * @see org.jfree.data.xy.XYDataset#getXValue(int, int)
      */
+    @Override
     public Number getX(int seriesIndex, int itemIndex) {
         MatrixSeries series = (MatrixSeries) this.seriesList.get(seriesIndex);
         int x = series.getItemColumn(itemIndex);
@@ -173,8 +170,9 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return The i index value for the specified matrix item.
      *
-     * @see XYDataset#getYValue(int, int)
+     * @see org.jfree.data.xy.XYDataset#getYValue(int, int)
      */
+    @Override
     public Number getY(int seriesIndex, int itemIndex) {
         MatrixSeries series = (MatrixSeries) this.seriesList.get(seriesIndex);
         int y = series.getItemRow(itemIndex);
@@ -192,8 +190,9 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return The Mij item value for the specified matrix item.
      *
-     * @see XYZDataset#getZValue(int, int)
+     * @see org.jfree.data.xy.XYZDataset#getZValue(int, int)
      */
+    @Override
     public Number getZ(int seriesIndex, int itemIndex) {
         MatrixSeries series = (MatrixSeries) this.seriesList.get(seriesIndex);
         Number z = series.getItem(itemIndex);
@@ -207,22 +206,16 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      * Notifies all registered listeners that the dataset has changed.
      * </p>
      *
-     * @param series the series.
-     *
-     * @throws IllegalArgumentException
+     * @param series the series ({@code null} not permitted).
      */
     public void addSeries(MatrixSeries series) {
-        // check arguments...
-        if (series == null) {
-            throw new IllegalArgumentException("Cannot add null series.");
-        }
+        Args.nullNotPermitted(series, "series");
         // FIXME: Check that there isn't already a series with the same key
 
         // add the series...
         this.seriesList.add(series);
         series.addChangeListener(this);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
 
@@ -233,6 +226,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
@@ -245,7 +239,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
         if (obj instanceof MatrixSeriesCollection) {
             MatrixSeriesCollection c = (MatrixSeriesCollection) obj;
 
-            return ObjectUtilities.equal(this.seriesList, c.seriesList);
+            return ObjectUtils.equal(this.seriesList, c.seriesList);
         }
 
         return false;
@@ -256,6 +250,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         return (this.seriesList != null ? this.seriesList.hashCode() : 0);
     }
@@ -267,9 +262,10 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      *
      * @throws CloneNotSupportedException if there is a problem.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         MatrixSeriesCollection clone = (MatrixSeriesCollection) super.clone();
-        clone.seriesList = (List) ObjectUtilities.deepClone(this.seriesList);
+        clone.seriesList = (List) ObjectUtils.deepClone(this.seriesList);
         return clone;
     }
 
@@ -289,8 +285,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
 
         // Remove all the series from the collection and notify listeners.
         this.seriesList.clear();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
 
@@ -300,22 +295,14 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      * Notifies all registered listeners that the dataset has changed.
      * </p>
      *
-     * @param series the series.
-     *
-     * @throws IllegalArgumentException
+     * @param series the series ({@code null}).
      */
     public void removeSeries(MatrixSeries series) {
-        // check arguments...
-        if (series == null) {
-            throw new IllegalArgumentException("Cannot remove null series.");
-        }
-
-        // remove the series...
+        Args.nullNotPermitted(series, "series");
         if (this.seriesList.contains(series)) {
             series.removeChangeListener(this);
             this.seriesList.remove(series);
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
@@ -326,8 +313,6 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
      * Notifies all registered listeners that the dataset has changed.
      *
      * @param seriesIndex the series (zero based index).
-     *
-     * @throws IllegalArgumentException
      */
     public void removeSeries(int seriesIndex) {
         // check arguments...
@@ -339,8 +324,7 @@ public class MatrixSeriesCollection extends AbstractXYZDataset
         MatrixSeries series = (MatrixSeries) this.seriesList.get(seriesIndex);
         series.removeChangeListener(this);
         this.seriesList.remove(seriesIndex);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
 }

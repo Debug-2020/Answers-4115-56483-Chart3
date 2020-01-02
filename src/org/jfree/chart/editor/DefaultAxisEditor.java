@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * DefaultAxisEditor.java
  * ----------------------
- * (C) Copyright 2005-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2005-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert;
  * Contributor(s):   Andrzej Porebski;
@@ -36,7 +36,8 @@
  * Changes
  * -------
  * 24-Nov-2005 : Version 1, based on AxisPropertyEditPanel.java (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
+ *               Jess Thrysoee (DG);
  *
  */
 
@@ -61,12 +62,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 import org.jfree.chart.axis.Axis;
+import org.jfree.chart.axis.LogAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.ui.FontChooserPanel;
 import org.jfree.chart.ui.FontDisplayField;
 import org.jfree.chart.ui.LCBLayout;
 import org.jfree.chart.ui.PaintSample;
-import org.jfree.chart.util.RectangleInsets;
+import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.util.ResourceBundleWrapper;
 
 /**
@@ -132,8 +134,8 @@ class DefaultAxisEditor extends JPanel implements ActionListener {
     private JTabbedPane otherTabs;
 
     /** The resourceBundle for the localization. */
-    protected static ResourceBundle localizationResources =
-            ResourceBundleWrapper.getBundle(
+    protected static ResourceBundle localizationResources
+            = ResourceBundleWrapper.getBundle(
                     "org.jfree.chart.editor.LocalizationBundle");
 
     /**
@@ -143,7 +145,7 @@ class DefaultAxisEditor extends JPanel implements ActionListener {
      * @param axis  the axis whose properties are to be displayed/edited in
      *              the panel.
      *
-     * @return A panel or <code>null</code< if axis is <code>null</code>.
+     * @return A panel or {@code null} if axis is {@code null}.
      */
     public static DefaultAxisEditor getInstance(Axis axis) {
 
@@ -152,6 +154,9 @@ class DefaultAxisEditor extends JPanel implements ActionListener {
             // appropriate panel
             if (axis instanceof NumberAxis) {
                 return new DefaultNumberAxisEditor((NumberAxis) axis);
+            }
+            if (axis instanceof LogAxis) {
+                return new DefaultLogAxisEditor((LogAxis) axis);
             }
             else {
                 return new DefaultAxisEditor(axis);
@@ -319,7 +324,7 @@ class DefaultAxisEditor extends JPanel implements ActionListener {
     /**
      * Returns a flag that indicates whether or not the tick labels are visible.
      *
-     * @return <code>true</code> if ick mark labels are visible.
+     * @return {@code true} if tick mark labels are visible.
      */
     public boolean isTickLabelsVisible() {
         return this.showTickLabelsCheckBox.isSelected();
@@ -347,7 +352,7 @@ class DefaultAxisEditor extends JPanel implements ActionListener {
      * Returns the current value of the flag that determines whether or not
      * tick marks are visible.
      *
-     * @return <code>true</code> if tick marks are visible.
+     * @return {@code true} if tick marks are visible.
      */
     public boolean isTickMarksVisible() {
         return this.showTickMarksCheckBox.isSelected();
@@ -389,6 +394,7 @@ class DefaultAxisEditor extends JPanel implements ActionListener {
      * @param event  information about the event that triggered the call to
      *      this method.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (command.equals("SelectLabelFont")) {
@@ -433,7 +439,7 @@ class DefaultAxisEditor extends JPanel implements ActionListener {
     private void attemptModifyLabelPaint() {
         Color c;
         c = JColorChooser.showDialog(
-            this, localizationResources.getString("Label_Color"), Color.blue
+            this, localizationResources.getString("Label_Color"), Color.BLUE
         );
         if (c != null) {
             this.labelPaintSample.setPaint(c);

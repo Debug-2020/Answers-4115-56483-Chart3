@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,14 +21,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * ThermometerPlot.java
  * --------------------
  *
- * (C) Copyright 2000-2008, by Bryan Scott and Contributors.
+ * (C) Copyright 2000-2017, by Bryan Scott and Contributors.
  *
  * Original Author:  Bryan Scott (based on MeterPlot by Hari).
  * Contributor(s):   David Gilbert (for Object Refinery Limited).
@@ -82,11 +82,12 @@
  *               deprecated get/setShowValueLines(), deprecated
  *               getMinimum/MaximumVerticalDataValue(), and fixed serialization
  *               bug (DG);
- * 19-Jun-2007 : Removed deprecated code (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 24-Sep-2007 : Implemented new methods in Zoomable interface (DG);
  * 08-Oct-2007 : Added attributes for thermometer dimensions - see patch 1769088
  *               by Julien Henry (DG);
+ * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
+ *               Jess Thrysoee (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -117,17 +118,17 @@ import java.util.ResourceBundle;
 import org.jfree.chart.LegendItemCollection;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.event.PlotChangeEvent;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.RectangleInsets;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.ResourceBundleWrapper;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 import org.jfree.chart.util.UnitType;
 import org.jfree.data.Range;
-import org.jfree.data.event.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.data.general.ValueDataset;
 
@@ -187,48 +188,6 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
 
     /** A constant for the 'critical' range. */
     public static final int CRITICAL = 2;
-
-    /**
-     * The bulb radius.
-     *
-     * @deprecated As of 1.0.7, use {@link #getBulbRadius()}.
-     */
-    protected static final int BULB_RADIUS = 40;
-
-    /**
-     * The bulb diameter.
-     *
-     * @deprecated As of 1.0.7, use {@link #getBulbDiameter()}.
-     */
-    protected static final int BULB_DIAMETER = BULB_RADIUS * 2;
-
-    /**
-     * The column radius.
-     *
-     * @deprecated As of 1.0.7, use {@link #getColumnRadius()}.
-     */
-    protected static final int COLUMN_RADIUS = 20;
-
-    /**
-     * The column diameter.
-     *
-     * @deprecated As of 1.0.7, use {@link #getColumnDiameter()}.
-     */
-    protected static final int COLUMN_DIAMETER = COLUMN_RADIUS * 2;
-
-    /**
-     * The gap radius.
-     *
-     * @deprecated As of 1.0.7, use {@link #getGap()}.
-     */
-    protected static final int GAP_RADIUS = 5;
-
-    /**
-     * The gap diameter.
-     *
-     * @deprecated As of 1.0.7, use {@link #getGap()} times two.
-     */
-    protected static final int GAP_DIAMETER = GAP_RADIUS * 2;
 
     /** The axis gap. */
     protected static final int AXIS_GAP = 10;
@@ -318,7 +277,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     private transient Stroke thermometerStroke = new BasicStroke(1.0f);
 
     /** Paint for drawing the thermometer */
-    private transient Paint thermometerPaint = Color.black;
+    private transient Paint thermometerPaint = Color.BLACK;
 
     /** The display units */
     private int units = UNITS_CELCIUS;
@@ -330,16 +289,19 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     private int axisLocation = LEFT;
 
     /** The font to write the value in */
-    private Font valueFont = new Font("Tahoma", Font.BOLD, 16);
+    private Font valueFont = new Font("SansSerif", Font.BOLD, 16);
 
     /** Colour that the value is written in */
-    private transient Paint valuePaint = Color.white;
+    private transient Paint valuePaint = Color.WHITE;
 
     /** Number format for the value */
     private NumberFormat valueFormat = new DecimalFormat();
 
     /** The default paint for the mercury in the thermometer. */
-    private transient Paint mercuryPaint = Color.lightGray;
+    private transient Paint mercuryPaint = Color.LIGHT_GRAY;
+
+    /** A flag that controls whether value lines are drawn. */
+    private boolean showValueLines = false;
 
     /** The display sub-range. */
     private int subrange = -1;
@@ -364,8 +326,8 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     private boolean useSubrangePaint = true;
 
     /** Paint for each range */
-    private transient Paint[] subrangePaint = {Color.green, Color.orange,
-            Color.red};
+    private transient Paint[] subrangePaint = {Color.GREEN, Color.ORANGE,
+            Color.RED};
 
     /** A flag that controls whether the sub-range indicators are visible. */
     private boolean subrangeIndicatorsVisible = true;
@@ -377,8 +339,8 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     private transient Stroke rangeIndicatorStroke = new BasicStroke(3.0f);
 
     /** The resourceBundle for the localization. */
-    protected static ResourceBundle localizationResources =
-            ResourceBundleWrapper.getBundle(
+    protected static ResourceBundle localizationResources
+            = ResourceBundleWrapper.getBundle(
                     "org.jfree.chart.plot.LocalizationBundle");
 
     /**
@@ -396,7 +358,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     public ThermometerPlot(ValueDataset dataset) {
 
         super();
-        setBackgroundPaint(Color.WHITE);
+
         this.padding = new RectangleInsets(UnitType.RELATIVE, 0.05, 0.05, 0.05,
                 0.05);
         this.dataset = dataset;
@@ -415,7 +377,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Returns the dataset for the plot.
      *
-     * @return The dataset (possibly <code>null</code>).
+     * @return The dataset (possibly {@code null}).
      *
      * @see #setDataset(ValueDataset)
      */
@@ -427,7 +389,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the dataset for the plot, replacing the existing dataset if there
      * is one, and sends a {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      *
      * @see #getDataset()
      */
@@ -448,9 +410,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
         }
 
         // send a dataset change event to self...
-        DatasetChangeEvent event = new DatasetChangeEvent(this, dataset,
-                new DatasetChangeInfo());
-        // TODO: fill in change type
+        DatasetChangeEvent event = new DatasetChangeEvent(this, dataset);
         datasetChanged(event);
 
     }
@@ -458,7 +418,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Returns the range axis.
      *
-     * @return The range axis (never <code>null</code>).
+     * @return The range axis (never {@code null}).
      *
      * @see #setRangeAxis(ValueAxis)
      */
@@ -470,14 +430,12 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the range axis for the plot and sends a {@link PlotChangeEvent} to
      * all registered listeners.
      *
-     * @param axis  the new axis (<code>null</code> not permitted).
+     * @param axis  the new axis ({@code null} not permitted).
      *
      * @see #getRangeAxis()
      */
     public void setRangeAxis(ValueAxis axis) {
-        if (axis == null) {
-            throw new IllegalArgumentException("Null 'axis' argument.");
-        }
+        Args.nullNotPermitted(axis, "axis");
         // plot is registered as a listener with the existing axis...
         this.rangeAxis.removeChangeListener(this);
 
@@ -485,7 +443,6 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
         axis.addChangeListener(this);
         this.rangeAxis = axis;
         fireChangeEvent();
-
     }
 
     /**
@@ -552,7 +509,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Returns the padding for the thermometer.  This is the space inside the
      * plot area.
      *
-     * @return The padding (never <code>null</code>).
+     * @return The padding (never {@code null}).
      *
      * @see #setPadding(RectangleInsets)
      */
@@ -564,14 +521,12 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the padding for the thermometer and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param padding  the padding (<code>null</code> not permitted).
+     * @param padding  the padding ({@code null} not permitted).
      *
      * @see #getPadding()
      */
     public void setPadding(RectangleInsets padding) {
-        if (padding == null) {
-            throw new IllegalArgumentException("Null 'padding' argument.");
-        }
+        Args.nullNotPermitted(padding, "padding");
         this.padding = padding;
         fireChangeEvent();
     }
@@ -579,7 +534,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Returns the stroke used to draw the thermometer outline.
      *
-     * @return The stroke (never <code>null</code>).
+     * @return The stroke (never {@code null}).
      *
      * @see #setThermometerStroke(Stroke)
      * @see #getThermometerPaint()
@@ -592,7 +547,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the stroke used to draw the thermometer outline and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param s  the new stroke (<code>null</code> ignored).
+     * @param s  the new stroke ({@code null} ignored).
      *
      * @see #getThermometerStroke()
      */
@@ -606,7 +561,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Returns the paint used to draw the thermometer outline.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setThermometerPaint(Paint)
      * @see #getThermometerStroke()
@@ -619,7 +574,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the paint used to draw the thermometer outline and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param paint  the new paint (<code>null</code> ignored).
+     * @param paint  the new paint ({@code null} ignored).
      *
      * @see #getThermometerPaint()
      */
@@ -682,11 +637,8 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the location at which the current value is displayed and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      * <P>
-     * The location can be one of the constants:
-     * <code>NONE</code>,
-     * <code>RIGHT</code>
-     * <code>LEFT</code> and
-     * <code>BULB</code>.
+     * The location can be one of the constants: {@code NONE}, {@code RIGHT},
+     * {@code LEFT} and {@code BULB}.
      *
      * @param location  the location.
      */
@@ -746,14 +698,12 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Sets the font used to display the current value.
      *
-     * @param f  the new font (<code>null</code> not permitted).
+     * @param f  the new font ({@code null} not permitted).
      *
      * @see #getValueFont()
      */
     public void setValueFont(Font f) {
-        if (f == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(f, "f");
         if (!this.valueFont.equals(f)) {
             this.valueFont = f;
             fireChangeEvent();
@@ -775,14 +725,12 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the paint used to display the current value and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param paint  the new paint (<code>null</code> not permitted).
+     * @param paint  the new paint ({@code null} not permitted).
      *
      * @see #getValuePaint()
      */
     public void setValuePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         if (!this.valuePaint.equals(paint)) {
             this.valuePaint = paint;
             fireChangeEvent();
@@ -795,12 +743,10 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the formatter for the value label and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param formatter  the new formatter (<code>null</code> not permitted).
+     * @param formatter  the new formatter ({@code null} not permitted).
      */
     public void setValueFormat(NumberFormat formatter) {
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         this.valueFormat = formatter;
         fireChangeEvent();
     }
@@ -808,7 +754,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Returns the default mercury paint.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setMercuryPaint(Paint)
      */
@@ -820,14 +766,12 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Sets the default mercury paint and sends a {@link PlotChangeEvent} to
      * all registered listeners.
      *
-     * @param paint  the new paint (<code>null</code> not permitted).
+     * @param paint  the new paint ({@code null} not permitted).
      *
      * @see #getMercuryPaint()
      */
     public void setMercuryPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.mercuryPaint = paint;
         fireChangeEvent();
     }
@@ -927,7 +871,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * {@link PlotChangeEvent} to all registered listeners.
      *
      * @param range  the range (0, 1 or 2).
-     * @param paint  the paint to be applied (<code>null</code> not permitted).
+     * @param paint  the paint to be applied ({@code null} not permitted).
      *
      * @see #getSubrangePaint(int)
      */
@@ -1098,10 +1042,11 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @param g2  the graphics device.
      * @param area  the area within which the plot should be drawn.
-     * @param anchor  the anchor point (<code>null</code> permitted).
+     * @param anchor  the anchor point ({@code null} permitted).
      * @param parentState  the state from the parent plot, if there is one.
      * @param info  collects info about the drawing.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
                      PlotState parentState,
                      PlotRenderingInfo info) {
@@ -1111,8 +1056,8 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
         RoundRectangle2D mercuryStem = new RoundRectangle2D.Double();
         Ellipse2D outerBulb = new Ellipse2D.Double();
         Ellipse2D innerBulb = new Ellipse2D.Double();
-        String temp = null;
-        FontMetrics metrics = null;
+        String temp;
+        FontMetrics metrics;
         if (info != null) {
             info.setPlotArea(area);
         }
@@ -1225,8 +1170,11 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
             // draw the axis...
             if ((this.rangeAxis != null) && (this.axisLocation != NONE)) {
                 int drawWidth = AXIS_GAP;
+                if (this.showValueLines) {
+                    drawWidth += getColumnDiameter();
+                }
                 Rectangle2D drawArea;
-                double cursor = 0;
+                double cursor;
 
                 switch (this.axisLocation) {
                     case RIGHT:
@@ -1303,6 +1251,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @param percent  the zoom percentage.
      */
+    @Override
     public void zoom(double percent) {
         // intentionally blank
    }
@@ -1312,6 +1261,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @return A short string describing the type of plot.
      */
+    @Override
     public String getPlotType() {
         return localizationResources.getString("Thermometer_Plot");
     }
@@ -1321,6 +1271,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @param event  the dataset change event.
      */
+    @Override
     public void datasetChanged(DatasetChangeEvent event) {
         if (this.dataset != null) {
             Number vn = this.dataset.getValue();
@@ -1351,6 +1302,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @return The range of data displayed.
      */
+    @Override
     public Range getDataRange(ValueAxis axis) {
        return new Range(this.lowerBound, this.upperBound);
     }
@@ -1372,8 +1324,9 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Returns the legend items for the plot.
      *
-     * @return <code>null</code>.
+     * @return {@code null}.
      */
+    @Override
     public LegendItemCollection getLegendItems() {
         return null;
     }
@@ -1383,6 +1336,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @return The orientation (always {@link PlotOrientation#VERTICAL}).
      */
+    @Override
     public PlotOrientation getOrientation() {
         return PlotOrientation.VERTICAL;
     }
@@ -1392,8 +1346,8 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @param d  the number to be tested.
      *
-     * @return <code>true</code> if the number is valid and finite, and
-     *         <code>false</code> otherwise.
+     * @return {@code true} if the number is valid and finite, and
+     *         {@code false} otherwise.
      */
     protected static boolean isValidNumber(double d) {
         return (!(Double.isNaN(d) || Double.isInfinite(d)));
@@ -1417,7 +1371,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Called from the {@link #draw(Graphics2D, Rectangle2D, Point2D,
      * PlotState, PlotRenderingInfo)} method.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      */
     private Paint getCurrentPaint() {
         Paint result = this.mercuryPaint;
@@ -1440,10 +1394,11 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * Tests this plot for equality with another object.  The plot's dataset
      * is not considered in the test.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -1455,7 +1410,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
         if (!super.equals(obj)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.rangeAxis, that.rangeAxis)) {
+        if (!ObjectUtils.equal(this.rangeAxis, that.rangeAxis)) {
             return false;
         }
         if (this.axisLocation != that.axisLocation) {
@@ -1467,14 +1422,14 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
         if (this.upperBound != that.upperBound) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.padding, that.padding)) {
+        if (!ObjectUtils.equal(this.padding, that.padding)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.thermometerStroke,
+        if (!ObjectUtils.equal(this.thermometerStroke,
                 that.thermometerStroke)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.thermometerPaint,
+        if (!PaintUtils.equal(this.thermometerPaint,
                 that.thermometerPaint)) {
             return false;
         }
@@ -1484,16 +1439,19 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
         if (this.valueLocation != that.valueLocation) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.valueFont, that.valueFont)) {
+        if (!ObjectUtils.equal(this.valueFont, that.valueFont)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.valuePaint, that.valuePaint)) {
+        if (!PaintUtils.equal(this.valuePaint, that.valuePaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.valueFormat, that.valueFormat)) {
+        if (!ObjectUtils.equal(this.valueFormat, that.valueFormat)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.mercuryPaint, that.mercuryPaint)) {
+        if (!PaintUtils.equal(this.mercuryPaint, that.mercuryPaint)) {
+            return false;
+        }
+        if (this.showValueLines != that.showValueLines) {
             return false;
         }
         if (this.subrange != that.subrange) {
@@ -1518,7 +1476,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
             return false;
         }
         for (int i = 0; i < this.subrangePaint.length; i++) {
-            if (!PaintUtilities.equal(this.subrangePaint[i],
+            if (!PaintUtils.equal(this.subrangePaint[i],
                     that.subrangePaint[i])) {
                 return false;
             }
@@ -1529,8 +1487,8 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     /**
      * Tests two double[][] arrays for equality.
      *
-     * @param array1  the first array (<code>null</code> permitted).
-     * @param array2  the second arrray (<code>null</code> permitted).
+     * @param array1  the first array ({@code null} permitted).
+     * @param array2  the second arrray ({@code null} permitted).
      *
      * @return A boolean.
      */
@@ -1559,6 +1517,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @throws CloneNotSupportedException  if the plot cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
 
         ThermometerPlot clone = (ThermometerPlot) super.clone();
@@ -1566,7 +1525,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
         if (clone.dataset != null) {
             clone.dataset.addChangeListener(clone);
         }
-        clone.rangeAxis = (ValueAxis) ObjectUtilities.clone(this.rangeAxis);
+        clone.rangeAxis = (ValueAxis) ObjectUtils.clone(this.rangeAxis);
         if (clone.rangeAxis != null) {
             clone.rangeAxis.setPlot(clone);
             clone.rangeAxis.addChangeListener(clone);
@@ -1587,14 +1546,14 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeStroke(this.thermometerStroke, stream);
-        SerialUtilities.writePaint(this.thermometerPaint, stream);
-        SerialUtilities.writePaint(this.valuePaint, stream);
-        SerialUtilities.writePaint(this.mercuryPaint, stream);
-        SerialUtilities.writeStroke(this.subrangeIndicatorStroke, stream);
-        SerialUtilities.writeStroke(this.rangeIndicatorStroke, stream);
+        SerialUtils.writeStroke(this.thermometerStroke, stream);
+        SerialUtils.writePaint(this.thermometerPaint, stream);
+        SerialUtils.writePaint(this.valuePaint, stream);
+        SerialUtils.writePaint(this.mercuryPaint, stream);
+        SerialUtils.writeStroke(this.subrangeIndicatorStroke, stream);
+        SerialUtils.writeStroke(this.rangeIndicatorStroke, stream);
         for (int i = 0; i < 3; i++) {
-            SerialUtilities.writePaint(this.subrangePaint[i], stream);
+            SerialUtils.writePaint(this.subrangePaint[i], stream);
         }
     }
 
@@ -1609,15 +1568,15 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
     private void readObject(ObjectInputStream stream) throws IOException,
             ClassNotFoundException {
         stream.defaultReadObject();
-        this.thermometerStroke = SerialUtilities.readStroke(stream);
-        this.thermometerPaint = SerialUtilities.readPaint(stream);
-        this.valuePaint = SerialUtilities.readPaint(stream);
-        this.mercuryPaint = SerialUtilities.readPaint(stream);
-        this.subrangeIndicatorStroke = SerialUtilities.readStroke(stream);
-        this.rangeIndicatorStroke = SerialUtilities.readStroke(stream);
+        this.thermometerStroke = SerialUtils.readStroke(stream);
+        this.thermometerPaint = SerialUtils.readPaint(stream);
+        this.valuePaint = SerialUtils.readPaint(stream);
+        this.mercuryPaint = SerialUtils.readPaint(stream);
+        this.subrangeIndicatorStroke = SerialUtils.readStroke(stream);
+        this.rangeIndicatorStroke = SerialUtils.readStroke(stream);
         this.subrangePaint = new Paint[3];
         for (int i = 0; i < 3; i++) {
-            this.subrangePaint[i] = SerialUtilities.readPaint(stream);
+            this.subrangePaint[i] = SerialUtils.readPaint(stream);
         }
         if (this.rangeAxis != null) {
             this.rangeAxis.addChangeListener(this);
@@ -1631,6 +1590,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * @param state  the plot state.
      * @param source  the source point.
      */
+    @Override
     public void zoomDomainAxes(double factor, PlotRenderingInfo state,
                                Point2D source) {
         // no domain axis to zoom
@@ -1647,6 +1607,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @since 1.0.7
      */
+    @Override
     public void zoomDomainAxes(double factor, PlotRenderingInfo state,
                                Point2D source, boolean useAnchor) {
         // no domain axis to zoom
@@ -1659,6 +1620,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * @param state  the plot state.
      * @param source  the source point.
      */
+    @Override
     public void zoomRangeAxes(double factor, PlotRenderingInfo state,
                               Point2D source) {
         this.rangeAxis.resizeRange(factor);
@@ -1675,6 +1637,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      *
      * @since 1.0.7
      */
+    @Override
     public void zoomRangeAxes(double factor, PlotRenderingInfo state,
                               Point2D source, boolean useAnchor) {
         double anchorY = this.getRangeAxis().java2DToValue(source.getY(),
@@ -1690,6 +1653,7 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * @param state  the plot state.
      * @param source  the source point.
      */
+    @Override
     public void zoomDomainAxes(double lowerPercent, double upperPercent,
                                PlotRenderingInfo state, Point2D source) {
         // no domain axis to zoom
@@ -1703,25 +1667,28 @@ public class ThermometerPlot extends Plot implements ValueAxisPlot,
      * @param state  the plot state.
      * @param source  the source point.
      */
+    @Override
     public void zoomRangeAxes(double lowerPercent, double upperPercent,
                               PlotRenderingInfo state, Point2D source) {
         this.rangeAxis.zoomRange(lowerPercent, upperPercent);
     }
 
     /**
-     * Returns <code>false</code>.
+     * Returns {@code false}.
      *
      * @return A boolean.
      */
+    @Override
     public boolean isDomainZoomable() {
         return false;
     }
 
     /**
-     * Returns <code>true</code>.
+     * Returns {@code true}.
      *
      * @return A boolean.
      */
+    @Override
     public boolean isRangeZoomable() {
         return true;
     }

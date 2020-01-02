@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------
  * OHLC.java
@@ -42,11 +42,11 @@
 package org.jfree.data.time.ohlc;
 
 import java.io.Serializable;
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
 
 /**
- * A high low data record (immutable).  This class is used internally by the
- * {@link OHLCItem} class.
+ * A data record containing open-high-low-close data (immutable).  This class 
+ * is used internally by the {@link OHLCItem} class.
  *
  * @since 1.0.4
  */
@@ -65,7 +65,7 @@ public class OHLC implements Serializable {
     private double low;
 
     /**
-     * Creates a new instance of <code>OHLC</code>.
+     * Creates a new instance of {@code OHLC}.
      *
      * @param open  the open value.
      * @param close  the close value.
@@ -118,10 +118,11 @@ public class OHLC implements Serializable {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -150,12 +151,13 @@ public class OHLC implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
-        result = HashUtilities.hashCode(result, this.open);
-        result = HashUtilities.hashCode(result, this.high);
-        result = HashUtilities.hashCode(result, this.low);
-        result = HashUtilities.hashCode(result, this.close);
+        result = HashUtils.hashCode(result, this.open);
+        result = HashUtils.hashCode(result, this.high);
+        result = HashUtils.hashCode(result, this.low);
+        result = HashUtils.hashCode(result, this.close);
         return result;
     }
 

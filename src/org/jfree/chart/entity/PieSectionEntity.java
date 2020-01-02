@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * PieSectionEntity.java
@@ -48,6 +48,7 @@
  *               Comparable (DG);
  * 30-Jul-2003 : Added PieDataset reference (CZ);
  * 11-Jan-2005 : Removed deprecated code in preparation for 1.0.0 release (DG);
+ * 13-Nov-2007 : Implemented equals() and hashCode() (DG);
  *
  */
 
@@ -56,9 +57,9 @@ package org.jfree.chart.entity;
 import java.awt.Shape;
 import java.io.Serializable;
 
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.data.pie.PieDataset;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.data.general.PieDataset;
 
 /**
  * A chart entity that represents one section within a pie plot.
@@ -199,10 +200,11 @@ public class PieSectionEntity extends ChartEntity
     /**
      * Tests this entity for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -211,7 +213,7 @@ public class PieSectionEntity extends ChartEntity
             return false;
         }
         PieSectionEntity that = (PieSectionEntity) obj;
-        if (!ObjectUtilities.equal(this.dataset, that.dataset)) {
+        if (!ObjectUtils.equal(this.dataset, that.dataset)) {
             return false;
         }
         if (this.pieIndex != that.pieIndex) {
@@ -220,7 +222,7 @@ public class PieSectionEntity extends ChartEntity
         if (this.sectionIndex != that.sectionIndex) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.sectionKey, that.sectionKey)) {
+        if (!ObjectUtils.equal(this.sectionKey, that.sectionKey)) {
             return false;
         }
         return super.equals(obj);
@@ -231,10 +233,11 @@ public class PieSectionEntity extends ChartEntity
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = HashUtilities.hashCode(result, this.pieIndex);
-        result = HashUtilities.hashCode(result, this.sectionIndex);
+        result = HashUtils.hashCode(result, this.pieIndex);
+        result = HashUtils.hashCode(result, this.sectionIndex);
         return result;
     }
 
@@ -243,6 +246,7 @@ public class PieSectionEntity extends ChartEntity
      *
      * @return A string representing the entity.
      */
+    @Override
     public String toString() {
         return "PieSection: " + this.pieIndex + ", " + this.sectionIndex + "("
                               + this.sectionKey.toString() + ")";

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * XYRangeInfo.java
@@ -55,14 +55,14 @@ public interface XYRangeInfo {
      * Returns the range of the values in this dataset's range.
      *
      * @param visibleSeriesKeys  the keys of the visible series.
-     * @param xRange  the x-range (<code>null</code> not permitted).
+     * @param xRange  the x-range ({@code null} not permitted).
      * @param includeInterval  a flag that determines whether or not the
      *                         y-interval is taken into account.
      *
-     * @return The range (or <code>null</code> if the dataset contains no
+     * @return The range (or {@code null} if the dataset contains no
      *     values).
      */
     public Range getRangeBounds(List visibleSeriesKeys, Range xRange,
-                                boolean includeInterval);
+            boolean includeInterval);
 
 }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * KeyToGroupMap.java
  * ------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2004-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,7 +39,7 @@
  *               cloning problem (DG);
  * 18-Aug-2005 : Added casts in clone() method to suppress 1.5 compiler
  *               warnings - see patch 1260587 (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -54,12 +54,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
- * A class that maps keys (instances of <code>Comparable</code>) to groups.
+ * A class that maps keys (instances of {@code Comparable}) to groups.
  */
 public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
 
@@ -85,12 +85,10 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
     /**
      * Creates a new map with the specified default group.
      *
-     * @param defaultGroup  the default group (<code>null</code> not permitted).
+     * @param defaultGroup  the default group ({@code null} not permitted).
      */
     public KeyToGroupMap(Comparable defaultGroup) {
-        if (defaultGroup == null) {
-            throw new IllegalArgumentException("Null 'defaultGroup' argument.");
-        }
+        Args.nullNotPermitted(defaultGroup, "defaultGroup");
         this.defaultGroup = defaultGroup;
         this.groups = new ArrayList();
         this.keyToGroupMap = new HashMap();
@@ -110,7 +108,7 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
      * map.  The returned list is independent of the map, so altering the list
      * will have no effect.
      *
-     * @return The groups (never <code>null</code>).
+     * @return The groups (never {@code null}).
      */
     public List getGroups() {
         List result = new ArrayList();
@@ -149,15 +147,13 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
     /**
      * Returns the group that a key is mapped to.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
-     * @return The group (never <code>null</code>, returns the default group if
+     * @return The group (never {@code null}, returns the default group if
      *         there is no mapping for the specified key).
      */
     public Comparable getGroup(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         Comparable result = this.defaultGroup;
         Comparable group = (Comparable) this.keyToGroupMap.get(key);
         if (group != null) {
@@ -169,14 +165,12 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
     /**
      * Maps a key to a group.
      *
-     * @param key  the key (<code>null</code> not permitted).
-     * @param group  the group (<code>null</code> permitted, clears any
+     * @param key  the key ({@code null} not permitted).
+     * @param group  the group ({@code null} permitted, clears any
      *               existing mapping).
      */
     public void mapKeyToGroup(Comparable key, Comparable group) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         Comparable currentGroup = getGroup(key);
         if (!currentGroup.equals(this.defaultGroup)) {
             if (!currentGroup.equals(group)) {
@@ -204,14 +198,12 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
      * won't always return an accurate result for the default group, since
      * explicit mappings are not required for this group.
      *
-     * @param group  the group (<code>null</code> not permitted).
+     * @param group  the group ({@code null} not permitted).
      *
      * @return The key count.
      */
     public int getKeyCount(Comparable group) {
-        if (group == null) {
-            throw new IllegalArgumentException("Null 'group' argument.");
-        }
+        Args.nullNotPermitted(group, "group");
         int result = 0;
         Iterator iterator = this.keyToGroupMap.values().iterator();
         while (iterator.hasNext()) {
@@ -226,10 +218,11 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
     /**
      * Tests the map for equality against an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -238,7 +231,7 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
             return false;
         }
         KeyToGroupMap that = (KeyToGroupMap) obj;
-        if (!ObjectUtilities.equal(this.defaultGroup, that.defaultGroup)) {
+        if (!ObjectUtils.equal(this.defaultGroup, that.defaultGroup)) {
             return false;
         }
         if (!this.keyToGroupMap.equals(that.keyToGroupMap)) {
@@ -255,6 +248,7 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
      * @throws CloneNotSupportedException  if there is a problem cloning the
      *                                     map.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         KeyToGroupMap result = (KeyToGroupMap) super.clone();
         result.defaultGroup
@@ -267,7 +261,7 @@ public class KeyToGroupMap implements Cloneable, PublicCloneable, Serializable {
     /**
      * Attempts to clone the specified object using reflection.
      *
-     * @param object  the object (<code>null</code> permitted).
+     * @param object  the object ({@code null} permitted).
      *
      * @return The cloned object, or the original object if cloning failed.
      */

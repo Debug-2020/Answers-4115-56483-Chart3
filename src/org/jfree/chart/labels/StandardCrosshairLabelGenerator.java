@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------------------
  * StandardCrosshairLabelGenerator.java
@@ -69,9 +69,9 @@ public class StandardCrosshairLabelGenerator implements CrosshairLabelGenerator,
     /**
      * Creates a new instance with the specified attributes.
      *
-     * @param labelTemplate  the label template (<code>null</code> not
+     * @param labelTemplate  the label template ({@code null} not
      *     permitted).
-     * @param numberFormat  the number formatter (<code>null</code> not
+     * @param numberFormat  the number formatter ({@code null} not
      *     permitted).
      */
     public StandardCrosshairLabelGenerator(String labelTemplate,
@@ -92,7 +92,7 @@ public class StandardCrosshairLabelGenerator implements CrosshairLabelGenerator,
     /**
      * Returns the label template string.
      *
-     * @return The label template string (never <code>null</code>).
+     * @return The label template string (never {@code null}).
      */
     public String getLabelTemplate() {
         return this.labelTemplate;
@@ -101,7 +101,7 @@ public class StandardCrosshairLabelGenerator implements CrosshairLabelGenerator,
     /**
      * Returns the number formatter.
      *
-     * @return The formatter (never <code>null</code>).
+     * @return The formatter (never {@code null}).
      */
     public NumberFormat getNumberFormat() {
         return this.numberFormat;
@@ -110,10 +110,11 @@ public class StandardCrosshairLabelGenerator implements CrosshairLabelGenerator,
     /**
      * Returns a string that can be used as the label for a crosshair.
      *
-     * @param crosshair  the crosshair (<code>null</code> not permitted).
+     * @param crosshair  the crosshair ({@code null} not permitted).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
+    @Override
     public String generateLabel(Crosshair crosshair) {
         Object[] v = new Object[] {this.numberFormat.format(
                 crosshair.getValue())};
@@ -123,11 +124,12 @@ public class StandardCrosshairLabelGenerator implements CrosshairLabelGenerator,
 
     /**
      * Tests this generator for equality with an arbitrary object.
-     *
-     * @param obj  the object (<code>null</code> permitted).
-     *
+     * 
+     * @param obj  the object ({@code null} permitted).
+     * 
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -151,6 +153,7 @@ public class StandardCrosshairLabelGenerator implements CrosshairLabelGenerator,
      *
      * @return A hash code for this instance.
      */
+    @Override
     public int hashCode() {
         return this.labelTemplate.hashCode();
     }

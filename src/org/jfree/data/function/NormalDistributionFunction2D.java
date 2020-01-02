@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------------
  * NormalDistributionFunction2D.java
  * ---------------------------------
- * (C)opyright 2004-2009, by Object Refinery Limited.
+ * (C)opyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -46,7 +46,8 @@
 package org.jfree.data.function;
 
 import java.io.Serializable;
-import org.jfree.chart.util.HashUtilities;
+
+import org.jfree.chart.HashUtils;
 
 /**
  * A normal distribution function.  See
@@ -70,7 +71,7 @@ public class NormalDistributionFunction2D implements Function2D, Serializable {
      * Constructs a new normal distribution function.
      *
      * @param mean  the mean.
-     * @param std  the standard deviation (> 0).
+     * @param std  the standard deviation (&gt; 0).
      */
     public NormalDistributionFunction2D(double mean, double std) {
         if (std <= 0) {
@@ -91,7 +92,7 @@ public class NormalDistributionFunction2D implements Function2D, Serializable {
     public double getMean() {
         return this.mean;
     }
-
+    
     /**
      * Returns the standard deviation for the function.
      *
@@ -108,6 +109,7 @@ public class NormalDistributionFunction2D implements Function2D, Serializable {
      *
      * @return The value.
      */
+    @Override
     public double getValue(double x) {
         double z = x - this.mean;
         return this.factor * Math.exp(-z * z / this.denominator);
@@ -116,10 +118,11 @@ public class NormalDistributionFunction2D implements Function2D, Serializable {
     /**
      * Tests this function for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof NormalDistributionFunction2D)) {
             return false;
@@ -139,10 +142,11 @@ public class NormalDistributionFunction2D implements Function2D, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 29;
-        result = HashUtilities.hashCode(result, this.mean);
-        result = HashUtilities.hashCode(result, this.std);
+        result = HashUtils.hashCode(result, this.mean);
+        result = HashUtils.hashCode(result, this.std);
         return result;
     }
 

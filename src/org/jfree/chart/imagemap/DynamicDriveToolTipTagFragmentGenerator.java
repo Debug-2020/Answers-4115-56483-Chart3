@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------------------------
  * DynamicDriveToolTipTagFragmentGenerator.java
  * --------------------------------------------
- * (C) Copyright 2003-2009, by Richard Atkinson and Contributors.
+ * (C) Copyright 2003-2017, by Richard Atkinson and Contributors.
  *
  * Original Author:  Richard Atkinson;
  * Contributors:     David Gilbert (for Object Refinery Limited);
@@ -83,10 +83,11 @@ public class DynamicDriveToolTipTagFragmentGenerator
      *
      * @return The formatted HTML area tag attribute(s).
      */
+    @Override
     public String generateToolTipFragment(String toolTipText) {
         return " onMouseOver=\"return stm(['"
-            + ImageMapUtilities.javascriptEscape(this.title) + "','"
-            + ImageMapUtilities.javascriptEscape(toolTipText) + "'],Style["
+            + ImageMapUtils.javascriptEscape(this.title) + "','"
+            + ImageMapUtils.javascriptEscape(toolTipText) + "'],Style["
             + this.style + "]);\"" + " onMouseOut=\"return htm();\"";
     }
 

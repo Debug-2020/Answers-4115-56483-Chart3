@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * CyclicXYItemRenderer.java
  * ---------------------------
- * (C) Copyright 2003-2009, by Nicolas Brodu and Contributors.
+ * (C) Copyright 2003-2008, by Nicolas Brodu and Contributors.
  *
  * Original Author:  Nicolas Brodu;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -39,7 +39,7 @@
  * 25-Feb-2004 : Replaced CrosshairInfo with CrosshairState (DG);
  * 15-Jul-2004 : Switched getX() with getXValue() and getY() with
  *               getYValue() (DG);
- * ------------- JFREECHART 1.0.x ---------------------------------------------
+ * ------------- JFREECHART 1.0.0 ---------------------------------------------
  * 06-Jul-2006 : Modified to call only dataset methods that return double
  *               primitives (DG);
  *
@@ -59,7 +59,7 @@ import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.urls.XYURLGenerator;
 import org.jfree.data.DomainOrder;
-import org.jfree.data.event.DatasetChangeListener;
+import org.jfree.data.general.DatasetChangeListener;
 import org.jfree.data.general.DatasetGroup;
 import org.jfree.data.xy.XYDataset;
 
@@ -129,23 +129,27 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
      * @param g2  the graphics device.
      * @param state  the renderer state.
      * @param dataArea  the data area.
+     * @param info  the plot rendering info.
      * @param plot  the plot.
      * @param domainAxis  the domain axis.
      * @param rangeAxis  the range axis.
      * @param dataset  the dataset.
      * @param series  the series index.
      * @param item  the item index.
+     * @param crosshairState  crosshair information for the plot
+     *                        ({@code null} permitted).
      * @param pass  the current pass index.
      */
-    public void drawItem(Graphics2D g2, XYItemRendererState state,
-            Rectangle2D dataArea, XYPlot plot, ValueAxis domainAxis,
-            ValueAxis rangeAxis, XYDataset dataset, int series, int item,
-            boolean selected, int pass) {
+    @Override
+    public void drawItem(Graphics2D g2, XYItemRendererState state, 
+            Rectangle2D dataArea, PlotRenderingInfo info, XYPlot plot,
+            ValueAxis domainAxis, ValueAxis rangeAxis, XYDataset dataset,
+            int series, int item, CrosshairState crosshairState, int pass) {
 
         if ((!getPlotLines()) || ((!(domainAxis instanceof CyclicNumberAxis))
                 && (!(rangeAxis instanceof CyclicNumberAxis))) || (item <= 0)) {
-            super.drawItem(g2, state, dataArea, plot, domainAxis,
-                    rangeAxis, dataset, series, item, selected, pass);
+            super.drawItem(g2, state, dataArea, info, plot, domainAxis,
+                    rangeAxis, dataset, series, item, crosshairState, pass);
             return;
         }
 
@@ -154,8 +158,8 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
         double yn = dataset.getYValue(series, item - 1);
         // If null, don't draw line => then delegate to parent
         if (Double.isNaN(yn)) {
-            super.drawItem(g2, state, dataArea, plot, domainAxis,
-                    rangeAxis, dataset, series, item, selected, pass);
+            super.drawItem(g2, state, dataArea, info, plot, domainAxis,
+                    rangeAxis, dataset, series, item, crosshairState, pass);
             return;
         }
         double[] x = new double[2];
@@ -237,8 +241,8 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
 
         // If the line is not wrapping, then parent is OK
         if (x.length == 2) {
-            super.drawItem(g2, state, dataArea, plot, domainAxis,
-                    rangeAxis, dataset, series, item, selected, pass);
+            super.drawItem(g2, state, dataArea, info, plot, domainAxis,
+                    rangeAxis, dataset, series, item, crosshairState, pass);
             return;
         }
 
@@ -260,8 +264,10 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
                 cnay.setBoundMappedToLastCycle(y[0] <= ycycleBound);
             }
         }
-        super.drawItem(g2, state, dataArea, plot, domainAxis, rangeAxis,
-                newset, series, 1, selected, pass);
+        super.drawItem(
+            g2, state, dataArea, info, plot, domainAxis, rangeAxis,
+            newset, series, 1, crosshairState, pass
+        );
 
         if (cnax != null) {
             if (xcycleBound == x[1]) {
@@ -279,8 +285,8 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
                 cnay.setBoundMappedToLastCycle(y[1] <= ycycleBound);
             }
         }
-        super.drawItem(g2, state, dataArea, plot, domainAxis, rangeAxis,
-                newset, series, 2, selected, pass);
+        super.drawItem(g2, state, dataArea, info, plot, domainAxis, rangeAxis,
+                newset, series, 2, crosshairState, pass);
 
         if (x.length == 4) {
             if (cnax != null) {
@@ -299,8 +305,8 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
                     cnay.setBoundMappedToLastCycle(y[2] <= ycycleBound);
                 }
             }
-            super.drawItem(g2, state, dataArea, plot, domainAxis,
-                    rangeAxis, newset, series, 3, selected, pass);
+            super.drawItem(g2, state, dataArea, info, plot, domainAxis,
+                    rangeAxis, newset, series, 3, crosshairState, pass);
         }
 
         if (cnax != null) {
@@ -344,6 +350,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The domain order.
          */
+        @Override
         public DomainOrder getDomainOrder() {
             return DomainOrder.NONE;
         }
@@ -355,6 +362,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The item count.
          */
+        @Override
         public int getItemCount(int series) {
             return this.x.length;
         }
@@ -367,6 +375,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The x-value.
          */
+        @Override
         public Number getX(int series, int item) {
             return this.x[item];
         }
@@ -380,11 +389,12 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The x-value.
          */
+        @Override
         public double getXValue(int series, int item) {
             double result = Double.NaN;
-            Number x = getX(series, item);
-            if (x != null) {
-                result = x.doubleValue();
+            Number xx = getX(series, item);
+            if (xx != null) {
+                result = xx.doubleValue();
             }
             return result;
         }
@@ -397,6 +407,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The y-value.
          */
+        @Override
         public Number getY(int series, int item) {
             return this.y[item];
         }
@@ -410,11 +421,12 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The y-value.
          */
+        @Override
         public double getYValue(int series, int item) {
             double result = Double.NaN;
-            Number y = getY(series, item);
-            if (y != null) {
-                result = y.doubleValue();
+            Number yy = getY(series, item);
+            if (yy != null) {
+                result = yy.doubleValue();
             }
             return result;
         }
@@ -424,6 +436,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The series count.
          */
+        @Override
         public int getSeriesCount() {
             return this.delegateSet.getSeriesCount();
         }
@@ -435,6 +448,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The series name.
          */
+        @Override
         public Comparable getSeriesKey(int series) {
             return this.delegateSet.getSeriesKey(series);
         }
@@ -446,6 +460,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The index.
          */
+        @Override
         public int indexOf(Comparable seriesName) {
             return this.delegateSet.indexOf(seriesName);
         }
@@ -455,6 +470,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @param listener  ignored.
          */
+        @Override
         public void addChangeListener(DatasetChangeListener listener) {
             // unused in parent
         }
@@ -464,6 +480,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @param listener  ignored.
          */
+        @Override
         public void removeChangeListener(DatasetChangeListener listener) {
             // unused in parent
         }
@@ -473,6 +490,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @return The dataset group.
          */
+        @Override
         public DatasetGroup getGroup() {
             // unused but must return something, so while we are at it...
             return this.delegateSet.getGroup();
@@ -483,6 +501,7 @@ public class CyclicXYItemRenderer extends StandardXYItemRenderer
          *
          * @param group  ignored.
          */
+        @Override
         public void setGroup(DatasetGroup group) {
             // unused in parent
         }

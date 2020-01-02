@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * BoxAndWhiskerXYDataset.java
@@ -130,7 +130,7 @@ public interface BoxAndWhiskerXYDataset extends XYDataset {
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return A <code>Number</code> representing the maximum non-farout value.
+     * @return A {@code Number} representing the maximum non-farout value.
      */
     public Number getMinOutlier(int series, int item);
 
@@ -141,17 +141,18 @@ public interface BoxAndWhiskerXYDataset extends XYDataset {
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return A <code>Number</code> representing the maximum non-farout value.
+     * @return A {@code Number} representing the maximum non-farout value.
      */
     public Number getMaxOutlier(int series, int item);
 
     /**
-     * Returns an array of outliers for the specified series and item.
+     * Returns a list of outliers for the specified series and item.
      *
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return The array of outliers for the specified series and item.
+     * @return The list of outliers for the specified series and item
+     *         (possibly {@code null}).
      */
     public List getOutliers(int series, int item);
 
@@ -162,7 +163,7 @@ public interface BoxAndWhiskerXYDataset extends XYDataset {
      * of values included.  Currently only used to ensure farout coefficient
      * is greater than the outlier coefficient
      *
-     * @return A <code>double</code> representing the value used to calculate
+     * @return A {@code double} representing the value used to calculate
      *         outliers
      */
     public double getOutlierCoefficient();
@@ -171,7 +172,7 @@ public interface BoxAndWhiskerXYDataset extends XYDataset {
      * Returns the value used as the farout coefficient. The farout coefficient
      * allows the calculation of which values will be off the graph.
      *
-     * @return A <code>double</code> representing the value used to calculate
+     * @return A {@code double} representing the value used to calculate
      *         farouts
      */
     public double getFaroutCoefficient();

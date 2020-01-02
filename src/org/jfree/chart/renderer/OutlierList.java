@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * OutlierList.java
@@ -126,8 +126,8 @@ public class OutlierList {
     }
 
     /**
-     * Returns <code>true</code> if the list contains multiple outliers, and
-     * <code>false</code> otherwise.
+     * Returns {@code true} if the list contains multiple outliers, and
+     * {@code false} otherwise.
      *
      * @return A boolean.
      */
@@ -146,8 +146,8 @@ public class OutlierList {
     }
 
     /**
-     * Returns <code>true</code> if the outlier overlaps, and
-     * <code>false</code> otherwise.
+     * Returns {@code true} if the outlier overlaps, and
+     * {@code false} otherwise.
      *
      * @param other  the outlier.
      *
@@ -173,14 +173,13 @@ public class OutlierList {
         double totalYCoords = 0.0;
         int size = getItemCount();
         for (Iterator iterator = this.outliers.iterator();
-             iterator.hasNext();) {
+                iterator.hasNext();) {
             Outlier o = (Outlier) iterator.next();
             totalXCoords += o.getX();
             totalYCoords += o.getY();
         }
         getAveragedOutlier().getPoint().setLocation(
-            new Point2D.Double(totalXCoords / size, totalYCoords / size)
-        );
+                new Point2D.Double(totalXCoords / size, totalYCoords / size));
     }
 
 }

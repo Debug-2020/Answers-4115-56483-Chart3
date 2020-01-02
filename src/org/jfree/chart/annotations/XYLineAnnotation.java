@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * XYLineAnnotation.java
  * ---------------------
- * (C) Copyright 2003-2009, by Object Refinery Limited.
+ * (C) Copyright 2003-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (see patch 2809117);
@@ -43,9 +43,9 @@
  *               AbstractXYAnnotation (DG);
  * 04-Oct-2004 : Renamed ShapeUtils --> ShapeUtilities (DG);
  * 08-Jun-2005 : Fixed equals() method to handle GradientPaint() (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 05-Nov-2008 : Added workaround for JRE bug 6574155, see JFreeChart bug
  *               2221495 (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -68,12 +68,14 @@ import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.LineUtils;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.ShapeUtilities;
+import org.jfree.chart.util.SerialUtils;
+import org.jfree.chart.util.ShapeUtils;
 
 /**
  * A simple line annotation that can be placed on an {@link XYPlot}.
@@ -113,7 +115,7 @@ public class XYLineAnnotation extends AbstractXYAnnotation
      * @param y2  the y-coordinate for the end of the line.
      */
     public XYLineAnnotation(double x1, double y1, double x2, double y2) {
-        this(x1, y1, x2, y2, new BasicStroke(1.0f), Color.black);
+        this(x1, y1, x2, y2, new BasicStroke(1.0f), Color.BLACK);
     }
 
     /**
@@ -125,19 +127,15 @@ public class XYLineAnnotation extends AbstractXYAnnotation
      * @param y1  the y-coordinate for the start of the line.
      * @param x2  the x-coordinate for the end of the line.
      * @param y2  the y-coordinate for the end of the line.
-     * @param stroke  the line stroke (<code>null</code> not permitted).
-     * @param paint  the line color (<code>null</code> not permitted).
+     * @param stroke  the line stroke ({@code null} not permitted).
+     * @param paint  the line color ({@code null} not permitted).
      */
     public XYLineAnnotation(double x1, double y1, double x2, double y2,
                             Stroke stroke, Paint paint) {
 
         super();
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
+        Args.nullNotPermitted(paint, "paint");
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
@@ -160,6 +158,7 @@ public class XYLineAnnotation extends AbstractXYAnnotation
      * @param info  if supplied, this info object will be populated with
      *              entity information.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                      ValueAxis domainAxis, ValueAxis rangeAxis,
                      int rendererIndex,
@@ -199,7 +198,7 @@ public class XYLineAnnotation extends AbstractXYAnnotation
         Line2D line = new Line2D.Float(j2DX1, j2DY1, j2DX2, j2DY2);
         // line is clipped to avoid JRE bug 6574155, for more info
         // see JFreeChart bug 2221495
-        boolean visible = ShapeUtilities.clipLine(line, dataArea);
+        boolean visible = LineUtils.clipLine(line, dataArea);
         if (visible) {
             g2.draw(line);
         }
@@ -207,7 +206,7 @@ public class XYLineAnnotation extends AbstractXYAnnotation
         String toolTip = getToolTipText();
         String url = getURL();
         if (toolTip != null || url != null) {
-            addEntity(info, ShapeUtilities.createLineRegion(line, 1.0f),
+            addEntity(info, ShapeUtils.createLineRegion(line, 1.0f),
                     rendererIndex, toolTip, url);
         }
     }
@@ -215,10 +214,11 @@ public class XYLineAnnotation extends AbstractXYAnnotation
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -242,10 +242,10 @@ public class XYLineAnnotation extends AbstractXYAnnotation
         if (this.y2 != that.y2) {
             return false;
         }
-        if (!PaintUtilities.equal(this.paint, that.paint)) {
+        if (!PaintUtils.equal(this.paint, that.paint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.stroke, that.stroke)) {
+        if (!ObjectUtils.equal(this.stroke, that.stroke)) {
             return false;
         }
         // seems to be the same...
@@ -257,6 +257,7 @@ public class XYLineAnnotation extends AbstractXYAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         long temp;
@@ -278,6 +279,7 @@ public class XYLineAnnotation extends AbstractXYAnnotation
      *
      * @throws CloneNotSupportedException  if the annotation can't be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -291,8 +293,8 @@ public class XYLineAnnotation extends AbstractXYAnnotation
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
-        SerialUtilities.writeStroke(this.stroke, stream);
+        SerialUtils.writePaint(this.paint, stream);
+        SerialUtils.writeStroke(this.stroke, stream);
     }
 
     /**
@@ -306,8 +308,8 @@ public class XYLineAnnotation extends AbstractXYAnnotation
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
-        this.stroke = SerialUtilities.readStroke(stream);
+        this.paint = SerialUtils.readPaint(stream);
+        this.stroke = SerialUtils.readStroke(stream);
     }
 
 }

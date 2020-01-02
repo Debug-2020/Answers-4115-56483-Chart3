@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------
  * OHLCItem.java
@@ -44,14 +44,15 @@ import org.jfree.data.ComparableObjectItem;
 import org.jfree.data.time.RegularTimePeriod;
 
 /**
- * An item representing data in the form (period, open, high, low, close).
+ * An item representing data in the form {@code (time-period, open, high, low, 
+ * close)}.
  *
  * @since 1.0.4
  */
 public class OHLCItem extends ComparableObjectItem {
 
     /**
-     * Creates a new instance of <code>OHLCItem</code>.
+     * Creates a new instance of {@code OHLCItem}.
      *
      * @param period  the time period.
      * @param open  the open-value.
@@ -67,7 +68,7 @@ public class OHLCItem extends ComparableObjectItem {
     /**
      * Returns the period.
      *
-     * @return The period (never <code>null</code>).
+     * @return The period (never {@code null}).
      */
     public RegularTimePeriod getPeriod() {
         return (RegularTimePeriod) getComparable();

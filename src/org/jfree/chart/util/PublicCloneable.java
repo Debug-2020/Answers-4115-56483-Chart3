@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,21 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * --------------------
- * PublicCloneable.java
- * --------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes
- * -------
- * 18-Aug-2003 : Version 1 (DG);
- * 20-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -45,15 +32,15 @@ package org.jfree.chart.util;
  * An interface that exposes the clone() method.
  */
 public interface PublicCloneable extends Cloneable {
-
+    
     /**
      * Returns a clone of the object.
-     *
+     * 
      * @return A clone.
-     *
-     * @throws CloneNotSupportedException if cloning is not supported for some
-     *     reason.
+     * 
+     * @throws CloneNotSupportedException if cloning is not supported for some reason.
      */
     public Object clone() throws CloneNotSupportedException;
 
 }
+

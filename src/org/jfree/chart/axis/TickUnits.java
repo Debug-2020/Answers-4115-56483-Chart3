@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * TickUnits.java
@@ -84,7 +84,7 @@ public class TickUnits implements TickUnitSource, Cloneable, Serializable {
      * Adds a tick unit to the collection.  The tick units are maintained in
      * ascending order.
      *
-     * @param unit  the tick unit to add (<code>null</code> not permitted).
+     * @param unit  the tick unit to add ({@code null} not permitted).
      */
     public void add(TickUnit unit) {
         if (unit == null) {
@@ -125,8 +125,8 @@ public class TickUnits implements TickUnitSource, Cloneable, Serializable {
      *
      * @return A tick unit that is larger than the supplied unit.
      */
+    @Override
     public TickUnit getLargerTickUnit(TickUnit unit) {
-
         int index = Collections.binarySearch(this.tickUnits, unit);
         if (index >= 0) {
             index = index + 1;
@@ -137,7 +137,6 @@ public class TickUnits implements TickUnitSource, Cloneable, Serializable {
 
         return (TickUnit) this.tickUnits.get(Math.min(index,
                 this.tickUnits.size() - 1));
-
     }
 
     /**
@@ -148,8 +147,8 @@ public class TickUnits implements TickUnitSource, Cloneable, Serializable {
      *
      * @return A unit from the collection.
      */
+    @Override
     public TickUnit getCeilingTickUnit(TickUnit unit) {
-
         int index = Collections.binarySearch(this.tickUnits, unit);
         if (index >= 0) {
             return (TickUnit) this.tickUnits.get(index);
@@ -159,7 +158,6 @@ public class TickUnits implements TickUnitSource, Cloneable, Serializable {
             return (TickUnit) this.tickUnits.get(Math.min(index,
                     this.tickUnits.size() - 1));
         }
-
     }
 
     /**
@@ -170,6 +168,7 @@ public class TickUnits implements TickUnitSource, Cloneable, Serializable {
      *
      * @return A unit from the collection.
      */
+    @Override
     public TickUnit getCeilingTickUnit(double size) {
         return getCeilingTickUnit(new NumberTickUnit(size,
                 NumberFormat.getInstance()));
@@ -183,19 +182,21 @@ public class TickUnits implements TickUnitSource, Cloneable, Serializable {
      * @throws CloneNotSupportedException if an item in the collection does not
      *         support cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         TickUnits clone = (TickUnits) super.clone();
-        clone.tickUnits = new ArrayList(this.tickUnits);
+        clone.tickUnits = new java.util.ArrayList(this.tickUnits);
         return clone;
     }
 
     /**
      * Tests an object for equality with this instance.
      *
-     * @param obj  the object to test (<code>null</code> permitted).
+     * @param obj  the object to test ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------------
  * BoxAndWhiskerCalculator.java
  * ----------------------------
- * (C) Copyright 2003-2008,  by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2016,  by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -41,6 +41,7 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 15-Nov-2006 : Cleaned up handling of null arguments, and null or NaN items
  *               in the list (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -50,21 +51,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import org.jfree.chart.util.Args;
 
 /**
  * A utility class that calculates the mean, median, quartiles Q1 and Q3, plus
  * a list of outlier values...all from an arbitrary list of
- * <code>Number</code> objects.
+ * {@code Number} objects.
  */
 public abstract class BoxAndWhiskerCalculator {
 
     /**
      * Calculates the statistics required for a {@link BoxAndWhiskerItem}
-     * from a list of <code>Number</code> objects.  Any items in the list
-     * that are <code>null</code>, not an instance of <code>Number</code>, or
-     * equivalent to <code>Double.NaN</code>, will be ignored.
+     * from a list of {@code Number} objects.  Any items in the list
+     * that are {@code null}, not an instance of {@code Number}, or
+     * equivalent to {@code Double.NaN}, will be ignored.
      *
-     * @param values  a list of numbers (a <code>null</code> list is not
+     * @param values  a list of numbers (a {@code null} list is not
      *                permitted).
      *
      * @return A box-and-whisker item.
@@ -76,11 +78,11 @@ public abstract class BoxAndWhiskerCalculator {
 
     /**
      * Calculates the statistics required for a {@link BoxAndWhiskerItem}
-     * from a list of <code>Number</code> objects.  Any items in the list
-     * that are <code>null</code>, not an instance of <code>Number</code>, or
-     * equivalent to <code>Double.NaN</code>, will be ignored.
+     * from a list of {@code Number} objects.  Any items in the list
+     * that are {@code null}, not an instance of {@code Number}, or
+     * equivalent to {@code Double.NaN}, will be ignored.
      *
-     * @param values  a list of numbers (a <code>null</code> list is not
+     * @param values  a list of numbers (a {@code null} list is not
      *                permitted).
      * @param stripNullAndNaNItems  a flag that controls the handling of null
      *     and NaN items.
@@ -92,9 +94,7 @@ public abstract class BoxAndWhiskerCalculator {
     public static BoxAndWhiskerItem calculateBoxAndWhiskerStatistics(
             List values, boolean stripNullAndNaNItems) {
 
-        if (values == null) {
-            throw new IllegalArgumentException("Null 'values' argument.");
-        }
+        Args.nullNotPermitted(values, "values");
 
         List vlist;
         if (stripNullAndNaNItems) {
@@ -169,19 +169,17 @@ public abstract class BoxAndWhiskerCalculator {
     /**
      * Calculates the first quartile for a list of numbers in ascending order.
      * If the items in the list are not in ascending order, the result is
-     * unspecified.  If the list contains items that are <code>null</code>, not
-     * an instance of <code>Number</code>, or equivalent to
-     * <code>Double.NaN</code>, the result is unspecified.
+     * unspecified.  If the list contains items that are {@code null}, not
+     * an instance of {@code Number}, or equivalent to
+     * {@code Double.NaN}, the result is unspecified.
      *
-     * @param values  the numbers in ascending order (<code>null</code> not
+     * @param values  the numbers in ascending order ({@code null} not
      *     permitted).
      *
      * @return The first quartile.
      */
     public static double calculateQ1(List values) {
-        if (values == null) {
-            throw new IllegalArgumentException("Null 'values' argument.");
-        }
+        Args.nullNotPermitted(values, "values");
 
         double result = Double.NaN;
         int count = values.size();
@@ -205,18 +203,16 @@ public abstract class BoxAndWhiskerCalculator {
     /**
      * Calculates the third quartile for a list of numbers in ascending order.
      * If the items in the list are not in ascending order, the result is
-     * unspecified.  If the list contains items that are <code>null</code>, not
-     * an instance of <code>Number</code>, or equivalent to
-     * <code>Double.NaN</code>, the result is unspecified.
+     * unspecified.  If the list contains items that are {@code null}, not
+     * an instance of {@code Number}, or equivalent to
+     * {@code Double.NaN}, the result is unspecified.
      *
-     * @param values  the list of values (<code>null</code> not permitted).
+     * @param values  the list of values ({@code null} not permitted).
      *
      * @return The third quartile.
      */
     public static double calculateQ3(List values) {
-        if (values == null) {
-            throw new IllegalArgumentException("Null 'values' argument.");
-        }
+        Args.nullNotPermitted(values, "values");
         double result = Double.NaN;
         int count = values.size();
         if (count > 0) {

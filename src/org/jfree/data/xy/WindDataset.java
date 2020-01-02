@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * WindDataset.java
@@ -51,10 +51,10 @@ public interface WindDataset extends XYDataset {
      * Returns the wind direction (should be in the range 0 to 12,
      * corresponding to the positions on an upside-down clock face).
      *
-     * @param series  the series (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
-     * @param item  the item (in the range <code>0</code> to
-     *     <code>getItemCount(series) - 1</code>).
+     * @param series  the series (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
+     * @param item  the item (in the range {@code 0} to
+     *     {@code getItemCount(series) - 1}).
      *
      * @return The wind direction.
      */
@@ -65,10 +65,10 @@ public interface WindDataset extends XYDataset {
      * <p>
      * http://en.wikipedia.org/wiki/Beaufort_scale
      *
-     * @param series  the series (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
-     * @param item  the item (in the range <code>0</code> to
-     *     <code>getItemCount(series) - 1</code>).
+     * @param series  the series (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
+     * @param item  the item (in the range {@code 0} to
+     *     {@code getItemCount(series) - 1}).
      *
      * @return The wind force.
      */

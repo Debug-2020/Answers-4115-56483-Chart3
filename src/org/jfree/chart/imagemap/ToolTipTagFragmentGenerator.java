@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------------
  * ToolTipTagFragmentGenerator.java
@@ -42,7 +42,7 @@ package org.jfree.chart.imagemap;
 
 /**
  * Interface for generating the tooltip fragment of an HTML image map area tag.
- * The fragment should be <code>XHTML 1.0</code> compliant.
+ * The fragment should be {@code XHTML 1.0} compliant.
  */
 public interface ToolTipTagFragmentGenerator {
 
@@ -52,7 +52,7 @@ public interface ToolTipTagFragmentGenerator {
      * to return an 'alt' attribute IN ADDITION TO whatever it does to create
      * the tooltip (often a 'title' attribute).
      * <br><br>
-     * Note that the <code>toolTipText</code> may have been generated from
+     * Note that the {@code toolTipText} may have been generated from
      * user-defined data, so care should be taken to filter/escape any
      * characters that may corrupt the HTML tag.
      *

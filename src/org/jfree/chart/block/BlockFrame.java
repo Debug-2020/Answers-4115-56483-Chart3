@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * BlockFrame.java
@@ -35,7 +35,6 @@
  * Changes:
  * --------
  * 16-Mar-2007 : Version 1 (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -43,9 +42,8 @@ package org.jfree.chart.block;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-
+import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleInsets;
 
 /**
  * A block frame is a type of border that can be drawn around the outside of
@@ -59,7 +57,7 @@ public interface BlockFrame {
     /**
      * Returns the space reserved for the border.
      *
-     * @return The space (never <code>null</code>).
+     * @return The space (never {@code null}).
      */
     public RectangleInsets getInsets();
 

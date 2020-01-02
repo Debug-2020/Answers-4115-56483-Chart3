@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------------
  * IntervalCategoryDataset.java
@@ -58,7 +58,7 @@ public interface IntervalCategoryDataset extends CategoryDataset {
      * @param series  the series (zero-based index).
      * @param category  the category (zero-based index).
      *
-     * @return The start value (possibly <code>null</code>).
+     * @return The start value (possibly {@code null}).
      *
      * @see #getEndValue(int, int)
      */
@@ -70,7 +70,7 @@ public interface IntervalCategoryDataset extends CategoryDataset {
      * @param series  the series key.
      * @param category  the category key.
      *
-     * @return The start value (possibly <code>null</code>).
+     * @return The start value (possibly {@code null}).
      *
      * @see #getEndValue(Comparable, Comparable)
      */
@@ -82,7 +82,7 @@ public interface IntervalCategoryDataset extends CategoryDataset {
      * @param series  the series (zero-based index).
      * @param category  the category (zero-based index).
      *
-     * @return The end value (possibly <code>null</code>).
+     * @return The end value (possibly {@code null}).
      *
      * @see #getStartValue(int, int)
      */
@@ -94,7 +94,7 @@ public interface IntervalCategoryDataset extends CategoryDataset {
      * @param series  the series key.
      * @param category  the category key.
      *
-     * @return The end value (possibly <code>null</code>).
+     * @return The end value (possibly {@code null}).
      *
      * @see #getStartValue(Comparable, Comparable)
      */

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------
  * Pannable.java
@@ -56,21 +56,21 @@ public interface Pannable {
     /**
      * Returns the orientation of the plot.
      *
-     * @return The orientation (never <code>null</code>).
+     * @return The orientation (never {@code null}).
      */
     public PlotOrientation getOrientation();
 
     /**
      * Evaluates if the domain axis can be panned.
      *
-     * @return <code>true</code> if the domain axis is pannable.
+     * @return {@code true} if the domain axis is pannable.
      */
     public boolean isDomainPannable();
 
     /**
      * Evaluates if the range axis can be panned.
      *
-     * @return <code>true</code> if the range axis is pannable.
+     * @return {@code true} if the range axis is pannable.
      */
     public boolean isRangePannable();
 
@@ -82,7 +82,7 @@ public interface Pannable {
      * @param source the source point where the pan action started.
      */
     public void panDomainAxes(double percent, PlotRenderingInfo info,
-                              Point2D source);
+            Point2D source);
 
     /**
      * Pans the range axes by the specified percentage.
@@ -92,6 +92,6 @@ public interface Pannable {
      * @param source the source point where the pan action started.
      */
     public void panRangeAxes(double percent, PlotRenderingInfo info,
-                             Point2D source);
+            Point2D source);
 
 }

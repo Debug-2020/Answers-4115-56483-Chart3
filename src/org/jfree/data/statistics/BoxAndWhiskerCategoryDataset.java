@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------------
  * BoxAndWhiskerCategoryDataset.java
@@ -217,7 +217,7 @@ public interface BoxAndWhiskerCategoryDataset extends CategoryDataset {
 
     /**
      * Returns a list of outlier values for an item.  The list may be empty,
-     * but should never be <code>null</code>.
+     * but should never be {@code null}.
      *
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
@@ -228,7 +228,7 @@ public interface BoxAndWhiskerCategoryDataset extends CategoryDataset {
 
     /**
      * Returns a list of outlier values for an item.  The list may be empty,
-     * but should never be <code>null</code>.
+     * but should never be {@code null}.
      *
      * @param rowKey  the row key.
      * @param columnKey  the columnKey.

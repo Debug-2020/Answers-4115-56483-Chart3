@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * PolynomialFunction2D.java
  * -------------------------
- * (C) Copyright 2009, by Object Refinery Limited.
+ * (C) Copyright 2009-2016, by Object Refinery Limited.
  *
  * Original Author:  Peter Kolb;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -36,6 +36,7 @@
  * --------
  * 23-Mar-2009 : Version 1, patch 2795746 (PK);
  * 28-May-2009 : Integrated in JFreeChart with modifications (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -43,11 +44,12 @@ package org.jfree.data.function;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.util.Args;
 
 /**
- * A function in the form <code>y = a0 + a1 * x + a2 * x^2 + ... + an *
- * x^n</code>.  Instances of this class are immutable.
+ * A function in the form {@code y = a0 + a1 * x + a2 * x^2 + ... + an *
+ * x^n}.  Instances of this class are immutable.
  *
  * @since 1.0.14
  */
@@ -57,16 +59,14 @@ public class PolynomialFunction2D implements Function2D, Serializable {
     private double[] coefficients;
 
     /**
-     * Constructs a new polynomial function <code>y = a0 + a1 * x + a2 * x^2 +
-     * ... + an * x^n</code>
+     * Constructs a new polynomial function {@code y = a0 + a1 * x + a2 * x^2 +
+     * ... + an * x^n}
      *
      * @param coefficients  an array with the coefficients [a0, a1, ..., an]
-     *         (<code>null</code> not permitted).
+     *         ({@code null} not permitted).
      */
     public PolynomialFunction2D(double[] coefficients) {
-        if (coefficients == null) {
-            throw new IllegalArgumentException("Null 'coefficients' argument");
-        }
+        Args.nullNotPermitted(coefficients, "coefficients");
         this.coefficients = (double[]) coefficients.clone();
     }
 
@@ -96,6 +96,7 @@ public class PolynomialFunction2D implements Function2D, Serializable {
      *
      * @return The value.
      */
+    @Override
     public double getValue(double x) {
         double y = 0;
         for(int i = 0; i < coefficients.length; i++){
@@ -107,10 +108,11 @@ public class PolynomialFunction2D implements Function2D, Serializable {
     /**
      * Tests this function for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof PolynomialFunction2D)) {
             return false;
@@ -124,8 +126,9 @@ public class PolynomialFunction2D implements Function2D, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
-        return HashUtilities.hashCodeForDoubleArray(this.coefficients);
+        return HashUtils.hashCodeForDoubleArray(this.coefficients);
     }
 
 }

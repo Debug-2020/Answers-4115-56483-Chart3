@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,16 +21,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * TextAnnotation.java
  * -------------------
- * (C) Copyright 2002-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2002-2017, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (patch 2809117);
+ *                   Martin Hoeller;
  *
  * Changes:
  * --------
@@ -46,9 +47,10 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 16-Jan-2007 : Added argument checks, fixed hashCode() method and updated
  *               API docs (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 24-Jun-2009 : Fire change events (see patch 2809117 by PK) (DG);
- *
+ * 28-Oct-2011 : Added missing argument check, Bug #3428870 (MH);
+ * 01-Jul-2013 : Added missing AnnotationChangeEvent for setText() (DG);
+ * 
  */
 
 package org.jfree.chart.annotations;
@@ -61,11 +63,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.jfree.chart.text.TextAnchor;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.event.AnnotationChangeEvent;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A base class for text annotations.  This class records the content but not
@@ -77,10 +81,11 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     private static final long serialVersionUID = 7008912287533127432L;
 
     /** The default font. */
-    public static final Font DEFAULT_FONT = new Font("Tahoma", Font.PLAIN, 10);
+    public static final Font DEFAULT_FONT
+            = new Font("SansSerif", Font.PLAIN, 10);
 
     /** The default paint. */
-    public static final Paint DEFAULT_PAINT = Color.black;
+    public static final Paint DEFAULT_PAINT = Color.BLACK;
 
     /** The default text anchor. */
     public static final TextAnchor DEFAULT_TEXT_ANCHOR = TextAnchor.CENTER;
@@ -112,13 +117,11 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     /**
      * Creates a text annotation with default settings.
      *
-     * @param text  the text (<code>null</code> not permitted).
+     * @param text  the text ({@code null} not permitted).
      */
     protected TextAnnotation(String text) {
         super();
-        if (text == null) {
-            throw new IllegalArgumentException("Null 'text' argument.");
-        }
+        Args.nullNotPermitted(text, "text");
         this.text = text;
         this.font = DEFAULT_FONT;
         this.paint = DEFAULT_PAINT;
@@ -130,7 +133,7 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     /**
      * Returns the text for the annotation.
      *
-     * @return The text (never <code>null</code>).
+     * @return The text (never {@code null}).
      *
      * @see #setText(String)
      */
@@ -139,23 +142,23 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     }
 
     /**
-     * Sets the text for the annotation.
+     * Sets the text for the annotation and sends an 
+     * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param text  the text (<code>null</code> not permitted).
+     * @param text  the text ({@code null} not permitted).
      *
      * @see #getText()
      */
     public void setText(String text) {
-        if (text == null) {
-            throw new IllegalArgumentException("Null 'text' argument.");
-        }
+        Args.nullNotPermitted(text, "text");
         this.text = text;
+        fireAnnotationChanged();
     }
 
     /**
      * Returns the font for the annotation.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setFont(Font)
      */
@@ -167,14 +170,12 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
      * Sets the font for the annotation and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getFont()
      */
     public void setFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.font = font;
         fireAnnotationChanged();
     }
@@ -182,7 +183,7 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     /**
      * Returns the paint for the annotation.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setPaint(Paint)
      */
@@ -194,14 +195,12 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
      * Sets the paint for the annotation and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPaint()
      */
     public void setPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.paint = paint;
         fireAnnotationChanged();
     }
@@ -222,14 +221,12 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
      * aligned to the (x, y) coordinate of the annotation) and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param anchor  the anchor point (<code>null</code> not permitted).
+     * @param anchor  the anchor point ({@code null} not permitted).
      *
      * @see #getTextAnchor()
      */
     public void setTextAnchor(TextAnchor anchor) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(anchor, "anchor");
         this.textAnchor = anchor;
         fireAnnotationChanged();
     }
@@ -237,7 +234,7 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     /**
      * Returns the rotation anchor.
      *
-     * @return The rotation anchor point (never <code>null</code>).
+     * @return The rotation anchor point (never {@code null}).
      *
      * @see #setRotationAnchor(TextAnchor)
      */
@@ -249,11 +246,12 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
      * Sets the rotation anchor point and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param anchor  the anchor (<code>null</code> not permitted).
+     * @param anchor  the anchor ({@code null} not permitted).
      *
      * @see #getRotationAnchor()
      */
     public void setRotationAnchor(TextAnchor anchor) {
+        Args.nullNotPermitted(anchor, "anchor");
         this.rotationAnchor = anchor;
         fireAnnotationChanged();
     }
@@ -285,10 +283,11 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -298,19 +297,19 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
             return false;
         }
         TextAnnotation that = (TextAnnotation) obj;
-        if (!ObjectUtilities.equal(this.text, that.getText())) {
+        if (!ObjectUtils.equal(this.text, that.getText())) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.font, that.getFont())) {
+        if (!ObjectUtils.equal(this.font, that.getFont())) {
             return false;
         }
-        if (!PaintUtilities.equal(this.paint, that.getPaint())) {
+        if (!PaintUtils.equal(this.paint, that.getPaint())) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.textAnchor, that.getTextAnchor())) {
+        if (!ObjectUtils.equal(this.textAnchor, that.getTextAnchor())) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.rotationAnchor,
+        if (!ObjectUtils.equal(this.rotationAnchor,
                 that.getRotationAnchor())) {
             return false;
         }
@@ -328,10 +327,11 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
         result = 37 * result + this.font.hashCode();
-        result = 37 * result + HashUtilities.hashCodeForPaint(this.paint);
+        result = 37 * result + HashUtils.hashCodeForPaint(this.paint);
         result = 37 * result + this.rotationAnchor.hashCode();
         long temp = Double.doubleToLongBits(this.rotationAngle);
         result = 37 * result + (int) (temp ^ (temp >>> 32));
@@ -349,7 +349,7 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
+        SerialUtils.writePaint(this.paint, stream);
     }
 
     /**
@@ -363,7 +363,7 @@ public class TextAnnotation extends AbstractAnnotation implements Serializable {
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
+        this.paint = SerialUtils.readPaint(stream);
     }
 
 }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,34 +21,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * -----------------------
- * StrokeChooserPanel.java
- * -----------------------
- * (C) Copyright 2000-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   Dirk Zeitz;
- *
- * Changes (from 26-Oct-2001)
- * --------------------------
- * 26-Oct-2001 : Changed package to com.jrefinery.ui.*;
- * 14-Oct-2002 : Fixed errors reported by Checkstyle (DG);
- * 16-Mar-2004 : Fix for focus problems (DZ);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
 package org.jfree.chart.ui;
 
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
@@ -70,13 +54,21 @@ public class StrokeChooserPanel extends JPanel {
      */
     public StrokeChooserPanel(StrokeSample current, StrokeSample[] available) {
         setLayout(new BorderLayout());
-        this.selector = new JComboBox(available);
-        this.selector.setSelectedItem(current);
-        this.selector.setRenderer(new StrokeSample(new BasicStroke(1)));
+        // we've changed the behaviour here to populate the combo box
+        // with Stroke objects directly - ideally we'd change the signature
+        // of the constructor too...maybe later.
+        DefaultComboBoxModel model = new DefaultComboBoxModel();
+        for (int i = 0; i < available.length; i++) {
+            model.addElement(available[i].getStroke());
+        }
+        this.selector = new JComboBox(model);
+        this.selector.setSelectedItem(current.getStroke());
+        this.selector.setRenderer(new StrokeSample(null));
         add(this.selector);
         // Changes due to focus problems!! DZ
         this.selector.addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent evt) {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
                 getSelector().transferFocus();
             }
         });
@@ -88,19 +80,18 @@ public class StrokeChooserPanel extends JPanel {
      *
      * @return Returns the selector.
      */
-    protected final JComboBox getSelector()
-    {
-      return this.selector;
+    protected final JComboBox getSelector() {
+        return this.selector;
     }
 
     /**
      * Returns the selected stroke.
      *
-     * @return the selected stroke.
+     * @return The selected stroke (possibly {@code null}).
      */
     public Stroke getSelectedStroke() {
-        StrokeSample sample = (StrokeSample) this.selector.getSelectedItem();
-        return sample.getStroke();
+        return (Stroke) this.selector.getSelectedItem();
     }
 
 }
+

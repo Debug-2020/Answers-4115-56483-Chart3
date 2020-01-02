@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * BorderArrangement.java
  * ----------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,9 +39,9 @@
  * 24-Feb-2005 : Improved arrangeRR() method (DG);
  * 03-May-2005 : Implemented Serializable and added equals() method (DG);
  * 13-May-2005 : Fixed bugs in the arrange() method (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 08-Apr-2008 : Fixed bug in arrangeFF() method where width is too small for
  *               left and right blocks (DG);
+ * 21-Nov-2013 : Fixed bug #1084 (DG);
  *
  */
 
@@ -50,10 +50,10 @@ package org.jfree.chart.block;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.util.ObjectUtils;
 
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.Size2D;
 import org.jfree.data.Range;
 
 /**
@@ -88,14 +88,17 @@ public class BorderArrangement implements Arrangement, Serializable {
 
     /**
      * Adds a block to the arrangement manager at the specified edge.
+     * If the key is not an instance of {@link RectangleEdge} the block will
+     * be added in the center.
      *
-     * @param block  the block (<code>null</code> permitted).
+     * @param block  the block ({@code null} permitted).
      * @param key  the edge (an instance of {@link RectangleEdge}) or
-     *             <code>null</code> for the center block.
+     *             {@code null} for the center block.
      */
+    @Override
     public void add(Block block, Object key) {
 
-        if (key == null) {
+        if (!(key instanceof RectangleEdge)) { // catches null also
             this.centerBlock = block;
         }
         else {
@@ -125,9 +128,9 @@ public class BorderArrangement implements Arrangement, Serializable {
      *
      * @return The block size.
      */
-    public Size2D arrange(BlockContainer container,
-                          Graphics2D g2,
-                          RectangleConstraint constraint) {
+    @Override
+    public Size2D arrange(BlockContainer container, Graphics2D g2,
+            RectangleConstraint constraint) {
         RectangleConstraint contentConstraint
                 = container.toContentConstraint(constraint);
         Size2D contentSize = null;
@@ -167,6 +170,7 @@ public class BorderArrangement implements Arrangement, Serializable {
                         constraint.getHeightRange(), g2);
             }
         }
+        assert contentSize != null; 
         return new Size2D(container.calculateTotalWidth(contentSize.getWidth()),
                 container.calculateTotalHeight(contentSize.getHeight()));
     }
@@ -377,9 +381,6 @@ public class BorderArrangement implements Arrangement, Serializable {
         if (this.centerBlock != null) {
             RectangleConstraint c5 = new RectangleConstraint(widthRange3,
                     heightRange3);
-            // TODO:  the width and height ranges should be reduced by the
-            // height required for the top and bottom, and the width required
-            // by the left and right
             Size2D size = this.centerBlock.arrange(g2, c5);
             w[4] = size.width;
             h[4] = size.height;
@@ -491,6 +492,7 @@ public class BorderArrangement implements Arrangement, Serializable {
     /**
      * Clears the layout.
      */
+    @Override
     public void clear() {
         this.centerBlock = null;
         this.topBlock = null;
@@ -502,10 +504,11 @@ public class BorderArrangement implements Arrangement, Serializable {
     /**
      * Tests this arrangement for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -514,19 +517,19 @@ public class BorderArrangement implements Arrangement, Serializable {
             return false;
         }
         BorderArrangement that = (BorderArrangement) obj;
-        if (!ObjectUtilities.equal(this.topBlock, that.topBlock)) {
+        if (!ObjectUtils.equal(this.topBlock, that.topBlock)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.bottomBlock, that.bottomBlock)) {
+        if (!ObjectUtils.equal(this.bottomBlock, that.bottomBlock)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.leftBlock, that.leftBlock)) {
+        if (!ObjectUtils.equal(this.leftBlock, that.leftBlock)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.rightBlock, that.rightBlock)) {
+        if (!ObjectUtils.equal(this.rightBlock, that.rightBlock)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.centerBlock, that.centerBlock)) {
+        if (!ObjectUtils.equal(this.centerBlock, that.centerBlock)) {
             return false;
         }
         return true;

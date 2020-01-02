@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,22 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * --------------------
- * TextBlockAnchor.java
- * --------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes:
- * --------
- * 06-Nov-2003 : Version 1 (DG);
- * 22-Mar-2004 : Added readResolve() method (DG);
- * 20-Jun-2007 : Copied from JCommon (D)G;
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -52,42 +38,46 @@ public final class TextBlockAnchor implements Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -3045058380983401544L;
-
+    
     /** Top/left. */
-    public static final TextBlockAnchor TOP_LEFT
-            = new TextBlockAnchor("TextBlockAnchor.TOP_LEFT");
+    public static final TextBlockAnchor TOP_LEFT 
+        = new TextBlockAnchor("TextBlockAnchor.TOP_LEFT");
 
     /** Top/center. */
     public static final TextBlockAnchor TOP_CENTER = new TextBlockAnchor(
-            "TextBlockAnchor.TOP_CENTER");
+        "TextBlockAnchor.TOP_CENTER"
+    );
 
     /** Top/right. */
     public static final TextBlockAnchor TOP_RIGHT = new TextBlockAnchor(
-           "TextBlockAnchor.TOP_RIGHT");
+       "TextBlockAnchor.TOP_RIGHT"
+    );
 
     /** Middle/left. */
     public static final TextBlockAnchor CENTER_LEFT = new TextBlockAnchor(
-            "TextBlockAnchor.CENTER_LEFT");
+        "TextBlockAnchor.CENTER_LEFT"
+    );
 
     /** Middle/center. */
-    public static final TextBlockAnchor CENTER = new TextBlockAnchor(
-            "TextBlockAnchor.CENTER");
+    public static final TextBlockAnchor CENTER 
+        = new TextBlockAnchor("TextBlockAnchor.CENTER");
 
     /** Middle/right. */
     public static final TextBlockAnchor CENTER_RIGHT = new TextBlockAnchor(
-            "TextBlockAnchor.CENTER_RIGHT");
+        "TextBlockAnchor.CENTER_RIGHT"
+    );
 
     /** Bottom/left. */
-    public static final TextBlockAnchor BOTTOM_LEFT
+    public static final TextBlockAnchor BOTTOM_LEFT 
         = new TextBlockAnchor("TextBlockAnchor.BOTTOM_LEFT");
 
     /** Bottom/center. */
-    public static final TextBlockAnchor BOTTOM_CENTER
-            = new TextBlockAnchor("TextBlockAnchor.BOTTOM_CENTER");
+    public static final TextBlockAnchor BOTTOM_CENTER 
+        = new TextBlockAnchor("TextBlockAnchor.BOTTOM_CENTER");
 
     /** Bottom/right. */
-    public static final TextBlockAnchor BOTTOM_RIGHT
-            = new TextBlockAnchor("TextBlockAnchor.BOTTOM_RIGHT");
+    public static final TextBlockAnchor BOTTOM_RIGHT 
+        = new TextBlockAnchor("TextBlockAnchor.BOTTOM_RIGHT");
 
     /** The name. */
     private String name;
@@ -111,23 +101,24 @@ public final class TextBlockAnchor implements Serializable {
     }
 
     /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
+     * Returns {@code true} if this object is equal to the specified 
+     * object, and {@code false} otherwise.
      *
-     * @param obj  the other object.
+     * @param o  the other object.
      *
      * @return A boolean.
      */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(Object o) {
 
-        if (this == obj) {
+        if (this == o) {
             return true;
         }
-        if (!(obj instanceof TextBlockAnchor)) {
+        if (!(o instanceof TextBlockAnchor)) {
             return false;
         }
 
-        TextBlockAnchor other = (TextBlockAnchor) obj;
+        TextBlockAnchor other = (TextBlockAnchor) o;
         if (!this.name.equals(other.name)) {
             return false;
         }
@@ -140,15 +131,16 @@ public final class TextBlockAnchor implements Serializable {
      *
      * @return the hashcode
      */
+    @Override
     public int hashCode() {
         return this.name.hashCode();
     }
 
     /**
      * Ensures that serialization returns the unique instances.
-     *
+     * 
      * @return The object.
-     *
+     * 
      * @throws ObjectStreamException if there is a problem.
      */
     private Object readResolve() throws ObjectStreamException {
@@ -183,3 +175,4 @@ public final class TextBlockAnchor implements Serializable {
     }
 
 }
+

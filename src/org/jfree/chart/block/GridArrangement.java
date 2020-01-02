@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * GridArrangement.java
@@ -35,7 +35,6 @@
  * Changes:
  * --------
  * 08-Feb-2005 : Version 1 (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 03-Dec-2008 : Implemented missing methods, and fixed bugs reported in
  *               patch 2370487 (DG);
  *
@@ -48,8 +47,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.ui.Size2D;
 
 /**
  * Arranges blocks in a grid within their container.
@@ -83,8 +81,9 @@ public class GridArrangement implements Arrangement, Serializable {
      * an opportunity to record the details if they are required.
      *
      * @param block  the block.
-     * @param key  the key (<code>null</code> permitted).
+     * @param key  the key ({@code null} permitted).
      */
+    @Override
     public void add(Block block, Object key) {
         // can safely ignore
     }
@@ -93,12 +92,13 @@ public class GridArrangement implements Arrangement, Serializable {
      * Arranges the blocks within the specified container, subject to the given
      * constraint.
      *
-     * @param container  the container (<code>null</code> not permitted).
+     * @param container  the container ({@code null} not permitted).
      * @param constraint  the constraint.
      * @param g2  the graphics device.
      *
      * @return The size following the arrangement.
      */
+    @Override
     public Size2D arrange(BlockContainer container, Graphics2D g2,
                           RectangleConstraint constraint) {
         LengthConstraintType w = constraint.getWidthConstraintType();
@@ -148,7 +148,7 @@ public class GridArrangement implements Arrangement, Serializable {
     /**
      * Arranges the container with no constraint on the width or height.
      *
-     * @param container  the container (<code>null</code> not permitted).
+     * @param container  the container ({@code null} not permitted).
      * @param g2  the graphics device.
      *
      * @return The size.
@@ -175,9 +175,9 @@ public class GridArrangement implements Arrangement, Serializable {
     /**
      * Arranges the container with a fixed overall width and height.
      *
-     * @param container  the container (<code>null</code> not permitted).
+     * @param container  the container ({@code null} not permitted).
      * @param g2  the graphics device.
-     * @param constraint  the constraint (<code>null</code> not permitted).
+     * @param constraint  the constraint ({@code null} not permitted).
      *
      * @return The size following the arrangement.
      */
@@ -419,6 +419,7 @@ public class GridArrangement implements Arrangement, Serializable {
     /**
      * Clears any cached layout information retained by the arrangement.
      */
+    @Override
     public void clear() {
         // nothing to clear
     }
@@ -430,6 +431,7 @@ public class GridArrangement implements Arrangement, Serializable {
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

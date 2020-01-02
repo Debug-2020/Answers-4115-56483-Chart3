@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * OHLCSeries.java
  * ---------------
- * (C) Copyright 2006-2009, by Object Refinery Limited.
+ * (C) Copyright 2006-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,11 +36,13 @@
  * -------
  * 04-Dec-2006 : Version 1 (DG);
  * 17-Jun-2009 : Added remove(int) method (DG);
+ * 21-Nov-2013 : Added add(OHLCItem) method - feature request #385 (DG);
  *
  */
 
 package org.jfree.data.time.ohlc;
 
+import org.jfree.chart.util.Args;
 import org.jfree.data.ComparableObjectItem;
 import org.jfree.data.ComparableObjectSeries;
 import org.jfree.data.time.RegularTimePeriod;
@@ -59,7 +61,7 @@ public class OHLCSeries extends ComparableObjectSeries {
      * be sorted into ascending order by period, and duplicate periods will
      * not be allowed.
      *
-     * @param key  the series key (<code>null</code> not permitted).
+     * @param key  the series key ({@code null} not permitted).
      */
     public OHLCSeries(Comparable key) {
         super(key, true, false);
@@ -84,6 +86,7 @@ public class OHLCSeries extends ComparableObjectSeries {
      *
      * @return The data item.
      */
+    @Override
     public ComparableObjectItem getDataItem(int index) {
         return super.getDataItem(index);
     }
@@ -108,14 +111,31 @@ public class OHLCSeries extends ComparableObjectSeries {
         }
         super.add(new OHLCItem(period, open, high, low, close), true);
     }
+    
+    /**
+     * Adds a data item to the series.  The values from the item passed to
+     * this method will be copied into a new object.
+     * 
+     * @param item  the item ({@code null} not permitted).
+     * 
+     * @since 1.0.17
+     */
+    public void add(OHLCItem item) {
+        Args.nullNotPermitted(item, "item");
+        add(item.getPeriod(), item.getOpenValue(), item.getHighValue(),
+                item.getLowValue(), item.getCloseValue());
+    }
 
     /**
      * Removes the item with the specified index.
      *
      * @param index  the item index.
+     * 
+     * @return The item removed.
      *
      * @since 1.0.14
      */
+    @Override
     public ComparableObjectItem remove(int index) {
         return super.remove(index);
     }

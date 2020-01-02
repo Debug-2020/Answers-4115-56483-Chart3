@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * AbstractOverlay.java
  * --------------------
- * (C) Copyright 2009, by Object Refinery Limited.
+ * (C) Copyright 2009-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,6 +35,7 @@
  * Changes:
  * --------
  * 09-Apr-2009 : Version 1 (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -45,6 +46,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.event.ChartChangeEvent;
 import org.jfree.chart.event.OverlayChangeEvent;
 import org.jfree.chart.event.OverlayChangeListener;
+import org.jfree.chart.util.Args;
 
 /**
  * A base class for implementing overlays for a {@link ChartPanel}.
@@ -66,28 +68,24 @@ public class AbstractOverlay {
     /**
      * Registers an object for notification of changes to the overlay.
      *
-     * @param listener  the listener (<code>null</code> not permitted).
+     * @param listener  the listener ({@code null} not permitted).
      *
      * @see #removeChangeListener(OverlayChangeListener)
      */
     public void addChangeListener(OverlayChangeListener listener) {
-        if (listener == null) {
-            throw new IllegalArgumentException("Null 'listener' argument.");
-        }
+        Args.nullNotPermitted(listener, "listener");
         this.changeListeners.add(OverlayChangeListener.class, listener);
     }
 
     /**
      * Deregisters an object for notification of changes to the overlay.
      *
-     * @param listener  the listener (<code>null</code> not permitted)
+     * @param listener  the listener ({@code null} not permitted)
      *
      * @see #addChangeListener(OverlayChangeListener)
      */
     public void removeChangeListener(OverlayChangeListener listener) {
-        if (listener == null) {
-            throw new IllegalArgumentException("Null 'listener' argument.");
-        }
+        Args.nullNotPermitted(listener, "listener");
         this.changeListeners.remove(OverlayChangeListener.class, listener);
     }
 
@@ -118,5 +116,4 @@ public class AbstractOverlay {
     }
 
 }
-
 

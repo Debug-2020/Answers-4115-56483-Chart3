@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * MatrixSeries.java
@@ -69,7 +69,7 @@ public class MatrixSeries extends Series implements Serializable {
      * By default, all matrix items are initialzed to 0.
      * </p>
      *
-     * @param name  series name (<code>null</code> not permitted).
+     * @param name  series name ({@code null} not permitted).
      * @param rows  the number of rows.
      * @param columns  the number of columns.
      */
@@ -91,7 +91,7 @@ public class MatrixSeries extends Series implements Serializable {
 
     /**
      * Return the matrix item at the specified index.  Note that this method
-     * creates a new <code>Double</code> instance every time it is called.
+     * creates a new {@code double} instance every time it is called.
      *
      * @param itemIndex item index.
      *
@@ -127,6 +127,7 @@ public class MatrixSeries extends Series implements Serializable {
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount() {
         return getRowCount() * getColumnsCount();
     }
@@ -206,10 +207,11 @@ public class MatrixSeries extends Series implements Serializable {
     /**
      * Tests this object instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

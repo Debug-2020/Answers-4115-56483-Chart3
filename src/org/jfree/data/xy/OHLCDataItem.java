@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * OHLCDataItem.java
  * -----------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2013, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,6 +36,7 @@
  * -------
  * 03-Dec-2003 : Version 1 (DG);
  * 29-Apr-2005 : Added equals() method (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -43,6 +44,7 @@ package org.jfree.data.xy;
 
 import java.io.Serializable;
 import java.util.Date;
+import org.jfree.chart.util.Args;
 
 /**
  * Represents a single (open-high-low-close) data item in
@@ -76,22 +78,16 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Creates a new item.
      *
-     * @param date  the date (<code>null</code> not permitted).
+     * @param date  the date ({@code null} not permitted).
      * @param open  the open value.
      * @param high  the high value.
      * @param low  the low value.
      * @param close  the close value.
      * @param volume  the volume.
      */
-    public OHLCDataItem(Date date,
-                        double open,
-                        double high,
-                        double low,
-                        double close,
-                        double volume) {
-        if (date == null) {
-            throw new IllegalArgumentException("Null 'date' argument.");
-        }
+    public OHLCDataItem(Date date, double open, double high, double low,
+            double close, double volume) {
+        Args.nullNotPermitted(date, "date");
         this.date = date;
         this.open = new Double(open);
         this.high = new Double(high);
@@ -103,7 +99,7 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Returns the date that the data item relates to.
      *
-     * @return The date (never <code>null</code>).
+     * @return The date (never {@code null}).
      */
     public Date getDate() {
         return this.date;
@@ -112,7 +108,7 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Returns the open value.
      *
-     * @return The open value.
+     * @return The open value (never {@code null}).
      */
     public Number getOpen() {
         return this.open;
@@ -121,7 +117,7 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Returns the high value.
      *
-     * @return The high value.
+     * @return The high value (never {@code null}).
      */
     public Number getHigh() {
         return this.high;
@@ -130,7 +126,7 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Returns the low value.
      *
-     * @return The low value.
+     * @return The low value (never {@code null}).
      */
     public Number getLow() {
         return this.low;
@@ -139,7 +135,7 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Returns the close value.
      *
-     * @return The close value.
+     * @return The close value (never {@code null}).
      */
     public Number getClose() {
         return this.close;
@@ -148,7 +144,7 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Returns the volume.
      *
-     * @return The volume.
+     * @return The volume (never {@code null}).
      */
     public Number getVolume() {
         return this.volume;
@@ -157,10 +153,11 @@ public class OHLCDataItem implements Comparable, Serializable {
     /**
      * Checks this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -197,6 +194,7 @@ public class OHLCDataItem implements Comparable, Serializable {
      * @return A negative integer, zero, or a positive integer as this object
      *         is less than, equal to, or greater than the specified object.
      */
+    @Override
     public int compareTo(Object object) {
         if (object instanceof OHLCDataItem) {
             OHLCDataItem item = (OHLCDataItem) object;

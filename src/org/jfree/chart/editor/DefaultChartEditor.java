@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * DefaultChartEditor.java
@@ -36,7 +36,9 @@
  * Changes
  * -------
  * 24-Nov-2005 : New class, based on ChartPropertyEditPanel.java (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
+ *               Jess Thrysoee (DG);
+ *
  */
 
 package org.jfree.chart.editor;
@@ -59,6 +61,7 @@ import javax.swing.JTextField;
 
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.PolarPlot;
 import org.jfree.chart.title.Title;
 import org.jfree.chart.ui.LCBLayout;
 import org.jfree.chart.ui.PaintSample;
@@ -180,7 +183,12 @@ class DefaultChartEditor extends JPanel implements ActionListener, ChartEditor {
         this.titleEditor.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         tabs.addTab(localizationResources.getString("Title"), this.titleEditor);
 
-        this.plotEditor = new DefaultPlotEditor(plot);
+        if (plot instanceof PolarPlot) {
+            this.plotEditor = new DefaultPolarPlotEditor((PolarPlot) plot);
+        }
+        else {
+            this.plotEditor = new DefaultPlotEditor(plot);
+        }
         this.plotEditor.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         tabs.addTab(localizationResources.getString("Plot"), this.plotEditor);
 
@@ -210,7 +218,7 @@ class DefaultChartEditor extends JPanel implements ActionListener, ChartEditor {
     /**
      * Returns the current setting of the anti-alias flag.
      *
-     * @return <code>true</code> if anti-aliasing is enabled.
+     * @return {@code true} if anti-aliasing is enabled.
      */
     public boolean getAntiAlias() {
         return this.antialias.isSelected();
@@ -230,6 +238,7 @@ class DefaultChartEditor extends JPanel implements ActionListener, ChartEditor {
      *
      * @param event  a BackgroundPaint action.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
         String command = event.getActionCommand();
         if (command.equals("BackgroundPaint")) {
@@ -245,7 +254,7 @@ class DefaultChartEditor extends JPanel implements ActionListener, ChartEditor {
     private void attemptModifyBackgroundPaint() {
         Color c;
         c = JColorChooser.showDialog(this, localizationResources.getString(
-                "Background_Color"), Color.blue);
+                "Background_Color"), Color.BLUE);
         if (c != null) {
             this.background.setPaint(c);
         }
@@ -257,11 +266,10 @@ class DefaultChartEditor extends JPanel implements ActionListener, ChartEditor {
      *
      * @param chart  the chart.
      */
+    @Override
     public void updateChart(JFreeChart chart) {
-
         this.titleEditor.setTitleProperties(chart);
         this.plotEditor.updatePlotProperties(chart.getPlot());
-
         chart.setAntiAlias(getAntiAlias());
         chart.setBackgroundPaint(getBackgroundPaint());
     }

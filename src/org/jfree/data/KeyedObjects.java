@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * KeyedObjects.java
  * -----------------
- * (C) Copyright 2003-2009, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,24 +36,19 @@
  * --------
  * 31-Oct-2002 : Version 1 (DG);
  * 11-Jan-2005 : Minor tidy up (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 28-Sep-2007 : Clean up equals() method (DG);
  * 03-Oct-2007 : Make method behaviour consistent with DefaultKeyedValues (DG);
- * 01-Jul-2009 : Added sorting methods (DG);
+ * 03-Jul-2016 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.data;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.SortOrder;
 
 /**
  * A collection of (key, object) pairs.
@@ -87,9 +82,9 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
      *
      * @param item  the item index (zero-based).
      *
-     * @return The object (possibly <code>null</code>).
+     * @return The object (possibly {@code null}).
      *
-     * @throws IndexOutOfBoundsException if <code>item</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code item} is out of bounds.
      */
     public Object getObject(int item) {
         Object result = null;
@@ -107,7 +102,7 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
      *
      * @return The row key.
      *
-     * @throws IndexOutOfBoundsException if <code>item</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if {@code item} is out of bounds.
      *
      * @see #getIndex(Comparable)
      */
@@ -121,18 +116,16 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
     }
 
     /**
-     * Returns the index for a given key, or <code>-1</code>.
+     * Returns the index for a given key, or {@code -1}.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
-     * @return The index, or <code>-1</code> if the key is unrecognised.
+     * @return The index, or {@code -1} if the key is unrecognised.
      *
      * @see #getKey(int)
      */
     public int getIndex(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         int i = 0;
         Iterator iterator = this.data.iterator();
         while (iterator.hasNext()) {
@@ -148,7 +141,7 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
     /**
      * Returns a list containing all the keys in the list.
      *
-     * @return The keys (never <code>null</code>).
+     * @return The keys (never {@code null}).
      */
     public List getKeys() {
         List result = new java.util.ArrayList();
@@ -161,11 +154,12 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
     }
 
     /**
-     * Returns the object for a given key.
+     * Returns the object for a given key. If the key is not recognised, the
+     * method should return {@code null}.
      *
      * @param key  the key.
      *
-     * @return The object (possibly <code>null</code>).
+     * @return The object (possibly {@code null}).
      *
      * @see #addObject(Comparable, Object)
      */
@@ -196,7 +190,7 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
      * This is the same as the {@link #addObject(Comparable, Object)}
      * method.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      * @param object  the object.
      *
      * @see #getObject(Comparable)
@@ -218,10 +212,10 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
      * there is an existing item with the specified key, updates the value
      * for that item and moves it to the specified position.
      *
-     * @param position  the position (in the range <code>0</code> to
-     *                  <code>getItemCount()</code>).
-     * @param key  the key (<code>null</code> not permitted).
-     * @param value  the value (<code>null</code> permitted).
+     * @param position  the position (in the range {@code 0} to
+     *                  {@code getItemCount()}).
+     * @param key  the key ({@code null} not permitted).
+     * @param value  the value ({@code null} permitted).
      *
      * @since 1.0.7
      */
@@ -229,9 +223,7 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
         if (position < 0 || position > this.data.size()) {
             throw new IllegalArgumentException("'position' out of bounds.");
         }
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         int pos = getIndex(key);
         if (pos >= 0) {
             this.data.remove(pos);
@@ -259,7 +251,7 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
     /**
      * Removes a value from the collection.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @see #removeValue(int)
      *
@@ -285,34 +277,6 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
     }
 
     /**
-     * Sorts the items in the list by key.
-     *
-     * @param order  the sort order (<code>null</code> not permitted).
-     *
-     * @since 1.2.0
-     */
-    public void sortByKeys(SortOrder order) {
-        Comparator comparator = new KeyedObjectComparator(
-                KeyedObjectComparatorType.BY_KEY, order);
-        Collections.sort(this.data, comparator);
-    }
-
-    /**
-     * Sorts the items in the list by value.  If the list contains
-     * <code>null</code> values, they will sort to the end of the list,
-     * irrespective of the sort order.
-     *
-     * @param order  the sort order (<code>null</code> not permitted).
-     *
-     * @since 1.2.0
-     */
-    public void sortByObjects(SortOrder order) {
-        Comparator comparator = new KeyedObjectComparator(
-                KeyedObjectComparatorType.BY_VALUE, order);
-        Collections.sort(this.data, comparator);
-    }
-
-    /**
      * Returns a clone of this object.  Keys in the list should be immutable
      * and are not cloned.  Objects in the list are cloned only if they
      * implement {@link PublicCloneable}.
@@ -321,6 +285,7 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
      *
      * @throws CloneNotSupportedException if there is a problem cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         KeyedObjects clone = (KeyedObjects) super.clone();
         clone.data = new java.util.ArrayList();
@@ -335,10 +300,11 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj == this) {
@@ -381,6 +347,7 @@ public class KeyedObjects implements Cloneable, PublicCloneable, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         return (this.data != null ? this.data.hashCode() : 0);
     }

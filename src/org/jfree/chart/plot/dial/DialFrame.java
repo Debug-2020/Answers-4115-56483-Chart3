@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * DialFrame.java
@@ -58,7 +58,7 @@ public interface DialFrame extends DialLayer {
 
     /**
      * Returns the shape of the viewing window for the dial, or
-     * <code>null</code> if the dial is completely open.  Other layers in the
+     * {@code null} if the dial is completely open.  Other layers in the
      * plot will rely on their drawing to be clipped within this window.
      *
      * @param frame  the reference frame for the dial.

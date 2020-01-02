@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------------------
  * AbstractPieItemLabelGenerator.java
  * ----------------------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,6 +39,7 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 03-May-2006 : Fixed bug 1480978, a problem in the clone() method (DG);
  * 23-Nov-2007 : Implemented hashCode() (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -48,9 +49,10 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.data.general.DatasetUtilities;
-import org.jfree.data.pie.PieDataset;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.data.general.DatasetUtils;
+import org.jfree.data.general.PieDataset;
 
 /**
  * A base class used for generating pie chart item labels.
@@ -72,37 +74,27 @@ public class AbstractPieItemLabelGenerator implements Serializable {
     /**
      * Creates an item label generator using the specified number formatters.
      *
-     * @param labelFormat  the label format string (<code>null</code> not
+     * @param labelFormat  the label format string ({@code null} not
      *                     permitted).
-     * @param numberFormat  the format object for the values (<code>null</code>
+     * @param numberFormat  the format object for the values ({@code null}
      *                      not permitted).
      * @param percentFormat  the format object for the percentages
-     *                       (<code>null</code> not permitted).
+     *                       ({@code null} not permitted).
      */
-    protected AbstractPieItemLabelGenerator(String labelFormat,
-                                            NumberFormat numberFormat,
-                                            NumberFormat percentFormat) {
-
-        if (labelFormat == null) {
-            throw new IllegalArgumentException("Null 'labelFormat' argument.");
-        }
-        if (numberFormat == null) {
-            throw new IllegalArgumentException("Null 'numberFormat' argument.");
-        }
-        if (percentFormat == null) {
-            throw new IllegalArgumentException(
-                    "Null 'percentFormat' argument.");
-        }
+    protected AbstractPieItemLabelGenerator(String labelFormat, 
+            NumberFormat numberFormat, NumberFormat percentFormat) {
+        Args.nullNotPermitted(labelFormat, "labelFormat");
+        Args.nullNotPermitted(numberFormat, "numberFormat");
+        Args.nullNotPermitted(percentFormat, "percentFormat");
         this.labelFormat = labelFormat;
         this.numberFormat = numberFormat;
         this.percentFormat = percentFormat;
-
     }
 
     /**
      * Returns the label format string.
      *
-     * @return The label format string (never <code>null</code>).
+     * @return The label format string (never {@code null}).
      */
     public String getLabelFormat() {
         return this.labelFormat;
@@ -111,7 +103,7 @@ public class AbstractPieItemLabelGenerator implements Serializable {
     /**
      * Returns the number formatter.
      *
-     * @return The formatter (never <code>null</code>).
+     * @return The formatter (never {@code null}).
      */
     public NumberFormat getNumberFormat() {
         return this.numberFormat;
@@ -120,7 +112,7 @@ public class AbstractPieItemLabelGenerator implements Serializable {
     /**
      * Returns the percent formatter.
      *
-     * @return The formatter (never <code>null</code>).
+     * @return The formatter (never {@code null}).
      */
     public NumberFormat getPercentFormat() {
         return this.percentFormat;
@@ -131,20 +123,20 @@ public class AbstractPieItemLabelGenerator implements Serializable {
      * {@link MessageFormat} class for creating labels.  The returned array
      * contains four values:
      * <ul>
-     * <li>result[0] = the section key converted to a <code>String</code>;</li>
+     * <li>result[0] = the section key converted to a {@code String};</li>
      * <li>result[1] = the formatted data value;</li>
      * <li>result[2] = the formatted percentage (of the total);</li>
      * <li>result[3] = the formatted total value.</li>
      * </ul>
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
-     * @param key  the key (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
-     * @return The items (never <code>null</code>).
+     * @return The items (never {@code null}).
      */
     protected Object[] createItemArray(PieDataset dataset, Comparable key) {
         Object[] result = new Object[4];
-        double total = DatasetUtilities.calculatePieDatasetTotal(dataset);
+        double total = DatasetUtils.calculatePieDatasetTotal(dataset);
         result[0] = key.toString();
         Number value = dataset.getValue(key);
         if (value != null) {
@@ -168,10 +160,10 @@ public class AbstractPieItemLabelGenerator implements Serializable {
     /**
      * Generates a label for a pie section.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
-     * @param key  the section key (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param key  the section key ({@code null} not permitted).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
     protected String generateSectionLabel(PieDataset dataset, Comparable key) {
         String result = null;
@@ -185,10 +177,11 @@ public class AbstractPieItemLabelGenerator implements Serializable {
     /**
      * Tests the generator for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -217,11 +210,12 @@ public class AbstractPieItemLabelGenerator implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 127;
-        result = HashUtilities.hashCode(result, this.labelFormat);
-        result = HashUtilities.hashCode(result, this.numberFormat);
-        result = HashUtilities.hashCode(result, this.percentFormat);
+        result = HashUtils.hashCode(result, this.labelFormat);
+        result = HashUtils.hashCode(result, this.numberFormat);
+        result = HashUtils.hashCode(result, this.percentFormat);
         return result;
     }
 
@@ -232,6 +226,7 @@ public class AbstractPieItemLabelGenerator implements Serializable {
      *
      * @throws CloneNotSupportedException  should not happen.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         AbstractPieItemLabelGenerator clone
                 = (AbstractPieItemLabelGenerator) super.clone();

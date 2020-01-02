@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * DateRange.java
@@ -51,7 +51,7 @@ import java.util.Date;
 import org.jfree.data.Range;
 
 /**
- * A range specified in terms of two <code>java.util.Date</code> objects.
+ * A range specified in terms of two {@code java.util.Date} objects.
  * Instances of this class are immutable.
  */
 public class DateRange extends Range implements Serializable {
@@ -75,8 +75,8 @@ public class DateRange extends Range implements Serializable {
     /**
      * Constructs a new range.
      *
-     * @param lower  the lower bound (<code>null</code> not permitted).
-     * @param upper  the upper bound (<code>null</code> not permitted).
+     * @param lower  the lower bound ({@code null} not permitted).
+     * @param upper  the upper bound ({@code null} not permitted).
      */
     public DateRange(Date lower, Date upper) {
         super(lower.getTime(), upper.getTime());
@@ -103,7 +103,7 @@ public class DateRange extends Range implements Serializable {
      * upper and lower bounds are evaluated as milliseconds since midnight
      * GMT, 1-Jan-1970.
      *
-     * @param other  the other range (<code>null</code> not permitted).
+     * @param other  the other range ({@code null} not permitted).
      */
     public DateRange(Range other) {
         this(other.getLowerBound(), other.getUpperBound());
@@ -162,6 +162,7 @@ public class DateRange extends Range implements Serializable {
      *
      * @return A string representing the date range.
      */
+    @Override
     public String toString() {
         DateFormat df = DateFormat.getDateTimeInstance();
         return "[" + df.format(getLowerDate()) + " --> "

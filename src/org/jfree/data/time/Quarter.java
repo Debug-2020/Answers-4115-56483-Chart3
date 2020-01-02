@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------
  * Quarter.java
  * ------------
- * (C) Copyright 2001-2008, by Object Refinery Limited.
+ * (C) Copyright 2001-2012, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -53,9 +53,9 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 05-Oct-2006 : Updated API docs (DG);
  * 06-Oct-2006 : Refactored to cache first and last millisecond values (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 16-Sep-2008 : Deprecated DEFAULT_TIME_ZONE (DG);
  * 25-Nov-2008 : Added new constructor with Locale (DG);
+ * 05-Jul-2012 : REmoved JDK 1.3.1 supporting code (DG);
  *
  */
 
@@ -66,6 +66,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.jfree.chart.date.MonthConstants;
+import org.jfree.chart.date.SerialDate;
 
 /**
  * Defines a quarter (in a given year).  The range supported is Q1 1900 to
@@ -148,29 +150,16 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      * Constructs a new instance, based on a date/time and the default time
      * zone.
      *
-     * @param time  the date/time (<code>null</code> not permitted).
+     * @param time  the date/time ({@code null} not permitted).
      *
-     * @see #Quarter(Date, TimeZone)
+     * @see #Quarter(Date, TimeZone, Locale)
      */
     public Quarter(Date time) {
-        this(time, TimeZone.getDefault());
+        this(time, TimeZone.getDefault(), Locale.getDefault());
     }
 
     /**
-     * Constructs a Quarter, based on a date/time and time zone.
-     *
-     * @param time  the date/time.
-     * @param zone  the zone (<code>null</code> not permitted).
-     *
-     * @deprecated Since 1.0.12, use {@link #Quarter(Date, TimeZone, Locale)}
-     *     instead.
-     */
-    public Quarter(Date time, TimeZone zone) {
-        this(time, zone, Locale.getDefault());
-    }
-
-    /**
-     * Creates a new <code>Quarter</code> instance, using the specified
+     * Creates a new {@code Quarter} instance, using the specified
      * zone and locale.
      *
      * @param time  the current time.
@@ -227,6 +216,7 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      *
      * @see #getLastMillisecond()
      */
+    @Override
     public long getFirstMillisecond() {
         return this.firstMillisecond;
     }
@@ -241,6 +231,7 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      *
      * @see #getFirstMillisecond()
      */
+    @Override
     public long getLastMillisecond() {
         return this.lastMillisecond;
     }
@@ -249,10 +240,11 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      * Recalculates the start date/time and end date/time for this time period
      * relative to the supplied calendar (which incorporates a time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @since 1.0.3
      */
+    @Override
     public void peg(Calendar calendar) {
         this.firstMillisecond = getFirstMillisecond(calendar);
         this.lastMillisecond = getLastMillisecond(calendar);
@@ -261,9 +253,10 @@ public class Quarter extends RegularTimePeriod implements Serializable {
     /**
      * Returns the quarter preceding this one.
      *
-     * @return The quarter preceding this one (or <code>null</code> if this is
+     * @return The quarter preceding this one (or {@code null} if this is
      *     Q1 1900).
      */
+    @Override
     public RegularTimePeriod previous() {
         Quarter result;
         if (this.quarter > FIRST_QUARTER) {
@@ -285,6 +278,7 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      *
      * @return The quarter following this one (or null if this is Q4 9999).
      */
+    @Override
     public RegularTimePeriod next() {
         Quarter result;
         if (this.quarter < LAST_QUARTER) {
@@ -306,21 +300,23 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      *
      * @return The serial index number.
      */
+    @Override
     public long getSerialIndex() {
         return this.year * 4L + this.quarter;
     }
 
     /**
      * Tests the equality of this Quarter object to an arbitrary object.
-     * Returns <code>true</code> if the target is a Quarter instance
+     * Returns {@code true} if the target is a Quarter instance
      * representing the same quarter as this object.  In all other cases,
-     * returns <code>false</code>.
+     * returns {@code false}.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> if quarter and year of this and the object are
+     * @return {@code true} if quarter and year of this and the object are
      *         the same.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj != null) {
@@ -343,11 +339,12 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      * Returns a hash code for this object instance.  The approach described by
      * Joshua Bloch in "Effective Java" has been used here:
      * <p>
-     * <code>http://developer.java.sun.com/developer/Books/effectivejava
-     * /Chapter3.pdf</code>
+     * {@code http://developer.java.sun.com/developer/Books/effectivejava
+     * /Chapter3.pdf}
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + this.quarter;
@@ -365,6 +362,7 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      *
      * @return negative == before, zero == same, positive == after.
      */
+    @Override
     public int compareTo(Object o1) {
 
         int result;
@@ -402,6 +400,7 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      *
      * @return A string representing the quarter.
      */
+    @Override
     public String toString() {
         return "Q" + this.quarter + "/" + this.year;
     }
@@ -410,41 +409,39 @@ public class Quarter extends RegularTimePeriod implements Serializable {
      * Returns the first millisecond in the Quarter, evaluated using the
      * supplied calendar (which determines the time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The first millisecond in the Quarter.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getFirstMillisecond(Calendar calendar) {
         int month = Quarter.FIRST_MONTH_IN_QUARTER[this.quarter];
         calendar.set(this.year, month - 1, 1, 0, 0, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        // in the following line, we'd rather call calendar.getTimeInMillis()
-        // to avoid object creation, but that isn't supported in Java 1.3.1
-        return calendar.getTime().getTime();
+        return calendar.getTimeInMillis();
     }
 
     /**
      * Returns the last millisecond of the Quarter, evaluated using the
      * supplied calendar (which determines the time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The last millisecond of the Quarter.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getLastMillisecond(Calendar calendar) {
         int month = Quarter.LAST_MONTH_IN_QUARTER[this.quarter];
         int eom = SerialDate.lastDayOfMonth(month, this.year);
         calendar.set(this.year, month - 1, eom, 23, 59, 59);
         calendar.set(Calendar.MILLISECOND, 999);
-        // in the following line, we'd rather call calendar.getTimeInMillis()
-        // to avoid object creation, but that isn't supported in Java 1.3.1
-        return calendar.getTime().getTime();
+        return calendar.getTimeInMillis();
     }
 
     /**

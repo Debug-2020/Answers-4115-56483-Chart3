@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------
  * PiePlot.java
  * ------------
- * (C) Copyright 2000-2009, by Andrzej Porebski and Contributors.
+ * (C) Copyright 2000-2017, by Andrzej Porebski and Contributors.
  *
  * Original Author:  Andrzej Porebski;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -39,8 +39,8 @@
  *                   Andreas Schroeder (very minor);
  *                   Christoph Beck (bug 2121818);
  *
- * Changes (from 21-Jun-2001)
- * --------------------------
+ * Changes
+ * -------
  * 21-Jun-2001 : Removed redundant JFreeChart parameter from constructors (DG);
  * 18-Sep-2001 : Updated header (DG);
  * 15-Oct-2001 : Data source classes moved to com.jrefinery.data.* (DG);
@@ -146,8 +146,6 @@
  * 19-Apr-2007 : Deprecated override settings (DG);
  * 18-May-2007 : Set dataset for LegendItem (DG);
  * 14-Jun-2007 : Added label distributor attribute (DG);
- * 19-Jun-2007 : Removed deprecated code (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 18-Jul-2007 : Added simple label option (DG);
  * 21-Nov-2007 : Fixed labelling bugs, added debug code, restored default
  *               white background (DG);
@@ -164,9 +162,15 @@
  *               by Christoph Beck (DG);
  * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
  *               Jess Thrysoee (DG);
- * 29-Jun-2009 : Moved PaintMap and StrokeMap to org.jfree.chart.util.* (DG);
  * 10-Jul-2009 : Added optional drop shadow generator (DG);
- *
+ * 03-Sep-2009 : Fixed bug where sinmpleLabelOffset is ignored (DG);
+ * 04-Nov-2009 : Add mouse wheel rotation support (DG);
+ * 18-Oct-2011 : Fixed tooltip offset with shadow generator (DG);
+ * 20-Nov-2011 : Initialise shadow generator as null (DG);
+ * 01-Jul-2012 : General label once only in drawSimpleLabels() (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
+ * 12-Sep-2013 : Check for KEY_SUPPRESS_SHADOW_GENERATION rendering hint (DG);
+ * 
  */
 
 package org.jfree.chart.plot;
@@ -179,13 +183,12 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Rectangle;
+import java.awt.RadialGradientPaint;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Arc2D;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
@@ -200,12 +203,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.TreeMap;
+import org.jfree.chart.JFreeChart;
 
 import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
-import org.jfree.chart.RenderingSource;
-import org.jfree.chart.util.PaintMap;
-import org.jfree.chart.util.StrokeMap;
+import org.jfree.chart.PaintMap;
+import org.jfree.chart.StrokeMap;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.entity.PieSectionEntity;
 import org.jfree.chart.event.PlotChangeEvent;
@@ -213,42 +216,36 @@ import org.jfree.chart.labels.PieSectionLabelGenerator;
 import org.jfree.chart.labels.PieToolTipGenerator;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.text.G2TextMeasurer;
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlock;
 import org.jfree.chart.text.TextBox;
-import org.jfree.chart.text.TextUtilities;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.ui.TextAnchor;
 import org.jfree.chart.urls.PieURLGenerator;
-import org.jfree.chart.util.DefaultShadowGenerator;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleAnchor;
-import org.jfree.chart.util.RectangleInsets;
 import org.jfree.chart.util.ResourceBundleWrapper;
 import org.jfree.chart.util.Rotation;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 import org.jfree.chart.util.ShadowGenerator;
-import org.jfree.chart.util.ShapeUtilities;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.chart.util.UnitType;
 import org.jfree.data.DefaultKeyedValues;
 import org.jfree.data.KeyedValues;
-import org.jfree.data.category.CategoryDataset;
-import org.jfree.data.event.DatasetChangeEvent;
-import org.jfree.data.general.DatasetUtilities;
-import org.jfree.data.pie.PieDataset;
-import org.jfree.data.pie.PieDatasetChangeInfo;
-import org.jfree.data.pie.PieDatasetChangeType;
-import org.jfree.data.pie.PieDatasetSelectionState;
-import org.jfree.data.pie.SelectablePieDataset;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetUtils;
+import org.jfree.data.general.PieDataset;
 
 /**
  * A plot that displays data in the form of a pie chart, using data from any
  * class that implements the {@link PieDataset} interface.
- * The example shown here is generated by the <code>PieChartDemo2.java</code>
+ * The example shown here is generated by the {@code PieChartDemo2.java}
  * program included in the JFreeChart Demo Collection:
  * <br><br>
- * <img src="../../../../images/PiePlotSample.png"
- * alt="PiePlotSample.png" />
+ * <img src="../../../../images/PiePlotSample.png" alt="PiePlotSample.png">
  * <P>
  * Special notes:
  * <ol>
@@ -256,14 +253,13 @@ import org.jfree.data.pie.SelectablePieDataset;
  * in a clockwise direction, but these settings can be changed;</li>
  * <li>negative values in the dataset are ignored;</li>
  * <li>there are utility methods for creating a {@link PieDataset} from a
- * {@link CategoryDataset};</li>
+ * {@link org.jfree.data.category.CategoryDataset};</li>
  * </ol>
  *
  * @see Plot
  * @see PieDataset
  */
-public class PiePlot extends Plot implements Selectable, Cloneable,
-        Serializable {
+public class PiePlot extends Plot implements Cloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -795612466005590431L;
@@ -278,18 +274,18 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     public static final double DEFAULT_START_ANGLE = 90.0;
 
     /** The default section label font. */
-    public static final Font DEFAULT_LABEL_FONT = new Font("Tahoma",
+    public static final Font DEFAULT_LABEL_FONT = new Font("SansSerif",
             Font.PLAIN, 10);
 
     /** The default section label paint. */
-    public static final Paint DEFAULT_LABEL_PAINT = Color.black;
+    public static final Paint DEFAULT_LABEL_PAINT = Color.BLACK;
 
     /** The default section label background paint. */
     public static final Paint DEFAULT_LABEL_BACKGROUND_PAINT = new Color(255,
             255, 192);
 
     /** The default section label outline paint. */
-    public static final Paint DEFAULT_LABEL_OUTLINE_PAINT = Color.black;
+    public static final Paint DEFAULT_LABEL_OUTLINE_PAINT = Color.BLACK;
 
     /** The default section label outline stroke. */
     public static final Stroke DEFAULT_LABEL_OUTLINE_STROKE = new BasicStroke(
@@ -326,8 +322,8 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /** The section paint map. */
     private PaintMap sectionPaintMap;
 
-    /** The base section paint (fallback). */
-    private transient Paint baseSectionPaint;
+    /** The default section paint (fallback). */
+    private transient Paint defaultSectionPaint;
 
     /**
      * A flag that controls whether or not the section paint is auto-populated
@@ -346,8 +342,8 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /** The section outline paint map. */
     private PaintMap sectionOutlinePaintMap;
 
-    /** The base section outline paint (fallback). */
-    private transient Paint baseSectionOutlinePaint;
+    /** The default section outline paint (fallback). */
+    private transient Paint defaultSectionOutlinePaint;
 
     /**
      * A flag that controls whether or not the section outline paint is
@@ -360,8 +356,8 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /** The section outline stroke map. */
     private StrokeMap sectionOutlineStrokeMap;
 
-    /** The base section outline stroke (fallback). */
-    private transient Stroke baseSectionOutlineStroke;
+    /** The default section outline stroke (fallback). */
+    private transient Stroke defaultSectionOutlineStroke;
 
     /**
      * A flag that controls whether or not the section outline stroke is
@@ -372,7 +368,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     private boolean autoPopulateSectionOutlineStroke;
 
     /** The shadow paint. */
-    private transient Paint shadowPaint = Color.gray;
+    private transient Paint shadowPaint = Color.GRAY;
 
     /** The x-offset for the shadow effect. */
     private double shadowXOffset = 4.0f;
@@ -381,7 +377,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     private double shadowYOffset = 4.0f;
 
     /** The percentage amount to explode each pie section. */
-    private Map explodePercentages;
+    private Map<Comparable, Double> explodePercentages;
 
     /** The section label generator. */
     private PieSectionLabelGenerator labelGenerator;
@@ -394,25 +390,25 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * The color used to draw the background of the section labels.  If this
-     * is <code>null</code>, the background is not filled.
+     * is {@code null}, the background is not filled.
      */
     private transient Paint labelBackgroundPaint;
 
     /**
      * The paint used to draw the outline of the section labels
-     * (<code>null</code> permitted).
+     * ({@code null} permitted).
      */
     private transient Paint labelOutlinePaint;
 
     /**
      * The stroke used to draw the outline of the section labels
-     * (<code>null</code> permitted).
+     * ({@code null} permitted).
      */
     private transient Stroke labelOutlineStroke;
 
     /**
      * The paint used to draw the shadow for the section labels
-     * (<code>null</code> permitted).
+     * ({@code null} permitted).
      */
     private transient Paint labelShadowPaint;
 
@@ -425,7 +421,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * The padding between the labels and the label outlines.  This is not
-     * allowed to be <code>null</code>.
+     * allowed to be {@code null}.
      *
      * @since 1.0.7
      */
@@ -461,7 +457,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     private double labelLinkMargin = 0.025;
 
     /** The paint used for the label linking lines. */
-    private transient Paint labelLinkPaint = Color.black;
+    private transient Paint labelLinkPaint = Color.BLACK;
 
     /** The stroke used for the label linking lines. */
     private transient Stroke labelLinkStroke = new BasicStroke(0.5f);
@@ -493,7 +489,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     private PieURLGenerator legendLabelURLGenerator;
 
     /**
-     * A flag that controls whether <code>null</code> values are ignored.
+     * A flag that controls whether {@code null} values are ignored.
      */
     private boolean ignoreNullValues;
 
@@ -519,8 +515,8 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     private double minimumArcAngleToDraw;
 
     /**
-     * The shadow generator for the plot (<code>null</code> permitted).
-     *
+     * The shadow generator for the plot ({@code null} permitted).
+     * 
      * @since 1.0.14
      */
     private ShadowGenerator shadowGenerator;
@@ -529,13 +525,6 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     protected static ResourceBundle localizationResources
             = ResourceBundleWrapper.getBundle(
                     "org.jfree.chart.plot.LocalizationBundle");
-
-    /**
-     * Override attributes for selected items.
-     *
-     * @since 1.2.0
-     */
-    private PieSelectionAttributes selectedItemAttributes;
 
     /**
      * This debug flag controls whether or not an outline is drawn showing the
@@ -558,7 +547,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     static final boolean DEBUG_DRAW_PIE_AREA = false;
 
     /**
-     * Creates a new plot.  The dataset is initially set to <code>null</code>.
+     * Creates a new plot.  The dataset is initially set to {@code null}.
      */
     public PiePlot() {
         this(null);
@@ -567,7 +556,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Creates a plot that will draw a pie chart for the specified dataset.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public PiePlot(PieDataset dataset) {
         super();
@@ -584,16 +573,16 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         this.minimumArcAngleToDraw = DEFAULT_MINIMUM_ARC_ANGLE_TO_DRAW;
 
         this.sectionPaintMap = new PaintMap();
-        this.baseSectionPaint = Color.gray;
+        this.defaultSectionPaint = Color.GRAY;
         this.autoPopulateSectionPaint = true;
 
         this.sectionOutlinesVisible = true;
         this.sectionOutlinePaintMap = new PaintMap();
-        this.baseSectionOutlinePaint = DEFAULT_OUTLINE_PAINT;
+        this.defaultSectionOutlinePaint = DEFAULT_OUTLINE_PAINT;
         this.autoPopulateSectionOutlinePaint = false;
 
         this.sectionOutlineStrokeMap = new StrokeMap();
-        this.baseSectionOutlineStroke = DEFAULT_OUTLINE_STROKE;
+        this.defaultSectionOutlineStroke = DEFAULT_OUTLINE_STROKE;
         this.autoPopulateSectionOutlineStroke = false;
 
         this.explodePercentages = new TreeMap();
@@ -623,14 +612,13 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         this.ignoreNullValues = false;
         this.ignoreZeroValues = false;
 
-        this.selectedItemAttributes = new PieSelectionAttributes();
-        this.shadowGenerator = new DefaultShadowGenerator();
+        this.shadowGenerator = null;
     }
 
     /**
      * Returns the dataset.
      *
-     * @return The dataset (possibly <code>null</code>).
+     * @return The dataset (possibly {@code null}).
      *
      * @see #setDataset(PieDataset)
      */
@@ -641,7 +629,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Sets the dataset and sends a {@link DatasetChangeEvent} to 'this'.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      *
      * @see #getDataset()
      */
@@ -661,8 +649,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         }
 
         // send a dataset change event to self...
-        DatasetChangeEvent event = new DatasetChangeEvent(this, dataset,
-                new PieDatasetChangeInfo(PieDatasetChangeType.UPDATE, -1, -1));
+        DatasetChangeEvent event = new DatasetChangeEvent(this, dataset);
         datasetChanged(event);
     }
 
@@ -721,7 +708,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Returns the direction in which the pie sections are drawn (clockwise or
      * anti-clockwise).
      *
-     * @return The direction (never <code>null</code>).
+     * @return The direction (never {@code null}).
      *
      * @see #setDirection(Rotation)
      */
@@ -733,14 +720,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the direction in which the pie sections are drawn and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param direction  the direction (<code>null</code> not permitted).
+     * @param direction  the direction ({@code null} not permitted).
      *
      * @see #getDirection()
      */
     public void setDirection(Rotation direction) {
-        if (direction == null) {
-            throw new IllegalArgumentException("Null 'direction' argument.");
-        }
+        Args.nullNotPermitted(direction, "direction");
         this.direction = direction;
         fireChangeEvent();
 
@@ -823,7 +808,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     }
 
     /**
-     * Returns the flag that controls whether <code>null</code> values in the
+     * Returns the flag that controls whether {@code null} values in the
      * dataset are ignored.
      *
      * @return A boolean.
@@ -835,7 +820,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     }
 
     /**
-     * Sets a flag that controls whether <code>null</code> values are ignored,
+     * Sets a flag that controls whether {@code null} values are ignored,
      * and sends a {@link PlotChangeEvent} to all registered listeners.  At
      * present, this only affects whether or not the key is presented in the
      * legend.
@@ -882,40 +867,31 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * Returns the paint for the specified section.  This is equivalent to
-     * <code>lookupSectionPaint(section, getAutoPopulateSectionPaint())</code>.
+     * {@code lookupSectionPaint(section, getAutoPopulateSectionPaint())}.
      *
      * @param key  the section key.
-     * @param selected  is the section selected?
      *
      * @return The paint for the specified section.
      *
-     * @since 1.2.0
+     * @since 1.0.3
      *
      * @see #lookupSectionPaint(Comparable, boolean)
      */
-    protected Paint lookupSectionPaint(Comparable key, boolean selected) {
-        Paint result = null;
-        if (selected) {
-            result = this.selectedItemAttributes.lookupSectionPaint(key);
-        }
-        if (result == null) {
-            result = lookupSectionPaint(key, selected,
-                    getAutoPopulateSectionPaint());
-        }
-        return result;
+    protected Paint lookupSectionPaint(Comparable key) {
+        return lookupSectionPaint(key, getAutoPopulateSectionPaint());
     }
 
     /**
      * Returns the paint for the specified section.  The lookup involves these
      * steps:
      * <ul>
-     * <li>if {@link #getSectionPaint(Comparable)} is non-<code>null</code>
-     *         return it;</li>
-     * <li>if {@link #getSectionPaint(Comparable)} is <code>null</code> but
-     *         <code>autoPopulate</code> is <code>true</code>, attempt to fetch
+     * <li>if {@link #getSectionPaint(Comparable)} is non-{@code null} return
+     *         it;</li>
+     * <li>if {@link #getSectionPaint(Comparable)} is {@code null} but
+     *         {@code autoPopulate} is {@code true}, attempt to fetch
      *         a new paint from the drawing supplier
      *         ({@link #getDrawingSupplier()});
-     * <li>if all else fails, return {@link #getBaseSectionPaint()}.
+     * <li>if all else fails, return {@link #getDefaultSectionPaint()}.
      * </ul>
      *
      * @param key  the section key.
@@ -924,18 +900,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      *
      * @return The paint.
      *
-     * @since 1.2.0
+     * @since 1.0.3
      */
-    protected Paint lookupSectionPaint(Comparable key, boolean selected, 
-            boolean autoPopulate) {
+    protected Paint lookupSectionPaint(Comparable key, boolean autoPopulate) { 
 
-        if (selected) {
-          //  return Color.WHITE;
-        }
-        Paint result = null;
-
-        // is a paint defined for the specified key
-        result = this.sectionPaintMap.getPaint(key);
+        // if not, check if there is a paint defined for the specified key
+        Paint result = this.sectionPaintMap.getPaint(key);
         if (result != null) {
             return result;
         }
@@ -948,11 +918,11 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                 this.sectionPaintMap.put(key, result);
             }
             else {
-                result = this.baseSectionPaint;
+                result = this.defaultSectionPaint;
             }
         }
         else {
-            result = this.baseSectionPaint;
+            result = this.defaultSectionPaint;
         }
         return result;
     }
@@ -986,25 +956,22 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * Returns the paint associated with the specified key, or
-     * <code>null</code> if there is no paint associated with the key.
+     * {@code null} if there is no paint associated with the key.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The paint associated with the specified key, or
-     *     <code>null</code>.
+     *     {@code null}.
      *
-     * @throws IllegalArgumentException if <code>key</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code key} is
+     *     {@code null}.
      *
      * @see #setSectionPaint(Comparable, Paint)
      *
-     * @since 1.2.0
+     * @since 1.0.3
      */
-    public Paint getSectionPaint(Comparable key, boolean selected) {
+    public Paint getSectionPaint(Comparable key) {
         // null argument check delegated...
-        if (selected) {
-            return Color.white;
-        }
         return this.sectionPaintMap.getPaint(key);
     }
 
@@ -1012,11 +979,11 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the paint associated with the specified key, and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      * @param paint  the paint.
      *
-     * @throws IllegalArgumentException if <code>key</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code key} is
+     *     {@code null}.
      *
      * @see #getSectionPaint(Comparable)
      *
@@ -1031,7 +998,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Clears the section paint settings for this plot and, if requested, sends
      * a {@link PlotChangeEvent} to all registered listeners.  Be aware that
-     * if the <code>autoPopulateSectionPaint</code> flag is set, the section
+     * if the {@code autoPopulateSectionPaint} flag is set, the section
      * paints may be repopulated using the same colours as before.
      *
      * @param notify  notify listeners?
@@ -1048,30 +1015,28 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     }
 
     /**
-     * Returns the base section paint.  This is used when no other paint is
-     * defined, which is rare.  The default value is <code>Color.gray</code>.
+     * Returns the default section paint.  This is used when no other paint is
+     * defined, which is rare.  The default value is {@code Color.GRAY}.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
-     * @see #setBaseSectionPaint(Paint)
+     * @see #setDefaultSectionPaint(Paint)
      */
-    public Paint getBaseSectionPaint() {
-        return this.baseSectionPaint;
+    public Paint getDefaultSectionPaint() {
+        return this.defaultSectionPaint;
     }
 
     /**
-     * Sets the base section paint and sends a {@link PlotChangeEvent} to all
+     * Sets the default section paint and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
-     * @see #getBaseSectionPaint()
+     * @see #getDefaultSectionPaint()
      */
-    public void setBaseSectionPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
-        this.baseSectionPaint = paint;
+    public void setDefaultSectionPaint(Paint paint) {
+        Args.nullNotPermitted(paint, "paint");
+        this.defaultSectionPaint = paint;
         fireChangeEvent();
     }
 
@@ -1132,29 +1097,20 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * Returns the outline paint for the specified section.  This is equivalent
-     * to <code>lookupSectionPaint(section,
-     * getAutoPopulateSectionOutlinePaint())</code>.
+     * to {@code lookupSectionPaint(section, 
+     * getAutoPopulateSectionOutlinePaint())}.
      *
      * @param key  the section key.
-     * @param selected  is the section selected?
      *
      * @return The paint for the specified section.
      *
-     * @since 1.2.0
+     * @since 1.0.3
      *
      * @see #lookupSectionOutlinePaint(Comparable, boolean)
      */
-    protected Paint lookupSectionOutlinePaint(Comparable key,
-            boolean selected) {
-        Paint result = null;
-        if (selected) {
-            result = this.selectedItemAttributes.lookupSectionOutlinePaint(key);
-        }
-        if (result == null) {
-            result = lookupSectionOutlinePaint(key, selected,
+    protected Paint lookupSectionOutlinePaint(Comparable key) {
+        return lookupSectionOutlinePaint(key,
                 getAutoPopulateSectionOutlinePaint());
-        }
-        return result;
     }
 
     /**
@@ -1162,33 +1118,27 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * involves these steps:
      * <ul>
      * <li>if {@link #getSectionOutlinePaint(Comparable)} is
-     *         non-<code>null</code> return it;</li>
-     * <li>if {@link #getSectionOutlinePaint(Comparable)} is
-     *         <code>null</code> but <code>autoPopulate</code> is
-     *         <code>true</code>, attempt to fetch a new outline paint from
-     *         the drawing supplier ({@link #getDrawingSupplier()});
-     * <li>if all else fails, return {@link #getBaseSectionOutlinePaint()}.
+     *         non-{@code null} return it;</li>
+     * <li>if {@link #getSectionOutlinePaint(Comparable)} is {@code null} but
+     *         {@code autoPopulate} is {@code true}, attempt to fetch
+     *         a new outline paint from the drawing supplier
+     *         ({@link #getDrawingSupplier()});
+     * <li>if all else fails, return {@link #getDefaultSectionOutlinePaint()}.
      * </ul>
      *
      * @param key  the section key.
-     * @param selected  is the section selected?
      * @param autoPopulate  a flag that controls whether the drawing supplier
      *     is used to auto-populate the section outline paint settings.
      *
      * @return The paint.
      *
-     * @since 1.2.0
+     * @since 1.0.3
      */
-    protected Paint lookupSectionOutlinePaint(Comparable key, boolean selected,
+    protected Paint lookupSectionOutlinePaint(Comparable key,
             boolean autoPopulate) {
 
-        Paint result = null;
-
-        if (selected) {
-            return Color.WHITE;
-        }
-        // is a paint defined for the specified key
-        result = this.sectionOutlinePaintMap.getPaint(key);
+        // if not, check if there is a paint defined for the specified key
+        Paint result = this.sectionOutlinePaintMap.getPaint(key);
         if (result != null) {
             return result;
         }
@@ -1201,26 +1151,26 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                 this.sectionOutlinePaintMap.put(key, result);
             }
             else {
-                result = this.baseSectionOutlinePaint;
+                result = this.defaultSectionOutlinePaint;
             }
         }
         else {
-            result = this.baseSectionOutlinePaint;
+            result = this.defaultSectionOutlinePaint;
         }
         return result;
     }
 
     /**
      * Returns the outline paint associated with the specified key, or
-     * <code>null</code> if there is no paint associated with the key.
+     * {@code null} if there is no paint associated with the key.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The paint associated with the specified key, or
-     *     <code>null</code>.
+     *     {@code null}.
      *
-     * @throws IllegalArgumentException if <code>key</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code key} is
+     *     {@code null}.
      *
      * @see #setSectionOutlinePaint(Comparable, Paint)
      *
@@ -1235,11 +1185,11 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the outline paint associated with the specified key, and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      * @param paint  the paint.
      *
-     * @throws IllegalArgumentException if <code>key</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code key} is
+     *     {@code null}.
      *
      * @see #getSectionOutlinePaint(Comparable)
      *
@@ -1254,7 +1204,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Clears the section outline paint settings for this plot and, if
      * requested, sends a {@link PlotChangeEvent} to all registered listeners.
-     * Be aware that if the <code>autoPopulateSectionPaint</code> flag is set,
+     * Be aware that if the {@code autoPopulateSectionPaint} flag is set,
      * the section paints may be repopulated using the same colours as before.
      *
      * @param notify  notify listeners?
@@ -1271,29 +1221,27 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     }
 
     /**
-     * Returns the base section paint.  This is used when no other paint is
+     * Returns the default section paint.  This is used when no other paint is
      * available.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
-     * @see #setBaseSectionOutlinePaint(Paint)
+     * @see #setDefaultSectionOutlinePaint(Paint)
      */
-    public Paint getBaseSectionOutlinePaint() {
-        return this.baseSectionOutlinePaint;
+    public Paint getDefaultSectionOutlinePaint() {
+        return this.defaultSectionOutlinePaint;
     }
 
     /**
-     * Sets the base section paint.
+     * Sets the default section paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
-     * @see #getBaseSectionOutlinePaint()
+     * @see #getDefaultSectionOutlinePaint()
      */
-    public void setBaseSectionOutlinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
-        this.baseSectionOutlinePaint = paint;
+    public void setDefaultSectionOutlinePaint(Paint paint) {
+        Args.nullNotPermitted(paint, "paint");
+        this.defaultSectionOutlinePaint = paint;
         fireChangeEvent();
     }
 
@@ -1328,29 +1276,20 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * Returns the outline stroke for the specified section.  This is
-     * equivalent to <code>lookupSectionOutlineStroke(section,
-     * getAutoPopulateSectionOutlineStroke())</code>.
+     * equivalent to {@code lookupSectionOutlineStroke(section,
+     * getAutoPopulateSectionOutlineStroke())}.
      *
      * @param key  the section key.
-     * @param selected  is the section selected?
      *
      * @return The stroke for the specified section.
      *
-     * @since 1.2.0
+     * @since 1.0.3
      *
      * @see #lookupSectionOutlineStroke(Comparable, boolean)
      */
-    protected Stroke lookupSectionOutlineStroke(Comparable key, 
-            boolean selected) {
-        Stroke s = null;
-        if (selected) {
-            s = this.selectedItemAttributes.lookupSectionOutlineStroke(key);
-        }
-        if (s == null) {
-            s = lookupSectionOutlineStroke(key, selected,
+    protected Stroke lookupSectionOutlineStroke(Comparable key) {
+        return lookupSectionOutlineStroke(key,
                 getAutoPopulateSectionOutlineStroke());
-        }
-        return s;
     }
 
     /**
@@ -1358,30 +1297,27 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * involves these steps:
      * <ul>
      * <li>if {@link #getSectionOutlineStroke(Comparable)} is
-     *         non-<code>null</code> return it;</li>
-     * <li>if {@link #getSectionOutlineStroke(Comparable)} is
-     *         <code>null</code> but <code>autoPopulate</code> is
-     *         <code>true</code>, attempt to fetch a new outline stroke from
-     *         the drawing supplier ({@link #getDrawingSupplier()});
-     * <li>if all else fails, return {@link #getBaseSectionOutlineStroke()}.
+     *         non-{@code null} return it;</li>
+     * <li>if {@link #getSectionOutlineStroke(Comparable)} is {@code null} but
+     *         {@code autoPopulate} is {@code true}, attempt to fetch
+     *         a new outline stroke from the drawing supplier
+     *         ({@link #getDrawingSupplier()});
+     * <li>if all else fails, return {@link #getDefaultSectionOutlineStroke()}.
      * </ul>
      *
      * @param key  the section key.
-     * @param selected  is the section selected?
      * @param autoPopulate  a flag that controls whether the drawing supplier
      *     is used to auto-populate the section outline stroke settings.
      *
      * @return The stroke.
      *
-     * @since 1.2.0
+     * @since 1.0.3
      */
     protected Stroke lookupSectionOutlineStroke(Comparable key,
-            boolean selected, boolean autoPopulate) {
+            boolean autoPopulate) {
 
-        Stroke result = null;
-
-        // is a stroke defined for the specified key
-        result = this.sectionOutlineStrokeMap.getStroke(key);
+        // if not, check if there is a stroke defined for the specified key
+        Stroke result = this.sectionOutlineStrokeMap.getStroke(key);
         if (result != null) {
             return result;
         }
@@ -1394,26 +1330,26 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                 this.sectionOutlineStrokeMap.put(key, result);
             }
             else {
-                result = this.baseSectionOutlineStroke;
+                result = this.defaultSectionOutlineStroke;
             }
         }
         else {
-            result = this.baseSectionOutlineStroke;
+            result = this.defaultSectionOutlineStroke;
         }
         return result;
     }
 
     /**
      * Returns the outline stroke associated with the specified key, or
-     * <code>null</code> if there is no stroke associated with the key.
+     * {@code null} if there is no stroke associated with the key.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The stroke associated with the specified key, or
-     *     <code>null</code>.
+     *     {@code null}.
      *
-     * @throws IllegalArgumentException if <code>key</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code key} is
+     *     {@code null}.
      *
      * @see #setSectionOutlineStroke(Comparable, Stroke)
      *
@@ -1428,11 +1364,11 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the outline stroke associated with the specified key, and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      * @param stroke  the stroke.
      *
-     * @throws IllegalArgumentException if <code>key</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code key} is
+     *     {@code null}.
      *
      * @see #getSectionOutlineStroke(Comparable)
      *
@@ -1447,7 +1383,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Clears the section outline stroke settings for this plot and, if
      * requested, sends a {@link PlotChangeEvent} to all registered listeners.
-     * Be aware that if the <code>autoPopulateSectionPaint</code> flag is set,
+     * Be aware that if the {@code autoPopulateSectionPaint} flag is set,
      * the section paints may be repopulated using the same colours as before.
      *
      * @param notify  notify listeners?
@@ -1464,29 +1400,27 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     }
 
     /**
-     * Returns the base section stroke.  This is used when no other stroke is
+     * Returns the default section stroke.  This is used when no other stroke is
      * available.
      *
-     * @return The stroke (never <code>null</code>).
+     * @return The stroke (never {@code null}).
      *
-     * @see #setBaseSectionOutlineStroke(Stroke)
+     * @see #setDefaultSectionOutlineStroke(Stroke)
      */
-    public Stroke getBaseSectionOutlineStroke() {
-        return this.baseSectionOutlineStroke;
+    public Stroke getDefaultSectionOutlineStroke() {
+        return this.defaultSectionOutlineStroke;
     }
 
     /**
-     * Sets the base section stroke.
+     * Sets the default section stroke.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      *
-     * @see #getBaseSectionOutlineStroke()
+     * @see #getDefaultSectionOutlineStroke()
      */
-    public void setBaseSectionOutlineStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
-        this.baseSectionOutlineStroke = stroke;
+    public void setDefaultSectionOutlineStroke(Stroke stroke) {
+        Args.nullNotPermitted(stroke, "stroke");
+        this.defaultSectionOutlineStroke = stroke;
         fireChangeEvent();
     }
 
@@ -1520,7 +1454,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the shadow paint.
      *
-     * @return The paint (possibly <code>null</code>).
+     * @return The paint (possibly {@code null}).
      *
      * @see #setShadowPaint(Paint)
      */
@@ -1532,7 +1466,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the shadow paint and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      *
      * @see #getShadowPaint()
      */
@@ -1593,13 +1527,13 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Returns the amount that the section with the specified key should be
      * exploded.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The amount that the section with the specified key should be
      *     exploded.
      *
-     * @throws IllegalArgumentException if <code>key</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code key} is
+     *     {@code null}.
      *
      * @since 1.0.3
      *
@@ -1620,7 +1554,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the amount that a pie section should be exploded and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param key  the section key (<code>null</code> not permitted).
+     * @param key  the section key ({@code null} not permitted).
      * @param percent  the explode percentage (0.30 = 30 percent).
      *
      * @since 1.0.3
@@ -1628,9 +1562,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * @see #getExplodePercent(Comparable)
      */
     public void setExplodePercent(Comparable key, double percent) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         if (this.explodePercentages == null) {
             this.explodePercentages = new TreeMap();
         }
@@ -1662,7 +1594,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the section label generator.
      *
-     * @return The generator (possibly <code>null</code>).
+     * @return The generator (possibly {@code null}).
      *
      * @see #setLabelGenerator(PieSectionLabelGenerator)
      */
@@ -1674,7 +1606,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the section label generator and sends a {@link PlotChangeEvent} to
      * all registered listeners.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @see #getLabelGenerator()
      */
@@ -1764,7 +1696,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the label link style.
      *
-     * @return The label link style (never <code>null</code>).
+     * @return The label link style (never {@code null}).
      *
      * @see #setLabelLinkStyle(PieLabelLinkStyle)
      *
@@ -1778,16 +1710,14 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the label link style and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param style  the new style (<code>null</code> not permitted).
+     * @param style  the new style ({@code null} not permitted).
      *
      * @see #getLabelLinkStyle()
      *
      * @since 1.0.10
      */
     public void setLabelLinkStyle(PieLabelLinkStyle style) {
-        if (style == null) {
-            throw new IllegalArgumentException("Null 'style' argument.");
-        }
+        Args.nullNotPermitted(style, "style");
         this.labelLinkStyle = style;
         fireChangeEvent();
     }
@@ -1821,7 +1751,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Returns the paint used for the lines that connect pie sections to their
      * corresponding labels.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setLabelLinkPaint(Paint)
      */
@@ -1834,14 +1764,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * corresponding labels, and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getLabelLinkPaint()
      */
     public void setLabelLinkPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.labelLinkPaint = paint;
         fireChangeEvent();
     }
@@ -1866,9 +1794,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * @see #getLabelLinkStroke()
      */
     public void setLabelLinkStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.labelLinkStroke = stroke;
         fireChangeEvent();
     }
@@ -1880,7 +1806,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * This method is overridden in the {@link RingPlot} class to resolve
      * bug 2121818.
      *
-     * @return <code>0.10</code>.
+     * @return {@code 0.10}.
      *
      * @since 1.0.12
      */
@@ -1891,7 +1817,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the section label font.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setLabelFont(Font)
      */
@@ -1903,14 +1829,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the section label font and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getLabelFont()
      */
     public void setLabelFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.labelFont = font;
         fireChangeEvent();
     }
@@ -1918,7 +1842,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the section label paint.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setLabelPaint(Paint)
      */
@@ -1930,14 +1854,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the section label paint and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getLabelPaint()
      */
     public void setLabelPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.labelPaint = paint;
         fireChangeEvent();
     }
@@ -1945,7 +1867,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the section label background paint.
      *
-     * @return The paint (possibly <code>null</code>).
+     * @return The paint (possibly {@code null}).
      *
      * @see #setLabelBackgroundPaint(Paint)
      */
@@ -1957,7 +1879,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the section label background paint and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      *
      * @see #getLabelBackgroundPaint()
      */
@@ -1969,7 +1891,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the section label outline paint.
      *
-     * @return The paint (possibly <code>null</code>).
+     * @return The paint (possibly {@code null}).
      *
      * @see #setLabelOutlinePaint(Paint)
      */
@@ -1981,7 +1903,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the section label outline paint and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      *
      * @see #getLabelOutlinePaint()
      */
@@ -1993,7 +1915,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the section label outline stroke.
      *
-     * @return The stroke (possibly <code>null</code>).
+     * @return The stroke (possibly {@code null}).
      *
      * @see #setLabelOutlineStroke(Stroke)
      */
@@ -2005,7 +1927,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the section label outline stroke and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param stroke  the stroke (<code>null</code> permitted).
+     * @param stroke  the stroke ({@code null} permitted).
      *
      * @see #getLabelOutlineStroke()
      */
@@ -2017,7 +1939,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the section label shadow paint.
      *
-     * @return The paint (possibly <code>null</code>).
+     * @return The paint (possibly {@code null}).
      *
      * @see #setLabelShadowPaint(Paint)
      */
@@ -2029,7 +1951,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the section label shadow paint and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} permitted).
      *
      * @see #getLabelShadowPaint()
      */
@@ -2041,7 +1963,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the label padding.
      *
-     * @return The label padding (never <code>null</code>).
+     * @return The label padding (never {@code null}).
      *
      * @since 1.0.7
      *
@@ -2055,16 +1977,14 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the padding between each label and its outline and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param padding  the padding (<code>null</code> not permitted).
+     * @param padding  the padding ({@code null} not permitted).
      *
      * @since 1.0.7
      *
      * @see #getLabelPadding()
      */
     public void setLabelPadding(RectangleInsets padding) {
-        if (padding == null) {
-            throw new IllegalArgumentException("Null 'padding' argument.");
-        }
+        Args.nullNotPermitted(padding, "padding");
         this.labelPadding = padding;
         fireChangeEvent();
     }
@@ -2098,7 +2018,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the offset used for the simple labels, if they are displayed.
      *
-     * @return The offset (never <code>null</code>).
+     * @return The offset (never {@code null}).
      *
      * @since 1.0.7
      *
@@ -2112,16 +2032,14 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the offset for the simple labels and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param offset  the offset (<code>null</code> not permitted).
+     * @param offset  the offset ({@code null} not permitted).
      *
      * @since 1.0.7
      *
      * @see #getSimpleLabelOffset()
      */
     public void setSimpleLabelOffset(RectangleInsets offset) {
-        if (offset == null) {
-            throw new IllegalArgumentException("Null 'offset' argument.");
-        }
+        Args.nullNotPermitted(offset, "offset");
         this.simpleLabelOffset = offset;
         fireChangeEvent();
     }
@@ -2130,7 +2048,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Returns the object responsible for the vertical layout of the pie
      * section labels.
      *
-     * @return The label distributor (never <code>null</code>).
+     * @return The label distributor (never {@code null}).
      *
      * @since 1.0.6
      */
@@ -2142,14 +2060,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the label distributor and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param distributor  the distributor (<code>null</code> not permitted).
+     * @param distributor  the distributor ({@code null} not permitted).
      *
      * @since 1.0.6
      */
     public void setLabelDistributor(AbstractPieLabelDistributor distributor) {
-        if (distributor == null) {
-            throw new IllegalArgumentException("Null 'distributor' argument.");
-        }
+        Args.nullNotPermitted(distributor, "distributor");
         this.labelDistributor = distributor;
         fireChangeEvent();
     }
@@ -2157,9 +2073,9 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the tool tip generator, an object that is responsible for
      * generating the text items used for tool tips by the plot.  If the
-     * generator is <code>null</code>, no tool tips will be created.
+     * generator is {@code null}, no tool tips will be created.
      *
-     * @return The generator (possibly <code>null</code>).
+     * @return The generator (possibly {@code null}).
      *
      * @see #setToolTipGenerator(PieToolTipGenerator)
      */
@@ -2169,10 +2085,10 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * Sets the tool tip generator and sends a {@link PlotChangeEvent} to all
-     * registered listeners.  Set the generator to <code>null</code> if you
+     * registered listeners.  Set the generator to {@code null} if you
      * don't want any tool tips.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @see #getToolTipGenerator()
      */
@@ -2184,7 +2100,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the URL generator.
      *
-     * @return The generator (possibly <code>null</code>).
+     * @return The generator (possibly {@code null}).
      *
      * @see #setURLGenerator(PieURLGenerator)
      */
@@ -2196,7 +2112,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the URL generator and sends a {@link PlotChangeEvent} to all
      * registered listeners.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @see #getURLGenerator()
      */
@@ -2242,7 +2158,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the shape used for legend items.
      *
-     * @return The shape (never <code>null</code>).
+     * @return The shape (never {@code null}).
      *
      * @see #setLegendItemShape(Shape)
      */
@@ -2254,14 +2170,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the shape used for legend items and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param shape  the shape (<code>null</code> not permitted).
+     * @param shape  the shape ({@code null} not permitted).
      *
      * @see #getLegendItemShape()
      */
     public void setLegendItemShape(Shape shape) {
-        if (shape == null) {
-            throw new IllegalArgumentException("Null 'shape' argument.");
-        }
+        Args.nullNotPermitted(shape, "shape");
         this.legendItemShape = shape;
         fireChangeEvent();
     }
@@ -2269,7 +2183,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the legend label generator.
      *
-     * @return The legend label generator (never <code>null</code>).
+     * @return The legend label generator (never {@code null}).
      *
      * @see #setLegendLabelGenerator(PieSectionLabelGenerator)
      */
@@ -2281,14 +2195,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the legend label generator and sends a {@link PlotChangeEvent} to
      * all registered listeners.
      *
-     * @param generator  the generator (<code>null</code> not permitted).
+     * @param generator  the generator ({@code null} not permitted).
      *
      * @see #getLegendLabelGenerator()
      */
     public void setLegendLabelGenerator(PieSectionLabelGenerator generator) {
-        if (generator == null) {
-            throw new IllegalArgumentException("Null 'generator' argument.");
-        }
+        Args.nullNotPermitted(generator, "generator");
         this.legendLabelGenerator = generator;
         fireChangeEvent();
     }
@@ -2296,7 +2208,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the legend label tool tip generator.
      *
-     * @return The legend label tool tip generator (possibly <code>null</code>).
+     * @return The legend label tool tip generator (possibly {@code null}).
      *
      * @see #setLegendLabelToolTipGenerator(PieSectionLabelGenerator)
      */
@@ -2308,7 +2220,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the legend label tool tip generator and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @see #getLegendLabelToolTipGenerator()
      */
@@ -2321,7 +2233,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns the legend label URL generator.
      *
-     * @return The legend label URL generator (possibly <code>null</code>).
+     * @return The legend label URL generator (possibly {@code null}).
      *
      * @see #setLegendLabelURLGenerator(PieURLGenerator)
      *
@@ -2335,7 +2247,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * Sets the legend label URL generator and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @see #getLegendLabelURLGenerator()
      *
@@ -2348,9 +2260,9 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     /**
      * Returns the shadow generator for the plot, if any.
-     *
-     * @return The shadow generator (possibly <code>null</code>).
-     *
+     * 
+     * @return The shadow generator (possibly {@code null}).
+     * 
      * @since 1.0.14
      */
     public ShadowGenerator getShadowGenerator() {
@@ -2360,11 +2272,11 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Sets the shadow generator for the plot and sends a
      * {@link PlotChangeEvent} to all registered listeners.  Note that this is
-     * a btmap drop-shadow generation facility and is separate from the
+     * a bitmap drop-shadow generation facility and is separate from the
      * vector based show option that is controlled via the
-     * {@link setShadowPaint()} method.
+     * {@link #setShadowPaint(java.awt.Paint)} method.
      *
-     * @param generator  the generator (<code>null</code> permitted).
+     * @param generator  the generator ({@code null} permitted).
      *
      * @since 1.0.14
      */
@@ -2374,14 +2286,26 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     }
 
     /**
+     * Handles a mouse wheel rotation (this method is intended for use by the
+     * {@code MouseWheelHandler} class).
+     *
+     * @param rotateClicks  the number of rotate clicks on the the mouse wheel.
+     *
+     * @since 1.0.14
+     */
+    public void handleMouseWheelRotation(int rotateClicks) {
+        setStartAngle(this.startAngle + rotateClicks * 4.0);
+    }
+
+    /**
      * Initialises the drawing procedure.  This method will be called before
      * the first item is rendered, giving the plot an opportunity to initialise
      * any state information it wants to maintain.
      *
      * @param g2  the graphics device.
-     * @param plotArea  the plot area (<code>null</code> not permitted).
+     * @param plotArea  the plot area ({@code null} not permitted).
      * @param plot  the plot.
-     * @param index  the secondary index (<code>null</code> for primary
+     * @param index  the secondary index ({@code null} for primary
      *               renderer).
      * @param info  collects chart rendering information for return to caller.
      *
@@ -2394,7 +2318,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         PiePlotState state = new PiePlotState(info);
         state.setPassesRequired(2);
         if (this.dataset != null) {
-            state.setTotal(DatasetUtilities.calculatePieDatasetTotal(
+            state.setTotal(DatasetUtils.calculatePieDatasetTotal(
                     plot.getDataset()));
         }
         state.setLatestAngle(plot.getStartAngle());
@@ -2408,11 +2332,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      *
      * @param g2  the graphics device.
      * @param area  the area within which the plot should be drawn.
-     * @param anchor  the anchor point (<code>null</code> permitted).
+     * @param anchor  the anchor point ({@code null} permitted).
      * @param parentState  the state from the parent plot, if there is one.
      * @param info  collects info about the drawing
-     *              (<code>null</code> permitted).
+     *              ({@code null} permitted).
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
                      PlotState parentState, PlotRenderingInfo info) {
 
@@ -2435,28 +2360,29 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
                 getForegroundAlpha()));
 
-        if (!DatasetUtilities.isEmptyOrNull(this.dataset)) {
+        if (!DatasetUtils.isEmptyOrNull(this.dataset)) {
             Graphics2D savedG2 = g2;
-            Rectangle2D savedDataArea = area;
+            boolean suppressShadow = Boolean.TRUE.equals(g2.getRenderingHint(
+                    JFreeChart.KEY_SUPPRESS_SHADOW_GENERATION));
             BufferedImage dataImage = null;
-            if (this.shadowGenerator != null) {
+            if (this.shadowGenerator != null && !suppressShadow) {
                 dataImage = new BufferedImage((int) area.getWidth(),
                     (int) area.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 g2 = dataImage.createGraphics();
+                g2.translate(-area.getX(), -area.getY());
                 g2.setRenderingHints(savedG2.getRenderingHints());
-                area = new Rectangle(0, 0, dataImage.getWidth(), dataImage.getHeight());
             }
             drawPie(g2, area, info);
-            if (this.shadowGenerator != null) {
-                BufferedImage shadowImage = this.shadowGenerator.createDropShadow(dataImage);
+            if (this.shadowGenerator != null && !suppressShadow) {
+                BufferedImage shadowImage 
+                        = this.shadowGenerator.createDropShadow(dataImage);
                 g2 = savedG2;
-                area = savedDataArea;
-                g2.drawImage(shadowImage, (int) savedDataArea.getX()
-                        + this.shadowGenerator.calculateOffsetX(),
-                        (int) savedDataArea.getY()
+                g2.drawImage(shadowImage, (int) area.getX() 
+                        + this.shadowGenerator.calculateOffsetX(), 
+                        (int) area.getY()
                         + this.shadowGenerator.calculateOffsetY(), null);
-                g2.drawImage(dataImage, (int) savedDataArea.getX(),
-                        (int) savedDataArea.getY(), null);
+                g2.drawImage(dataImage, (int) area.getX(), (int) area.getY(), 
+                        null);
             }
         }
         else {
@@ -2470,19 +2396,26 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
     }
 
-    private Rectangle2D[] calculateLinkAndExplodeAreas(Graphics2D g2,
-            Rectangle2D plotArea) {
+    /**
+     * Draws the pie.
+     *
+     * @param g2  the graphics device.
+     * @param plotArea  the plot area.
+     * @param info  chart rendering info.
+     */
+    protected void drawPie(Graphics2D g2, Rectangle2D plotArea,
+                           PlotRenderingInfo info) {
 
-        Rectangle2D[] result = new Rectangle2D[2];
+        PiePlotState state = initialise(g2, plotArea, this, null, info);
 
         // adjust the plot area for interior spacing and labels...
         double labelReserve = 0.0;
         if (this.labelGenerator != null && !this.simpleLabels) {
             labelReserve = this.labelGap + this.maximumLabelWidth;
         }
-        double gapHorizontal = plotArea.getWidth() * (this.interiorGap
-                + labelReserve) * 2.0;
+        double gapHorizontal = plotArea.getWidth() * labelReserve * 2.0;
         double gapVertical = plotArea.getHeight() * this.interiorGap * 2.0;
+
 
         if (DEBUG_DRAW_INTERIOR) {
             double hGap = plotArea.getWidth() * this.interiorGap;
@@ -2492,7 +2425,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
             double igx2 = plotArea.getMaxX() - hGap;
             double igy1 = plotArea.getY() + vGap;
             double igy2 = plotArea.getMaxY() - vGap;
-            g2.setPaint(Color.gray);
+            g2.setPaint(Color.GRAY);
             g2.draw(new Rectangle2D.Double(igx1, igy1, igx2 - igx1,
                     igy2 - igy1));
         }
@@ -2515,12 +2448,12 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         // the labels
         Rectangle2D linkArea = new Rectangle2D.Double(linkX, linkY, linkW,
                 linkH);
-        result[0] = linkArea;
+        state.setLinkArea(linkArea);
 
         if (DEBUG_DRAW_LINK_AREA) {
-            g2.setPaint(Color.blue);
+            g2.setPaint(Color.BLUE);
             g2.draw(linkArea);
-            g2.setPaint(Color.yellow);
+            g2.setPaint(Color.YELLOW);
             g2.draw(new Ellipse2D.Double(linkArea.getX(), linkArea.getY(),
                     linkArea.getWidth(), linkArea.getHeight()));
         }
@@ -2536,26 +2469,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         double vv = linkArea.getHeight() * lm * 2.0;
         Rectangle2D explodeArea = new Rectangle2D.Double(linkX + hh / 2.0,
                 linkY + vv / 2.0, linkW - hh, linkH - vv);
-        result[1] = explodeArea;
-        return result;
-    }
 
-    /**
-     * Draws the pie.
-     *
-     * @param g2  the graphics device.
-     * @param plotArea  the plot area.
-     * @param info  chart rendering info.
-     */
-    protected void drawPie(Graphics2D g2, Rectangle2D plotArea,
-                           PlotRenderingInfo info) {
-
-        PiePlotState state = initialise(g2, plotArea, this, null, info);
-
-        Rectangle2D[] areas = calculateLinkAndExplodeAreas(g2, plotArea);
-        Rectangle2D linkArea = areas[0];
-        Rectangle2D explodeArea = areas[1];
-        state.setLinkArea(linkArea);
         state.setExplodedPieArea(explodeArea);
 
         // the pie area defines the circle/ellipse for regular pie sections.
@@ -2571,7 +2485,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                 explodeArea.getWidth() - h1, explodeArea.getHeight() - v1);
 
         if (DEBUG_DRAW_PIE_AREA) {
-            g2.setPaint(Color.green);
+            g2.setPaint(Color.GREEN);
             g2.draw(pieArea);
         }
         state.setPieArea(pieArea);
@@ -2583,10 +2497,8 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         // plot the data (unless the dataset is null)...
         if ((this.dataset != null) && (this.dataset.getKeys().size() > 0)) {
 
-            PieDatasetSelectionState ss = findSelectionStateForDataset(
-                    this.dataset, state);
             List keys = this.dataset.getKeys();
-            double totalValue = DatasetUtilities.calculatePieDatasetTotal(
+            double totalValue = DatasetUtils.calculatePieDatasetTotal(
                     this.dataset);
 
             int passesRequired = state.getPassesRequired();
@@ -2598,12 +2510,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                         double value = n.doubleValue();
                         if (value > 0.0) {
                             runningTotal += value;
-                            boolean selected = false;
-                            if (ss != null) {
-                                selected = ss.isSelected(this.dataset.getKey(section));
-                            }
-                            drawItem(g2, section, selected, explodeArea, state,
-                                    pass);
+                            drawItem(g2, section, explodeArea, state, pass);
                         }
                     }
                 }
@@ -2625,15 +2532,14 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Draws a single data item.
      *
-     * @param g2  the graphics device (<code>null</code> not permitted).
+     * @param g2  the graphics device ({@code null} not permitted).
      * @param section  the section index.
-     * @param selected  is the item selected?
      * @param dataArea  the data plot area.
      * @param state  state information for one chart.
      * @param currentPass  the current pass index.
      */
-    protected void drawItem(Graphics2D g2, int section, boolean selected, 
-            Rectangle2D dataArea, PiePlotState state, int currentPass) {
+    protected void drawItem(Graphics2D g2, int section, Rectangle2D dataArea,
+                            PiePlotState state, int currentPass) {
 
         Number n = this.dataset.getValue(section);
         if (n == null) {
@@ -2660,7 +2566,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
             double ep = 0.0;
             double mep = getMaximumExplodePercent();
             if (mep > 0.0) {
-                ep = getExplodePercent(getSectionKey(section)) / mep;
+                ep = getExplodePercent(dataset.getKey(section)) / mep;
             }
             Rectangle2D arcBounds = getArcBounds(state.getPieArea(),
                     state.getExplodedPieArea(), angle1, angle, ep);
@@ -2668,8 +2574,8 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                     Arc2D.PIE);
 
             if (currentPass == 0) {
-                if (this.shadowPaint != null) {
-                    Shape shadowArc = ShapeUtilities.createTranslatedShape(
+                if (this.shadowPaint != null && this.shadowGenerator == null) {
+                    Shape shadowArc = ShapeUtils.createTranslatedShape(
                             arc, (float) this.shadowXOffset,
                             (float) this.shadowYOffset);
                     g2.setPaint(this.shadowPaint);
@@ -2678,21 +2584,17 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
             }
             else if (currentPass == 1) {
                 Comparable key = getSectionKey(section);
-                Paint paint = lookupSectionPaint(key, selected);
-                Shape savedClip = g2.getClip();
-                g2.clip(arc);
+                Paint paint = lookupSectionPaint(key, state);
                 g2.setPaint(paint);
                 g2.fill(arc);
 
-                Paint outlinePaint = lookupSectionOutlinePaint(key, selected);
-                Stroke outlineStroke = lookupSectionOutlineStroke(key,
-                        selected);
+                Paint outlinePaint = lookupSectionOutlinePaint(key);
+                Stroke outlineStroke = lookupSectionOutlineStroke(key);
                 if (this.sectionOutlinesVisible) {
                     g2.setPaint(outlinePaint);
                     g2.setStroke(outlineStroke);
                     g2.draw(arc);
                 }
-                g2.setClip(savedClip);
 
                 // update the linking line target for later
                 // add an entity for the pie section
@@ -2740,14 +2642,13 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
                 1.0f));
 
-        RectangleInsets labelInsets = new RectangleInsets(UnitType.RELATIVE,
-                0.18, 0.18, 0.18, 0.18);
-        Rectangle2D labelsArea = labelInsets.createInsetRectangle(pieArea);
+        Rectangle2D labelsArea = this.simpleLabelOffset.createInsetRectangle(
+                pieArea);
         double runningTotal = 0.0;
         Iterator iterator = keys.iterator();
         while (iterator.hasNext()) {
             Comparable key = (Comparable) iterator.next();
-            boolean include = true;
+            boolean include;
             double v = 0.0;
             Number n = getDataset().getValue(key);
             if (n == null) {
@@ -2770,25 +2671,25 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                 int x = (int) arc.getEndPoint().getX();
                 int y = (int) arc.getEndPoint().getY();
 
-                PieSectionLabelGenerator labelGenerator = getLabelGenerator();
-                if (labelGenerator == null) {
+                PieSectionLabelGenerator myLabelGenerator = getLabelGenerator();
+                if (myLabelGenerator == null) {
                     continue;
                 }
-                String label = labelGenerator.generateSectionLabel(
+                String label = myLabelGenerator.generateSectionLabel(
                         this.dataset, key);
                 if (label == null) {
                     continue;
                 }
                 g2.setFont(this.labelFont);
                 FontMetrics fm = g2.getFontMetrics();
-                Rectangle2D bounds = TextUtilities.getTextBounds(label, g2, fm);
+                Rectangle2D bounds = TextUtils.getTextBounds(label, g2, fm);
                 Rectangle2D out = this.labelPadding.createOutsetRectangle(
                         bounds);
-                Shape bg = ShapeUtilities.createTranslatedShape(out,
+                Shape bg = ShapeUtils.createTranslatedShape(out,
                         x - bounds.getCenterX(), y - bounds.getCenterY());
                 if (this.labelShadowPaint != null
                         && this.shadowGenerator == null) {
-                    Shape shadow = ShapeUtilities.createTranslatedShape(bg,
+                    Shape shadow = ShapeUtils.createTranslatedShape(bg,
                             this.shadowXOffset, this.shadowYOffset);
                     g2.setPaint(this.labelShadowPaint);
                     g2.fill(shadow);
@@ -2806,8 +2707,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
                 g2.setPaint(this.labelPaint);
                 g2.setFont(this.labelFont);
-                TextUtilities.drawAlignedString(getLabelGenerator()
-                        .generateSectionLabel(getDataset(), key), g2, x, y,
+                TextUtils.drawAlignedString(label, g2, x, y,
                         TextAnchor.CENTER);
 
             }
@@ -2843,7 +2743,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         Iterator iterator = keys.iterator();
         while (iterator.hasNext()) {
             Comparable key = (Comparable) iterator.next();
-            boolean include = true;
+            boolean include;
             double v = 0.0;
             Number n = this.dataset.getValue(key);
             if (n == null) {
@@ -2873,8 +2773,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
 
         // calculate the max label width from the plot dimensions, because
         // a circular pie can leave a lot more room for labels...
-        double marginX = plotArea.getX() + this.interiorGap
-                * plotArea.getWidth();
+        double marginX = plotArea.getX();
         double gap = plotArea.getWidth() * this.labelGap;
         double ww = linkArea.getX() - gap - marginX;
         float labelWidth = (float) this.labelPadding.trimWidth(ww);
@@ -2913,7 +2812,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
             String label = this.labelGenerator.generateSectionLabel(
                     this.dataset, leftKeys.getKey(i));
             if (label != null) {
-                TextBlock block = TextUtilities.createTextBlock(label,
+                TextBlock block = TextUtils.createTextBlock(label,
                         this.labelFont, this.labelPaint, maxLabelWidth,
                         new G2TextMeasurer(g2));
                 TextBox labelBox = new TextBox(block);
@@ -2974,14 +2873,19 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                     this.dataset, keys.getKey(i));
 
             if (label != null) {
-                TextBlock block = TextUtilities.createTextBlock(label,
+                TextBlock block = TextUtils.createTextBlock(label,
                         this.labelFont, this.labelPaint, maxLabelWidth,
                         new G2TextMeasurer(g2));
                 TextBox labelBox = new TextBox(block);
                 labelBox.setBackgroundPaint(this.labelBackgroundPaint);
                 labelBox.setOutlinePaint(this.labelOutlinePaint);
                 labelBox.setOutlineStroke(this.labelOutlineStroke);
-                labelBox.setShadowPaint(this.labelShadowPaint);
+                if (this.shadowGenerator == null) {
+                    labelBox.setShadowPaint(this.labelShadowPaint);
+                }
+                else {
+                    labelBox.setShadowPaint(null);
+                }
                 labelBox.setInteriorGap(this.labelPadding);
                 double theta = Math.toRadians(keys.getValue(i).doubleValue());
                 double baseY = state.getPieCenterY()
@@ -2995,7 +2899,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
             }
         }
         double hh = plotArea.getHeight();
-        double gap = hh * getInteriorGap();
+        double gap = 0.00; //hh * getInteriorGap();
         this.labelDistributor.distributeLabels(plotArea.getMinY() + gap,
                 hh - 2 * gap);
         for (int i = 0; i < this.labelDistributor.getItemCount(); i++) {
@@ -3008,8 +2912,9 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     /**
      * Returns a collection of legend items for the pie chart.
      *
-     * @return The legend items (never <code>null</code>).
+     * @return The legend items (never {@code null}).
      */
+    @Override
     public LegendItemCollection getLegendItems() {
 
         LegendItemCollection result = new LegendItemCollection();
@@ -3023,7 +2928,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         while (iterator.hasNext()) {
             Comparable key = (Comparable) iterator.next();
             Number n = this.dataset.getValue(key);
-            boolean include = true;
+            boolean include;
             if (n == null) {
                 include = !this.ignoreNullValues;
             }
@@ -3051,15 +2956,14 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                         urlText = this.legendLabelURLGenerator.generateURL(
                                 this.dataset, key, this.pieIndex);
                     }
-                    Paint paint = lookupSectionPaint(key, false);
-                    Paint outlinePaint = lookupSectionOutlinePaint(key, false);
-                    Stroke outlineStroke = lookupSectionOutlineStroke(key,
-                            false);
+                    Paint paint = lookupSectionPaint(key);
+                    Paint outlinePaint = lookupSectionOutlinePaint(key);
+                    Stroke outlineStroke = lookupSectionOutlineStroke(key);
                     LegendItem item = new LegendItem(label, description,
                             toolTipText, urlText, true, shape, true, paint,
                             true, outlinePaint, outlineStroke,
                             false,          // line not visible
-                            new Line2D.Float(), new BasicStroke(), Color.black);
+                            new Line2D.Float(), new BasicStroke(), Color.BLACK);
                     item.setDataset(getDataset());
                     item.setSeriesIndex(this.dataset.getIndex(key));
                     item.setSeriesKey(key);
@@ -3079,6 +2983,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      *
      * @return The plot type.
      */
+    @Override
     public String getPlotType() {
         return localizationResources.getString("Pie_Plot");
     }
@@ -3105,19 +3010,17 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         if (explodePercent == 0.0) {
             return unexploded;
         }
-        else {
-            Arc2D arc1 = new Arc2D.Double(unexploded, angle, extent / 2,
-                    Arc2D.OPEN);
-            Point2D point1 = arc1.getEndPoint();
-            Arc2D.Double arc2 = new Arc2D.Double(exploded, angle, extent / 2,
-                    Arc2D.OPEN);
-            Point2D point2 = arc2.getEndPoint();
-            double deltaX = (point1.getX() - point2.getX()) * explodePercent;
-            double deltaY = (point1.getY() - point2.getY()) * explodePercent;
-            return new Rectangle2D.Double(unexploded.getX() - deltaX,
-                    unexploded.getY() - deltaY, unexploded.getWidth(),
-                    unexploded.getHeight());
-        }
+        Arc2D arc1 = new Arc2D.Double(unexploded, angle, extent / 2,
+                Arc2D.OPEN);
+        Point2D point1 = arc1.getEndPoint();
+        Arc2D.Double arc2 = new Arc2D.Double(exploded, angle, extent / 2,
+                Arc2D.OPEN);
+        Point2D point2 = arc2.getEndPoint();
+        double deltaX = (point1.getX() - point2.getX()) * explodePercent;
+        double deltaY = (point1.getY() - point2.getY()) * explodePercent;
+        return new Rectangle2D.Double(unexploded.getX() - deltaX,
+                unexploded.getY() - deltaY, unexploded.getWidth(),
+                unexploded.getHeight());
     }
 
     /**
@@ -3224,233 +3127,98 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     }
 
     /**
-     * Returns the selection state for the specified dataset.  This could be
-     * <code>null</code> if the dataset hasn't been set up to support
-     * selections.
+     * Returns the center for the specified section.
+     * Checks to see if the section is exploded and recalculates the
+     * new center if so.
      *
-     * @param dataset  the dataset.
-     * @param source  the selection source.
+     * @param state  PiePlotState
+     * @param key  section key.
      *
-     * @return The selection state (possibly <code>null</code>).
+     * @return The center for the specified section.
+     *
+     * @since 1.0.14
      */
-    private PieDatasetSelectionState findSelectionStateForDataset(
-            PieDataset dataset, Object source) {
-        if (dataset instanceof SelectablePieDataset) {
-            SelectablePieDataset sd = (SelectablePieDataset) dataset;
-            PieDatasetSelectionState s = sd.getSelectionState();
-            return s;
+    protected Point2D getArcCenter(PiePlotState state, Comparable key) {
+        Point2D center = new Point2D.Double(state.getPieCenterX(), state
+            .getPieCenterY());
+
+        double ep = getExplodePercent(key);
+        double mep = getMaximumExplodePercent();
+        if (mep > 0.0) {
+            ep = ep / mep;
         }
-        throw new RuntimeException();
-        //return null;  // TODO: implement
-    }
+        if (ep != 0) {
+            Rectangle2D pieArea = state.getPieArea();
+            Rectangle2D expPieArea = state.getExplodedPieArea();
+            double angle1, angle2;
+            Number n = this.dataset.getValue(key);
+            double value = n.doubleValue();
 
-    /**
-     * Returns <code>true</code> to indicate that the plot supports selection
-     * by clicking on a point.
-     *
-     * @return <code>true</code>.
-     *
-     * @since 1.2.0
-     */
-    public boolean canSelectByPoint() {
-        return true;
-    }
-
-    /**
-     * Returns <code>false</code> to indicate that the plot does not support
-     * selection by region.
-     *
-     * @return <code>false</code>.
-     *
-     * @since 1.2.0
-     */
-    public boolean canSelectByRegion() {
-        return false;
-    }
-
-    /**
-     * Selects a data item.
-     * 
-     * @param x
-     * @param y
-     * @param dataArea
-     * @param source
-     */
-    public void select(double x, double y, Rectangle2D dataArea,
-            RenderingSource source) {
-
-        System.out.println("select " + x + ", " + y);
-
-        PieDatasetSelectionState state = findSelectionStateForDataset(
-                dataset, source);
-        if (state == null) {
-            return;
-        }
-
-        Rectangle2D[] areas = calculateLinkAndExplodeAreas(null, dataArea);
-        Rectangle2D linkArea = areas[0];
-        Rectangle2D explodeArea = areas[1];
-
-        // the pie area defines the circle/ellipse for regular pie sections.
-        // it is defined by shrinking the explodeArea by the explodeMargin
-        // factor.
-        double maximumExplodePercent = getMaximumExplodePercent();
-        double percent = maximumExplodePercent / (1.0 + maximumExplodePercent);
-
-        double h1 = explodeArea.getWidth() * percent;
-        double v1 = explodeArea.getHeight() * percent;
-        Rectangle2D pieArea = new Rectangle2D.Double(explodeArea.getX()
-                + h1 / 2.0, explodeArea.getY() + v1 / 2.0,
-                explodeArea.getWidth() - h1, explodeArea.getHeight() - v1);
-
-        // plot the data (unless the dataset is null)...
-        if ((this.dataset != null) && (this.dataset.getKeys().size() > 0)) {
-
-
-            List keys = this.dataset.getKeys();
-            double total = DatasetUtilities.calculatePieDatasetTotal(
-                    this.dataset);
-            double runningTotal = 0.0;
-            for (int section = 0; section < keys.size(); section++) {
-                Number n = this.dataset.getValue(section);
-                if (n == null) {
-                    continue;
-                }
-                double value = n.doubleValue();
-                if (value > 0.0) {
-                    double angle0 = calculateAngleForValue(runningTotal,
-                            total);
-                    double angle1 = calculateAngleForValue(runningTotal
-                            + value, total);
-                    runningTotal += value;
-                    System.out.println(this.dataset.getValue(section));
-                    System.out.println(angle0);
-                    System.out.println(angle1);
-                    double angle = (angle1 - angle0);
-                    if (Math.abs(angle) > getMinimumArcAngleToDraw()) {
-                        double ep = 0.0;
-                        double mep = getMaximumExplodePercent();
-                        if (mep > 0.0) {
-                            ep = getExplodePercent(getSectionKey(section)) / mep;
-                        }
-                        Rectangle2D arcBounds = getArcBounds(pieArea,
-                                explodeArea, angle0, angle, ep);
-                        Arc2D.Double arc = new Arc2D.Double(arcBounds,
-                                angle0, angle, Arc2D.PIE);
-                        if (arc.contains(x, y)) {
-                            Comparable key = this.dataset.getKey(section);
-                            state.setSelected(key, !state.isSelected(key));
-                            System.out.println(key + " is " + state.isSelected(key));
-                        }
-                    }
-                }
+            if (this.direction == Rotation.CLOCKWISE) {
+                angle1 = state.getLatestAngle();
+                angle2 = angle1 - value / state.getTotal() * 360.0;
+            } else if (this.direction == Rotation.ANTICLOCKWISE) {
+                angle1 = state.getLatestAngle();
+                angle2 = angle1 + value / state.getTotal() * 360.0;
+            } else {
+                throw new IllegalStateException("Rotation type not recognised.");
             }
-        }
-    }
+            double angle = (angle2 - angle1);
 
-    private double calculateAngleForValue(double value, double total) {
-        if (this.direction == Rotation.CLOCKWISE) {
-            return this.startAngle - (value / total * 360.0);
-        }
-        else if (this.direction == Rotation.ANTICLOCKWISE) {
-            return this.startAngle + (value / total * 360.0);
-        }
-        throw new RuntimeException("Unrecognised Rotation type.");
-    }
+            Arc2D arc1 = new Arc2D.Double(pieArea, angle1, angle / 2,
+                    Arc2D.OPEN);
+            Point2D point1 = arc1.getEndPoint();
+            Arc2D.Double arc2 = new Arc2D.Double(expPieArea, angle1, angle / 2,
+                    Arc2D.OPEN);
+            Point2D point2 = arc2.getEndPoint();
+            double deltaX = (point1.getX() - point2.getX()) * ep;
+            double deltaY = (point1.getY() - point2.getY()) * ep;
 
-    /**
-     * This method does nothing, because this plot does not support
-     * selection by region.
-     *
-     * @param region  ignored.
-     * @param dataArea  ignored.
-     * @param source  ignored.
-     *
-     * @see #canSelectByRegion()
-     *
-     * @since 1.2.0
-     */
-    public void select(GeneralPath region, Rectangle2D dataArea,
-            RenderingSource source) {
-        // operation not supported
+            center = new Point2D.Double(state.getPieCenterX() - deltaX,
+                     state.getPieCenterY() - deltaY);
+
+        }
+        return center;
     }
 
     /**
-     * Clears the selection.
+     * Returns the paint for the specified section. This is equivalent to
+     * {@code lookupSectionPaint(section)}.  Checks to see if the user set the 
+     * {@code Paint} to be of type {@code RadialGradientPaint} and if so it 
+     * adjusts the center and radius to match the Pie.
      *
-     * @since 1.2.0
+     * @param key  the section key.
+     * @param state  PiePlotState.
+     *
+     * @return The paint for the specified section.
+     *
+     * @since 1.0.14
      */
-    public void clearSelection() {
-        System.out.println("Clear selection.");
-    }
-
-    /**
-     * Returns a shape representing the hotspot for a pie section.
-     *
-     * @param g2  the graphics device.
-     * @param dataArea  the area within which the data is being rendered.
-     * @param selected  is the item selected?
-     *
-     * @return A shape equal to the hot spot for a data item.
-     */
-    public Shape createHotSpotShape(Graphics2D g2, Rectangle2D dataArea,
-            int section, boolean selected) {
-
-        Number n = this.dataset.getValue(section);
-        if (n == null) {
-            return null;
+    protected Paint lookupSectionPaint(Comparable key, PiePlotState state) {
+        Paint paint = lookupSectionPaint(key, getAutoPopulateSectionPaint());
+        // for a RadialGradientPaint we adjust the center and radius to match
+        // the current pie segment...
+        if (paint instanceof RadialGradientPaint) {
+            RadialGradientPaint rgp = (RadialGradientPaint) paint;
+            Point2D center = getArcCenter(state, key);
+            float radius = (float) Math.max(state.getPieHRadius(), 
+                    state.getPieWRadius());
+            float[] fractions = rgp.getFractions();
+            Color[] colors = rgp.getColors();
+            paint = new RadialGradientPaint(center, radius, fractions, colors);
         }
-        double value = n.doubleValue();
-        double angle1 = 0.0;
-        double angle2 = 0.0;
-
-        double total = DatasetUtilities.calculatePieDatasetTotal(this.dataset);
-        double lead = 0.0;
-        if (this.direction == Rotation.CLOCKWISE) {
-            for (int i = 0; i < section; i++) {
-                n = this.dataset.getValue(i);
-                if (n != null) {
-                    value = n.doubleValue();
-                    if (value >= 0.0) {
-                        lead = lead + value;
-                    }
-                }
-            }
-            angle1 = getStartAngle() - lead / total * 360.0;
-            angle2 = angle1 - value / total * 360.0;
-        }
-        else if (this.direction == Rotation.ANTICLOCKWISE) {
-            angle1 = getStartAngle() + lead / total * 360.0;
-            angle2 = angle1 + value / total * 360.0;
-        }
-        else {
-            throw new IllegalStateException("Rotation type not recognised.");
-        }
-
-        double angle = (angle2 - angle1);
-        if (Math.abs(angle) > getMinimumArcAngleToDraw()) {
-            double ep = 0.0;
-            double mep = getMaximumExplodePercent();
-            if (mep > 0.0) {
-                ep = getExplodePercent(getSectionKey(section)) / mep;
-            }
-            Rectangle2D arcBounds = getArcBounds(dataArea,
-                    dataArea, angle1, angle, ep);
-            Arc2D.Double arc = new Arc2D.Double(arcBounds, angle1, angle,
-                    Arc2D.PIE);
-            return arc;
-        }
-        return null;
+        return paint;
     }
 
     /**
      * Tests this plot for equality with an arbitrary object.  Note that the
      * plot's dataset is NOT included in the test for equality.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -3483,34 +3251,34 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         if (this.ignoreNullValues != that.ignoreNullValues) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.sectionPaintMap,
+        if (!ObjectUtils.equal(this.sectionPaintMap,
                 that.sectionPaintMap)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.baseSectionPaint,
-                that.baseSectionPaint)) {
+        if (!PaintUtils.equal(this.defaultSectionPaint,
+                that.defaultSectionPaint)) {
             return false;
         }
         if (this.sectionOutlinesVisible != that.sectionOutlinesVisible) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.sectionOutlinePaintMap,
+        if (!ObjectUtils.equal(this.sectionOutlinePaintMap,
                 that.sectionOutlinePaintMap)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.baseSectionOutlinePaint,
-                that.baseSectionOutlinePaint)) {
+        if (!PaintUtils.equal(this.defaultSectionOutlinePaint,
+                that.defaultSectionOutlinePaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.sectionOutlineStrokeMap,
+        if (!ObjectUtils.equal(this.sectionOutlineStrokeMap,
                 that.sectionOutlineStrokeMap)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.baseSectionOutlineStroke,
-                that.baseSectionOutlineStroke)) {
+        if (!ObjectUtils.equal(this.defaultSectionOutlineStroke,
+                that.defaultSectionOutlineStroke)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.shadowPaint, that.shadowPaint)) {
+        if (!PaintUtils.equal(this.shadowPaint, that.shadowPaint)) {
             return false;
         }
         if (!(this.shadowXOffset == that.shadowXOffset)) {
@@ -3519,33 +3287,33 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         if (!(this.shadowYOffset == that.shadowYOffset)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.explodePercentages,
+        if (!ObjectUtils.equal(this.explodePercentages,
                 that.explodePercentages)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.labelGenerator,
+        if (!ObjectUtils.equal(this.labelGenerator,
                 that.labelGenerator)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.labelFont, that.labelFont)) {
+        if (!ObjectUtils.equal(this.labelFont, that.labelFont)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.labelPaint, that.labelPaint)) {
+        if (!PaintUtils.equal(this.labelPaint, that.labelPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.labelBackgroundPaint,
+        if (!PaintUtils.equal(this.labelBackgroundPaint,
                 that.labelBackgroundPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.labelOutlinePaint,
+        if (!PaintUtils.equal(this.labelOutlinePaint,
                 that.labelOutlinePaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.labelOutlineStroke,
+        if (!ObjectUtils.equal(this.labelOutlineStroke,
                 that.labelOutlineStroke)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.labelShadowPaint,
+        if (!PaintUtils.equal(this.labelShadowPaint,
                 that.labelShadowPaint)) {
             return false;
         }
@@ -3573,35 +3341,35 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
         if (!this.labelLinkStyle.equals(that.labelLinkStyle)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.labelLinkPaint, that.labelLinkPaint)) {
+        if (!PaintUtils.equal(this.labelLinkPaint, that.labelLinkPaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.labelLinkStroke,
+        if (!ObjectUtils.equal(this.labelLinkStroke,
                 that.labelLinkStroke)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.toolTipGenerator,
+        if (!ObjectUtils.equal(this.toolTipGenerator,
                 that.toolTipGenerator)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.urlGenerator, that.urlGenerator)) {
+        if (!ObjectUtils.equal(this.urlGenerator, that.urlGenerator)) {
             return false;
         }
         if (!(this.minimumArcAngleToDraw == that.minimumArcAngleToDraw)) {
             return false;
         }
-        if (!ShapeUtilities.equal(this.legendItemShape, that.legendItemShape)) {
+        if (!ShapeUtils.equal(this.legendItemShape, that.legendItemShape)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.legendLabelGenerator,
+        if (!ObjectUtils.equal(this.legendLabelGenerator,
                 that.legendLabelGenerator)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.legendLabelToolTipGenerator,
+        if (!ObjectUtils.equal(this.legendLabelToolTipGenerator,
                 that.legendLabelToolTipGenerator)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.legendLabelURLGenerator,
+        if (!ObjectUtils.equal(this.legendLabelURLGenerator,
                 that.legendLabelURLGenerator)) {
             return false;
         }
@@ -3616,7 +3384,7 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
                 != that.autoPopulateSectionOutlineStroke) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.shadowGenerator,
+        if (!ObjectUtils.equal(this.shadowGenerator,
                 that.shadowGenerator)) {
             return false;
         }
@@ -3632,27 +3400,39 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      * @throws CloneNotSupportedException if some component of the plot does
      *         not support cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         PiePlot clone = (PiePlot) super.clone();
+        clone.sectionPaintMap = (PaintMap) this.sectionPaintMap.clone();
+        clone.sectionOutlinePaintMap 
+                = (PaintMap) this.sectionOutlinePaintMap.clone();
+        clone.sectionOutlineStrokeMap 
+                = (StrokeMap) this.sectionOutlineStrokeMap.clone();
+        clone.explodePercentages 
+                = new TreeMap<Comparable, Double>(this.explodePercentages);
+        if (this.labelGenerator != null) {
+            clone.labelGenerator = (PieSectionLabelGenerator) 
+                    ObjectUtils.clone(this.labelGenerator);
+        }
         if (clone.dataset != null) {
             clone.dataset.addChangeListener(clone);
         }
         if (this.urlGenerator instanceof PublicCloneable) {
-            clone.urlGenerator = (PieURLGenerator) ObjectUtilities.clone(
+            clone.urlGenerator = (PieURLGenerator) ObjectUtils.clone(
                     this.urlGenerator);
         }
-        clone.legendItemShape = ShapeUtilities.clone(this.legendItemShape);
+        clone.legendItemShape = ShapeUtils.clone(this.legendItemShape);
         if (this.legendLabelGenerator != null) {
             clone.legendLabelGenerator = (PieSectionLabelGenerator)
-                    ObjectUtilities.clone(this.legendLabelGenerator);
+                    ObjectUtils.clone(this.legendLabelGenerator);
         }
         if (this.legendLabelToolTipGenerator != null) {
             clone.legendLabelToolTipGenerator = (PieSectionLabelGenerator)
-                    ObjectUtilities.clone(this.legendLabelToolTipGenerator);
+                    ObjectUtils.clone(this.legendLabelToolTipGenerator);
         }
         if (this.legendLabelURLGenerator instanceof PublicCloneable) {
             clone.legendLabelURLGenerator = (PieURLGenerator)
-                    ObjectUtilities.clone(this.legendLabelURLGenerator);
+                    ObjectUtils.clone(this.legendLabelURLGenerator);
         }
         return clone;
     }
@@ -3666,18 +3446,18 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.baseSectionPaint, stream);
-        SerialUtilities.writePaint(this.baseSectionOutlinePaint, stream);
-        SerialUtilities.writeStroke(this.baseSectionOutlineStroke, stream);
-        SerialUtilities.writePaint(this.shadowPaint, stream);
-        SerialUtilities.writePaint(this.labelPaint, stream);
-        SerialUtilities.writePaint(this.labelBackgroundPaint, stream);
-        SerialUtilities.writePaint(this.labelOutlinePaint, stream);
-        SerialUtilities.writeStroke(this.labelOutlineStroke, stream);
-        SerialUtilities.writePaint(this.labelShadowPaint, stream);
-        SerialUtilities.writePaint(this.labelLinkPaint, stream);
-        SerialUtilities.writeStroke(this.labelLinkStroke, stream);
-        SerialUtilities.writeShape(this.legendItemShape, stream);
+        SerialUtils.writePaint(this.defaultSectionPaint, stream);
+        SerialUtils.writePaint(this.defaultSectionOutlinePaint, stream);
+        SerialUtils.writeStroke(this.defaultSectionOutlineStroke, stream);
+        SerialUtils.writePaint(this.shadowPaint, stream);
+        SerialUtils.writePaint(this.labelPaint, stream);
+        SerialUtils.writePaint(this.labelBackgroundPaint, stream);
+        SerialUtils.writePaint(this.labelOutlinePaint, stream);
+        SerialUtils.writeStroke(this.labelOutlineStroke, stream);
+        SerialUtils.writePaint(this.labelShadowPaint, stream);
+        SerialUtils.writePaint(this.labelLinkPaint, stream);
+        SerialUtils.writeStroke(this.labelLinkStroke, stream);
+        SerialUtils.writeShape(this.legendItemShape, stream);
     }
 
     /**
@@ -3691,21 +3471,18 @@ public class PiePlot extends Plot implements Selectable, Cloneable,
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.baseSectionPaint = SerialUtilities.readPaint(stream);
-        this.baseSectionOutlinePaint = SerialUtilities.readPaint(stream);
-        this.baseSectionOutlineStroke = SerialUtilities.readStroke(stream);
-        this.shadowPaint = SerialUtilities.readPaint(stream);
-        this.labelPaint = SerialUtilities.readPaint(stream);
-        this.labelBackgroundPaint = SerialUtilities.readPaint(stream);
-        this.labelOutlinePaint = SerialUtilities.readPaint(stream);
-        this.labelOutlineStroke = SerialUtilities.readStroke(stream);
-        this.labelShadowPaint = SerialUtilities.readPaint(stream);
-        this.labelLinkPaint = SerialUtilities.readPaint(stream);
-        this.labelLinkStroke = SerialUtilities.readStroke(stream);
-        this.legendItemShape = SerialUtilities.readShape(stream);
+        this.defaultSectionPaint = SerialUtils.readPaint(stream);
+        this.defaultSectionOutlinePaint = SerialUtils.readPaint(stream);
+        this.defaultSectionOutlineStroke = SerialUtils.readStroke(stream);
+        this.shadowPaint = SerialUtils.readPaint(stream);
+        this.labelPaint = SerialUtils.readPaint(stream);
+        this.labelBackgroundPaint = SerialUtils.readPaint(stream);
+        this.labelOutlinePaint = SerialUtils.readPaint(stream);
+        this.labelOutlineStroke = SerialUtils.readStroke(stream);
+        this.labelShadowPaint = SerialUtils.readPaint(stream);
+        this.labelLinkPaint = SerialUtils.readPaint(stream);
+        this.labelLinkStroke = SerialUtils.readStroke(stream);
+        this.legendItemShape = SerialUtils.readShape(stream);
     }
 
-    public PieSelectionAttributes getSelectedItemAttributes() {
-        return this.selectedItemAttributes;
-    }
 }

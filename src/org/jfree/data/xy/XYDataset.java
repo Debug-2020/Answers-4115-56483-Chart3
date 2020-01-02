@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * XYDataset.java
@@ -58,7 +58,7 @@ public interface XYDataset extends SeriesDataset {
     /**
      * Returns the order of the domain (or X) values returned by the dataset.
      *
-     * @return The order (never <code>null</code>).
+     * @return The order (never {@code null}).
      */
     public DomainOrder getDomainOrder();
 
@@ -66,11 +66,11 @@ public interface XYDataset extends SeriesDataset {
      * Returns the number of items in a series.
      * <br><br>
      * It is recommended that classes that implement this method should throw
-     * an <code>IllegalArgumentException</code> if the <code>series</code>
+     * an {@code IllegalArgumentException} if the {@code series}
      * argument is outside the specified range.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
      *
      * @return The item count.
      */
@@ -81,22 +81,22 @@ public interface XYDataset extends SeriesDataset {
      * may not be returned in ascending order, that is up to the class
      * implementing the interface.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
-     * @param item  the item index (in the range <code>0</code> to
-     *     <code>getItemCount(series)</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
+     * @param item  the item index (in the range {@code 0} to
+     *     {@code getItemCount(series)}).
      *
-     * @return The x-value (never <code>null</code>).
+     * @return The x-value (never {@code null}).
      */
     public Number getX(int series, int item);
 
     /**
      * Returns the x-value for an item within a series.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
-     * @param item  the item index (in the range <code>0</code> to
-     *     <code>getItemCount(series)</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
+     * @param item  the item index (in the range {@code 0} to
+     *     {@code getItemCount(series)}).
      *
      * @return The x-value.
      */
@@ -105,22 +105,22 @@ public interface XYDataset extends SeriesDataset {
     /**
      * Returns the y-value for an item within a series.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
-     * @param item  the item index (in the range <code>0</code> to
-     *     <code>getItemCount(series)</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
+     * @param item  the item index (in the range {@code 0} to
+     *     {@code getItemCount(series)}).
      *
-     * @return The y-value (possibly <code>null</code>).
+     * @return The y-value (possibly {@code null}).
      */
     public Number getY(int series, int item);
 
     /**
      * Returns the y-value (as a double primitive) for an item within a series.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
-     * @param item  the item index (in the range <code>0</code> to
-     *     <code>getItemCount(series)</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
+     * @param item  the item index (in the range {@code 0} to
+     *     {@code getItemCount(series)}).
      *
      * @return The y-value.
      */

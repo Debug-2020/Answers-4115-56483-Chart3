@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * ComparableObjectItem.java
  * -------------------------
- * (C) Copyright 2006-2008, by Object Refinery Limited.
+ * (C) Copyright 2006-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,15 +35,15 @@
  * Changes
  * -------
  * 19-Oct-2006 : New class, based on XYDataItem (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.data;
 
 import java.io.Serializable;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 
 /**
  * Represents one (Comparable, Object) data item for use in a
@@ -66,13 +66,11 @@ public class ComparableObjectItem implements Cloneable, Comparable,
     /**
      * Constructs a new data item.
      *
-     * @param x  the x-value (<code>null</code> NOT permitted).
-     * @param y  the y-value (<code>null</code> permitted).
+     * @param x  the x-value ({@code null} NOT permitted).
+     * @param y  the y-value ({@code null} permitted).
      */
     public ComparableObjectItem(Comparable x, Object y) {
-        if (x == null) {
-            throw new IllegalArgumentException("Null 'x' argument.");
-        }
+        Args.nullNotPermitted(x, "x");
         this.x = x;
         this.obj = y;
     }
@@ -80,7 +78,7 @@ public class ComparableObjectItem implements Cloneable, Comparable,
     /**
      * Returns the x-value.
      *
-     * @return The x-value (never <code>null</code>).
+     * @return The x-value (never {@code null}).
      */
     protected Comparable getComparable() {
         return this.x;
@@ -89,7 +87,7 @@ public class ComparableObjectItem implements Cloneable, Comparable,
     /**
      * Returns the y-value.
      *
-     * @return The y-value (possibly <code>null</code>).
+     * @return The y-value (possibly {@code null}).
      */
     protected Object getObject() {
         return this.obj;
@@ -99,7 +97,7 @@ public class ComparableObjectItem implements Cloneable, Comparable,
      * Sets the y-value for this data item.  Note that there is no
      * corresponding method to change the x-value.
      *
-     * @param y  the new y-value (<code>null</code> permitted).
+     * @param y  the new y-value ({@code null} permitted).
      */
     protected void setObject(Object y) {
         this.obj = y;
@@ -117,6 +115,7 @@ public class ComparableObjectItem implements Cloneable, Comparable,
      * @return An integer indicating the order of this data pair object
      *      relative to another object.
      */
+    @Override
     public int compareTo(Object o1) {
 
         int result;
@@ -147,6 +146,7 @@ public class ComparableObjectItem implements Cloneable, Comparable,
      * @throws CloneNotSupportedException not thrown by this class, but
      *         subclasses may differ.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -154,11 +154,12 @@ public class ComparableObjectItem implements Cloneable, Comparable,
     /**
      * Tests if this object is equal to another.
      *
-     * @param obj  the object to test against for equality (<code>null</code>
+     * @param obj  the object to test against for equality ({@code null}
      *             permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -170,7 +171,7 @@ public class ComparableObjectItem implements Cloneable, Comparable,
         if (!this.x.equals(that.x)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.obj, that.obj)) {
+        if (!ObjectUtils.equal(this.obj, that.obj)) {
             return false;
         }
         return true;
@@ -181,6 +182,7 @@ public class ComparableObjectItem implements Cloneable, Comparable,
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         result = this.x.hashCode();

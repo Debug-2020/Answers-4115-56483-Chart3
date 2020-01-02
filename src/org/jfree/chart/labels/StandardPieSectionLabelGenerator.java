@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------------------
  * StandardPieSectionLabelGenerator.java
  * -------------------------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,9 +39,9 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 03-May-2006 : Modified DEFAULT_SECTION_LABEL_FORMAT (DG);
  * 10-Jan-2007 : Include attributedLabels in equals() test (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 10-Jul-2007 : Added constructors with locale parameter (DG);
  * 23-Apr-2008 : Implemented PublicCloneable (DG);
+ * 07-Apr-2014 : Fix cloning issue (DG);
  *
  */
 
@@ -53,11 +53,12 @@ import java.awt.font.TextAttribute;
 import java.io.Serializable;
 import java.text.AttributedString;
 import java.text.NumberFormat;
+import java.util.HashMap;
 import java.util.Locale;
-
-import org.jfree.chart.util.ObjectList;
+import java.util.Map;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.data.pie.PieDataset;
+
+import org.jfree.data.general.PieDataset;
 
 /**
  * A standard item label generator for plots that use data from a
@@ -65,8 +66,8 @@ import org.jfree.data.pie.PieDataset;
  * <p>
  * For the label format, use {0} where the pie section key should be inserted,
  * {1} for the absolute section value and {2} for the percent amount of the pie
- * section, e.g. <code>"{0} = {1} ({2})"</code> will display as
- * <code>apple = 120 (5%)</code>.
+ * section, e.g. {@code "{0} = {1} ({2})"} will display as
+ * {@code apple = 120 (5%)}.
  */
 public class StandardPieSectionLabelGenerator
         extends AbstractPieItemLabelGenerator
@@ -80,9 +81,10 @@ public class StandardPieSectionLabelGenerator
     public static final String DEFAULT_SECTION_LABEL_FORMAT = "{0}";
 
     /**
-     * An optional list of attributed labels (instances of AttributedString).
+     * An optional map between item indices (Integer) and attributed labels 
+     * (instances of AttributedString).
      */
-    private ObjectList attributedLabels;
+    private Map attributedLabels;
 
     /**
      * Creates a new section label generator using
@@ -97,7 +99,7 @@ public class StandardPieSectionLabelGenerator
     /**
      * Creates a new instance for the specified locale.
      *
-     * @param locale  the local (<code>null</code> not permitted).
+     * @param locale  the local ({@code null} not permitted).
      *
      * @since 1.0.7
      */
@@ -109,7 +111,7 @@ public class StandardPieSectionLabelGenerator
      * Creates a new section label generator using the specified label format
      * string, and platform default number and percentage formatters.
      *
-     * @param labelFormat  the label format (<code>null</code> not permitted).
+     * @param labelFormat  the label format ({@code null} not permitted).
      */
     public StandardPieSectionLabelGenerator(String labelFormat) {
         this(labelFormat, NumberFormat.getNumberInstance(),
@@ -119,8 +121,8 @@ public class StandardPieSectionLabelGenerator
     /**
      * Creates a new instance for the specified locale.
      *
-     * @param labelFormat  the label format (<code>null</code> not permitted).
-     * @param locale  the local (<code>null</code> not permitted).
+     * @param labelFormat  the label format ({@code null} not permitted).
+     * @param locale  the local ({@code null} not permitted).
      *
      * @since 1.0.7
      */
@@ -132,21 +134,21 @@ public class StandardPieSectionLabelGenerator
     /**
      * Creates an item label generator using the specified number formatters.
      *
-     * @param labelFormat  the label format string (<code>null</code> not
+     * @param labelFormat  the label format string ({@code null} not
      *                     permitted).
-     * @param numberFormat  the format object for the values (<code>null</code>
+     * @param numberFormat  the format object for the values ({@code null}
      *                      not permitted).
      * @param percentFormat  the format object for the percentages
-     *                       (<code>null</code> not permitted).
+     *                       ({@code null} not permitted).
      */
     public StandardPieSectionLabelGenerator(String labelFormat,
             NumberFormat numberFormat, NumberFormat percentFormat) {
         super(labelFormat, numberFormat, percentFormat);
-        this.attributedLabels = new ObjectList();
+        this.attributedLabels = new HashMap();
     }
 
     /**
-     * Returns the attributed label for a section, or <code>null</code> if none
+     * Returns the attributed label for a section, or {@code null} if none
      * is defined.
      *
      * @param section  the section index.
@@ -161,27 +163,28 @@ public class StandardPieSectionLabelGenerator
      * Sets the attributed label for a section.
      *
      * @param section  the section index.
-     * @param label  the label (<code>null</code> permitted).
+     * @param label  the label ({@code null} permitted).
      */
     public void setAttributedLabel(int section, AttributedString label) {
-        this.attributedLabels.set(section, label);
+        this.attributedLabels.put(section, label);
     }
 
     /**
      * Generates a label for a pie section.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
-     * @param key  the section key (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param key  the section key ({@code null} not permitted).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
+    @Override
     public String generateSectionLabel(PieDataset dataset, Comparable key) {
         return super.generateSectionLabel(dataset, key);
     }
 
     /**
      * Generates an attributed label for the specified series, or
-     * <code>null</code> if no attributed label is available (in which case,
+     * {@code null} if no attributed label is available (in which case,
      * the string returned by
      * {@link #generateSectionLabel(PieDataset, Comparable)} will
      * provide the fallback).  Only certain attributes are recognised by the
@@ -201,23 +204,25 @@ public class StandardPieSectionLabelGenerator
      *     {@link TextAttribute#SUPERSCRIPT_SUPER} are recognised.</li>
      * </ul>
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param key  the key.
      *
-     * @return An attributed label (possibly <code>null</code>).
+     * @return An attributed label (possibly {@code null}).
      */
+    @Override
     public AttributedString generateAttributedSectionLabel(PieDataset dataset,
-                                                           Comparable key) {
+            Comparable key) {
         return getAttributedLabel(dataset.getIndex(key));
     }
 
     /**
      * Tests the generator for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -230,10 +235,7 @@ public class StandardPieSectionLabelGenerator
         if (!this.attributedLabels.equals(that.attributedLabels)) {
             return false;
         }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        return true;
+        return super.equals(obj);
     }
 
     /**
@@ -243,8 +245,13 @@ public class StandardPieSectionLabelGenerator
      *
      * @throws CloneNotSupportedException  should not happen.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+        StandardPieSectionLabelGenerator clone 
+                = (StandardPieSectionLabelGenerator) super.clone();        
+        clone.attributedLabels = new HashMap();
+        clone.attributedLabels.putAll(this.attributedLabels);
+        return clone;
     }
 
 }

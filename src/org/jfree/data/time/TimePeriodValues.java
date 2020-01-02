@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, 
  * USA.  
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc. 
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * TimePeriodValues.java
  * ---------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -41,10 +41,8 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 03-Oct-2006 : Fixed NullPointerException in equals(), fire change event in 
  *               add() method, updated API docs (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
- * 29-Jun-2007 : Changed first parameter in constructors from String to 
- *               Comparable (DG);
  * 07-Apr-2008 : Fixed bug with maxMiddleIndex in updateBounds() (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -53,10 +51,11 @@ package org.jfree.data.time;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 
-import org.jfree.chart.util.ObjectUtilities;
 import org.jfree.data.general.Series;
-import org.jfree.data.event.SeriesChangeEvent;
+import org.jfree.data.general.SeriesChangeEvent;
 import org.jfree.data.general.SeriesException;
 
 /**
@@ -108,9 +107,9 @@ public class TimePeriodValues extends Series implements Serializable {
     /**
      * Creates a new (empty) collection of time period values.
      *
-     * @param name  the name of the series (<code>null</code> not permitted).
+     * @param name  the name of the series ({@code null} not permitted).
      */
-    public TimePeriodValues(Comparable name) {
+    public TimePeriodValues(String name) {
         this(name, DEFAULT_DOMAIN_DESCRIPTION, DEFAULT_RANGE_DESCRIPTION);
     }
 
@@ -121,11 +120,11 @@ public class TimePeriodValues extends Series implements Serializable {
      * where this is helpful is when generating a chart for the time series -
      * axis labels can be taken from the domain and range description.
      *
-     * @param name  the name of the series (<code>null</code> not permitted).
+     * @param name  the name of the series ({@code null} not permitted).
      * @param domain  the domain description.
      * @param range  the range description.
      */
-    public TimePeriodValues(Comparable name, String domain, String range) {
+    public TimePeriodValues(String name, String domain, String range) {
         super(name);
         this.domain = domain;
         this.range = range;
@@ -135,7 +134,7 @@ public class TimePeriodValues extends Series implements Serializable {
     /**
      * Returns the domain description.
      *
-     * @return The domain description (possibly <code>null</code>).
+     * @return The domain description (possibly {@code null}).
      * 
      * @see #getRangeDescription()
      * @see #setDomainDescription(String)
@@ -146,9 +145,9 @@ public class TimePeriodValues extends Series implements Serializable {
 
     /**
      * Sets the domain description and fires a property change event (with the
-     * property name <code>Domain</code> if the description changes).
+     * property name {@code Domain} if the description changes).
      *
-     * @param description  the new description (<code>null</code> permitted).
+     * @param description  the new description ({@code null} permitted).
      * 
      * @see #getDomainDescription()
      */
@@ -161,7 +160,7 @@ public class TimePeriodValues extends Series implements Serializable {
     /**
      * Returns the range description.
      *
-     * @return The range description (possibly <code>null</code>).
+     * @return The range description (possibly {@code null}).
      * 
      * @see #getDomainDescription()
      * @see #setRangeDescription(String)
@@ -172,9 +171,9 @@ public class TimePeriodValues extends Series implements Serializable {
 
     /**
      * Sets the range description and fires a property change event with the
-     * name <code>Range</code>.
+     * name {@code Range}.
      *
-     * @param description  the new description (<code>null</code> permitted).
+     * @param description  the new description ({@code null} permitted).
      * 
      * @see #getRangeDescription()
      */
@@ -189,6 +188,7 @@ public class TimePeriodValues extends Series implements Serializable {
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount() {
         return this.data.size();
     }
@@ -196,8 +196,8 @@ public class TimePeriodValues extends Series implements Serializable {
     /**
      * Returns one data item for the series.
      *
-     * @param index  the item index (in the range <code>0</code> to 
-     *     <code>getItemCount() - 1</code>).
+     * @param index  the item index (in the range {@code 0} to 
+     *     {@code getItemCount() -1}).
      *
      * @return One data item for the series.
      */
@@ -208,8 +208,8 @@ public class TimePeriodValues extends Series implements Serializable {
     /**
      * Returns the time period at the specified index.
      *
-     * @param index  the item index (in the range <code>0</code> to 
-     *     <code>getItemCount() - 1</code>).
+     * @param index  the item index (in the range {@code 0} to 
+     *     {@code getItemCount() -1}).
      *
      * @return The time period at the specified index.
      * 
@@ -222,10 +222,10 @@ public class TimePeriodValues extends Series implements Serializable {
     /**
      * Returns the value at the specified index.
      *
-     * @param index  the item index (in the range <code>0</code> to 
-     *     <code>getItemCount() - 1</code>).
+     * @param index  the item index (in the range {@code 0} to 
+     *     {@code getItemCount() -1}).
      *
-     * @return The value at the specified index (possibly <code>null</code>).
+     * @return The value at the specified index (possibly {@code null}).
      * 
      * @see #getDataItem(int)
      */
@@ -237,12 +237,10 @@ public class TimePeriodValues extends Series implements Serializable {
      * Adds a data item to the series and sends a {@link SeriesChangeEvent} to
      * all registered listeners.
      *
-     * @param item  the item (<code>null</code> not permitted).
+     * @param item  the item ({@code null} not permitted).
      */
     public void add(TimePeriodValue item) {
-        if (item == null) {
-            throw new IllegalArgumentException("Null item not allowed.");
-        }
+        Args.nullNotPermitted(item, "item");
         this.data.add(item);
         updateBounds(item.getPeriod(), this.data.size() - 1);
         fireSeriesChanged();
@@ -354,7 +352,7 @@ public class TimePeriodValues extends Series implements Serializable {
      * Adds a new data item to the series and sends a {@link SeriesChangeEvent}
      * to all registered listeners.
      *
-     * @param period  the time period (<code>null</code> not permitted).
+     * @param period  the time period ({@code null} not permitted).
      * @param value  the value.
      * 
      * @see #add(TimePeriod, Number)
@@ -368,8 +366,8 @@ public class TimePeriodValues extends Series implements Serializable {
      * Adds a new data item to the series and sends a {@link SeriesChangeEvent}
      * to all registered listeners.
      *
-     * @param period  the time period (<code>null</code> not permitted).
-     * @param value  the value (<code>null</code> permitted).
+     * @param period  the time period ({@code null} not permitted).
+     * @param value  the value ({@code null} permitted).
      */
     public void add(TimePeriod period, Number value) {
         TimePeriodValue item = new TimePeriodValue(period, value);
@@ -381,7 +379,7 @@ public class TimePeriodValues extends Series implements Serializable {
      * {@link SeriesChangeEvent} to all registered listeners.
      *
      * @param index  the index of the data item to update.
-     * @param value  the new value (<code>null</code> not permitted).
+     * @param value  the new value ({@code null} not permitted).
      */
     public void update(int index, Number value) {
         TimePeriodValue item = getDataItem(index);
@@ -407,10 +405,11 @@ public class TimePeriodValues extends Series implements Serializable {
     /**
      * Tests the series for equality with another object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -422,11 +421,11 @@ public class TimePeriodValues extends Series implements Serializable {
             return false;
         }
         TimePeriodValues that = (TimePeriodValues) obj;
-        if (!ObjectUtilities.equal(this.getDomainDescription(), 
+        if (!ObjectUtils.equal(this.getDomainDescription(), 
                 that.getDomainDescription())) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.getRangeDescription(), 
+        if (!ObjectUtils.equal(this.getRangeDescription(), 
                 that.getRangeDescription())) {
             return false;
         }
@@ -447,6 +446,7 @@ public class TimePeriodValues extends Series implements Serializable {
      *
      * @return The hashcode
      */
+    @Override
     public int hashCode() {
         int result;
         result = (this.domain != null ? this.domain.hashCode() : 0);
@@ -476,6 +476,7 @@ public class TimePeriodValues extends Series implements Serializable {
      * 
      * @throws CloneNotSupportedException if there is a cloning problem.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         Object clone = createCopy(0, getItemCount() - 1);
         return clone;

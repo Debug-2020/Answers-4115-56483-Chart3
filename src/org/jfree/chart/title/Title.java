@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------
  * Title.java
  * ----------
- * (C) Copyright 2000-2008, by David Berry and Contributors.
+ * (C) Copyright 2000-2016, by David Berry and Contributors.
  *
  * Original Author:  David Berry;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -54,8 +54,8 @@
  *               release (DG);
  * 02-Feb-2005 : Changed Spacer --> RectangleInsets for padding (DG);
  * 03-May-2005 : Fixed problem in equals() method (DG);
- * 20-Jun-2007 : Removed JCommon dependency (DG);
  * 19-Sep-2008 : Added visibility flag (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -74,11 +74,12 @@ import org.jfree.chart.block.AbstractBlock;
 import org.jfree.chart.block.Block;
 import org.jfree.chart.event.TitleChangeEvent;
 import org.jfree.chart.event.TitleChangeListener;
-import org.jfree.chart.util.HorizontalAlignment;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.chart.util.VerticalAlignment;
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.ui.VerticalAlignment;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 
 /**
  * The base class for all chart titles.  A chart can have multiple titles,
@@ -88,7 +89,7 @@ import org.jfree.chart.util.VerticalAlignment;
  * hence do the actual work of drawing titles.
  */
 public abstract class Title extends AbstractBlock
-                            implements Block, Cloneable, Serializable {
+            implements Block, Cloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -6675162505277817221L;
@@ -144,12 +145,12 @@ public abstract class Title extends AbstractBlock
     /**
      * Creates a new title, using default attributes where necessary.
      *
-     * @param position  the position of the title (<code>null</code> not
+     * @param position  the position of the title ({@code null} not
      *                  permitted).
      * @param horizontalAlignment  the horizontal alignment of the title
-     *                             (<code>null</code> not permitted).
+     *                             ({@code null} not permitted).
      * @param verticalAlignment  the vertical alignment of the title
-     *                           (<code>null</code> not permitted).
+     *                           ({@code null} not permitted).
      */
     protected Title(RectangleEdge position,
                     HorizontalAlignment horizontalAlignment,
@@ -163,38 +164,25 @@ public abstract class Title extends AbstractBlock
     /**
      * Creates a new title.
      *
-     * @param position  the position of the title (<code>null</code> not
+     * @param position  the position of the title ({@code null} not
      *                  permitted).
      * @param horizontalAlignment  the horizontal alignment of the title (LEFT,
-     *                             CENTER or RIGHT, <code>null</code> not
+     *                             CENTER or RIGHT, {@code null} not
      *                             permitted).
      * @param verticalAlignment  the vertical alignment of the title (TOP,
-     *                           MIDDLE or BOTTOM, <code>null</code> not
+     *                           MIDDLE or BOTTOM, {@code null} not
      *                           permitted).
      * @param padding  the amount of space to leave around the outside of the
-     *                 title (<code>null</code> not permitted).
+     *                 title ({@code null} not permitted).
      */
-    protected Title(RectangleEdge position,
-                    HorizontalAlignment horizontalAlignment,
-                    VerticalAlignment verticalAlignment,
-                    RectangleInsets padding) {
+    protected Title(RectangleEdge position, 
+            HorizontalAlignment horizontalAlignment, 
+            VerticalAlignment verticalAlignment, RectangleInsets padding) {
 
-        // check arguments...
-        if (position == null) {
-            throw new IllegalArgumentException("Null 'position' argument.");
-        }
-        if (horizontalAlignment == null) {
-            throw new IllegalArgumentException(
-                    "Null 'horizontalAlignment' argument.");
-        }
-
-        if (verticalAlignment == null) {
-            throw new IllegalArgumentException(
-                    "Null 'verticalAlignment' argument.");
-        }
-        if (padding == null) {
-            throw new IllegalArgumentException("Null 'spacer' argument.");
-        }
+        Args.nullNotPermitted(position, "position");
+        Args.nullNotPermitted(horizontalAlignment, "horizontalAlignment");
+        Args.nullNotPermitted(verticalAlignment, "verticalAlignment");
+        Args.nullNotPermitted(padding, "padding");
 
         this.visible = true;
         this.position = position;
@@ -203,12 +191,11 @@ public abstract class Title extends AbstractBlock
         setPadding(padding);
         this.listenerList = new EventListenerList();
         this.notify = true;
-
     }
 
     /**
      * Returns a flag that controls whether or not the title should be
-     * drawn.  The default value is <code>true</code>.
+     * drawn.  The default value is {@code true}.
      *
      * @return A boolean.
      *
@@ -238,7 +225,7 @@ public abstract class Title extends AbstractBlock
     /**
      * Returns the position of the title.
      *
-     * @return The title position (never <code>null</code>).
+     * @return The title position (never {@code null}).
      */
     public RectangleEdge getPosition() {
         return this.position;
@@ -248,12 +235,10 @@ public abstract class Title extends AbstractBlock
      * Sets the position for the title and sends a {@link TitleChangeEvent} to
      * all registered listeners.
      *
-     * @param position  the position (<code>null</code> not permitted).
+     * @param position  the position ({@code null} not permitted).
      */
     public void setPosition(RectangleEdge position) {
-        if (position == null) {
-            throw new IllegalArgumentException("Null 'position' argument.");
-        }
+        Args.nullNotPermitted(position, "position");
         if (this.position != position) {
             this.position = position;
             notifyListeners(new TitleChangeEvent(this));
@@ -263,7 +248,7 @@ public abstract class Title extends AbstractBlock
     /**
      * Returns the horizontal alignment of the title.
      *
-     * @return The horizontal alignment (never <code>null</code>).
+     * @return The horizontal alignment (never {@code null}).
      */
     public HorizontalAlignment getHorizontalAlignment() {
         return this.horizontalAlignment;
@@ -273,13 +258,11 @@ public abstract class Title extends AbstractBlock
      * Sets the horizontal alignment for the title and sends a
      * {@link TitleChangeEvent} to all registered listeners.
      *
-     * @param alignment  the horizontal alignment (<code>null</code> not
+     * @param alignment  the horizontal alignment ({@code null} not
      *                   permitted).
      */
     public void setHorizontalAlignment(HorizontalAlignment alignment) {
-        if (alignment == null) {
-            throw new IllegalArgumentException("Null 'alignment' argument.");
-        }
+        Args.nullNotPermitted(alignment, "alignment");
         if (this.horizontalAlignment != alignment) {
             this.horizontalAlignment = alignment;
             notifyListeners(new TitleChangeEvent(this));
@@ -289,7 +272,7 @@ public abstract class Title extends AbstractBlock
     /**
      * Returns the vertical alignment of the title.
      *
-     * @return The vertical alignment (never <code>null</code>).
+     * @return The vertical alignment (never {@code null}).
      */
     public VerticalAlignment getVerticalAlignment() {
         return this.verticalAlignment;
@@ -300,12 +283,10 @@ public abstract class Title extends AbstractBlock
      * listeners of the change.
      *
      * @param alignment  the new vertical alignment (TOP, MIDDLE or BOTTOM,
-     *                   <code>null</code> not permitted).
+     *                   {@code null} not permitted).
      */
     public void setVerticalAlignment(VerticalAlignment alignment) {
-        if (alignment == null) {
-            throw new IllegalArgumentException("Null 'alignment' argument.");
-        }
+        Args.nullNotPermitted(alignment, "alignment");
         if (this.verticalAlignment != alignment) {
             this.verticalAlignment = alignment;
             notifyListeners(new TitleChangeEvent(this));
@@ -344,6 +325,7 @@ public abstract class Title extends AbstractBlock
      * @param area  the area allocated for the title (subclasses should not
      *              draw outside this area).
      */
+    @Override
     public abstract void draw(Graphics2D g2, Rectangle2D area);
 
     /**
@@ -358,6 +340,7 @@ public abstract class Title extends AbstractBlock
      * @throws CloneNotSupportedException not thrown by this class, but it may
      *         be thrown by subclasses.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         Title duplicate = (Title) super.clone();
         duplicate.listenerList = new EventListenerList();
@@ -405,10 +388,11 @@ public abstract class Title extends AbstractBlock
     /**
      * Tests an object for equality with this title.
      *
-     * @param obj  the object (<code>null</code> not permitted).
+     * @param obj  the object ({@code null} not permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -440,12 +424,13 @@ public abstract class Title extends AbstractBlock
      *
      * @return The hashcode.
      */
+    @Override
     public int hashCode() {
         int result = 193;
-        result = 37 * result + ObjectUtilities.hashCode(this.position);
+        result = 37 * result + ObjectUtils.hashCode(this.position);
         result = 37 * result
-                + ObjectUtilities.hashCode(this.horizontalAlignment);
-        result = 37 * result + ObjectUtilities.hashCode(this.verticalAlignment);
+                + ObjectUtils.hashCode(this.horizontalAlignment);
+        result = 37 * result + ObjectUtils.hashCode(this.verticalAlignment);
         return result;
     }
 

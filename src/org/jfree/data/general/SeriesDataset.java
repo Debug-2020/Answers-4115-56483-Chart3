@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * SeriesDataset.java
@@ -70,8 +70,8 @@ public interface SeriesDataset extends Dataset {
     /**
      * Returns the key for a series.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
      *
      * @return The key for the series.
      */
@@ -81,7 +81,7 @@ public interface SeriesDataset extends Dataset {
      * Returns the index of the series with the specified key, or -1 if there
      * is no such series in the dataset.
      *
-     * @param seriesKey  the series key (<code>null</code> permitted).
+     * @param seriesKey  the series key ({@code null} permitted).
      *
      * @return The index, or -1.
      */

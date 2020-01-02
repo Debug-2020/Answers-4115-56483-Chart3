@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * CategoryTick.java
@@ -36,16 +36,15 @@
  * -------
  * 07-Nov-2003 : Version 1 (DG);
  * 13-May-2004 : Added equals() method (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
 package org.jfree.chart.axis;
 
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlock;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.ObjectUtils;
 
 /**
  * A tick for a {@link CategoryAxis}.
@@ -113,23 +112,24 @@ public class CategoryTick extends Tick {
     /**
      * Tests this category tick for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
         if (obj instanceof CategoryTick && super.equals(obj)) {
             CategoryTick that = (CategoryTick) obj;
-            if (!ObjectUtilities.equal(this.category, that.category)) {
+            if (!ObjectUtils.equal(this.category, that.category)) {
                 return false;
             }
-            if (!ObjectUtilities.equal(this.label, that.label)) {
+            if (!ObjectUtils.equal(this.label, that.label)) {
                 return false;
             }
-            if (!ObjectUtilities.equal(this.labelAnchor, that.labelAnchor)) {
+            if (!ObjectUtils.equal(this.labelAnchor, that.labelAnchor)) {
                 return false;
            }
             return true;
@@ -142,6 +142,7 @@ public class CategoryTick extends Tick {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 41;
         result = 37 * result + this.category.hashCode();

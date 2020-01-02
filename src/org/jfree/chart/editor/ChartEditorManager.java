@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * ChartEditorManager.java
  * -----------------------
- * (C) Copyright 2005-2008, by Object Refinery Limited.
+ * (C) Copyright 2005-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   ;
@@ -35,12 +35,14 @@
  * Changes
  * -------
  * 24-Nov-2005 : Version 1 (DG);
- *
+ * 03-Jul-2013 : Use ParamChecks (DG);
+ * 
  */
 
 package org.jfree.chart.editor;
 
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.util.Args;
 
 /**
  * The central point for obtaining {@link ChartEditor} instances for editing
@@ -63,7 +65,7 @@ public class ChartEditorManager {
     /**
      * Returns the current factory.
      *
-     * @return The current factory (never <code>null</code>).
+     * @return The current factory (never {@code null}).
      */
     public static ChartEditorFactory getChartEditorFactory() {
         return factory;
@@ -72,12 +74,10 @@ public class ChartEditorManager {
     /**
      * Sets the chart editor factory.
      *
-     * @param f  the new factory (<code>null</code> not permitted).
+     * @param f  the new factory ({@code null} not permitted).
      */
     public static void setChartEditorFactory(ChartEditorFactory f) {
-        if (f == null) {
-            throw new IllegalArgumentException("Null 'f' argument.");
-        }
+        Args.nullNotPermitted(f, "f");
         factory = f;
     }
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * AbstractDataset.java
  * --------------------
- * (C)opyright 2000-2008, by Object Refinery Limited.
+ * (C)opyright 2000-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Nicolas Brodu (for Astrium and EADS Corporate Research
@@ -52,13 +52,14 @@
  * 08-Sep-2003 : Serialization fixes (NB);
  * 11-Sep-2003 : Cloning Fixes (NB);
  * 01-Jun-2005 : Added hasListener() method for unit testing (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
+ * 21-Nov-2013 : Added notify flag to allow suppressing change events 
+ *               temporarily (DG);
  *
  */
 
 package org.jfree.data.general;
 
-import org.jfree.data.event.DatasetChangeListener;
-import org.jfree.data.event.DatasetChangeEvent;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
@@ -70,7 +71,7 @@ import java.util.EventListener;
 import java.util.List;
 
 import javax.swing.event.EventListenerList;
-import org.jfree.chart.event.DatasetChangeInfo;
+import org.jfree.chart.util.Args;
 
 /**
  * An abstract implementation of the {@link Dataset} interface, containing a
@@ -87,6 +88,12 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
 
     /** Storage for registered change listeners. */
     private transient EventListenerList listenerList;
+    
+    /** 
+     * A flag that can be used to temporarily suppress dataset change event
+     * notifications.
+     */
+    private boolean notify;
 
     /**
      * Constructs a dataset. By default, the dataset is assigned to its own
@@ -95,15 +102,17 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
     protected AbstractDataset() {
         this.group = new DatasetGroup();
         this.listenerList = new EventListenerList();
+        this.notify = true;
     }
 
     /**
      * Returns the dataset group for the dataset.
      *
-     * @return The group (never <code>null</code>).
+     * @return The group (never {@code null}).
      *
      * @see #setGroup(DatasetGroup)
      */
+    @Override
     public DatasetGroup getGroup() {
         return this.group;
     }
@@ -111,17 +120,47 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
     /**
      * Sets the dataset group for the dataset.
      *
-     * @param group  the group (<code>null</code> not permitted).
+     * @param group  the group ({@code null} not permitted).
      *
      * @see #getGroup()
      */
+    @Override
     public void setGroup(DatasetGroup group) {
-        if (group == null) {
-            throw new IllegalArgumentException("Null 'group' argument.");
-        }
+        Args.nullNotPermitted(group, "group");
         this.group = group;
     }
 
+    /**
+     * Returns the value of the notify flag.  The default value is 
+     * {@code true}.  If this is {@code false}, calls to the 
+     * {@link #fireDatasetChanged()} method will NOT trigger a dataset
+     * change event.
+     * 
+     * @return A boolean.
+     * 
+     * @since 1.0.17
+     */
+    public boolean getNotify() {
+        return this.notify;
+    }
+    
+    /**
+     * Sets the notify flag, which controls whether or not the {@link #fireDatasetChanged()}
+     * method notifies listeners.  Setting this flag to {@code true} will
+     * trigger a {@code DatasetChangeEvent} because there may be 
+     * queued up changes.
+     * 
+     * @param notify  the new flag value.
+     * 
+     * @since 1.0.17
+     */
+    public void setNotify(boolean notify) {
+        this.notify = notify;
+        if (notify) {
+            fireDatasetChanged();
+        }    
+    }
+    
     /**
      * Registers an object to receive notification of changes to the dataset.
      *
@@ -129,6 +168,7 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
      *
      * @see #removeChangeListener(DatasetChangeListener)
      */
+    @Override
     public void addChangeListener(DatasetChangeListener listener) {
         this.listenerList.add(DatasetChangeListener.class, listener);
     }
@@ -141,12 +181,13 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
      *
      * @see #addChangeListener(DatasetChangeListener)
      */
+    @Override
     public void removeChangeListener(DatasetChangeListener listener) {
         this.listenerList.remove(DatasetChangeListener.class, listener);
     }
 
     /**
-     * Returns <code>true</code> if the specified object is registered with
+     * Returns {@code true} if the specified object is registered with
      * the dataset as a listener.  Most applications won't need to call this
      * method, it exists mainly for use by unit testing code.
      *
@@ -163,17 +204,16 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
     }
 
     /**
-     * Notifies all registered listeners that the dataset has changed.
-     *
-     * @param info  information about the change (<code>null</code> not
-     *         permitted).
+     * Notifies all registered listeners that the dataset has changed, 
+     * provided that the {@code notify} flag has not been set to 
+     * {@code false}.
      *
      * @see #addChangeListener(DatasetChangeListener)
-     *
-     * @since 1.2.0
      */
-    protected void fireDatasetChanged(DatasetChangeInfo info) {
-        notifyListeners(new DatasetChangeEvent(this, this, info));
+    protected void fireDatasetChanged() {
+        if (this.notify) {
+            notifyListeners(new DatasetChangeEvent(this, this));
+        }
     }
 
     /**
@@ -205,6 +245,7 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
      * @throws CloneNotSupportedException  if the dataset does not support
      *                                     cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         AbstractDataset clone = (AbstractDataset) super.clone();
         clone.listenerList = new EventListenerList();
@@ -255,9 +296,9 @@ public abstract class AbstractDataset implements Dataset, Cloneable,
      *
      * @exception InvalidObjectException If the object cannot validate itself.
      */
+    @Override
     public void validateObject() throws InvalidObjectException {
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO:  fill in real dataset change info (maybe NEW_DATASET?)
+        fireDatasetChanged();
     }
 
 }

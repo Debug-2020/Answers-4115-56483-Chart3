@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------------
  * SymbolicXYItemLabelGenerator.java
@@ -43,7 +43,6 @@
  * 19-Jan-2005 : Now accesses primitives only from dataset (DG);
  * 20-Apr-2005 : Renamed XYLabelGenerator --> XYItemLabelGenerator (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 31-Mar-2008 : Added hashCode() method to appease FindBugs (DG);
  *
  */
@@ -51,8 +50,8 @@
 package org.jfree.chart.labels;
 
 import java.io.Serializable;
-
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.time.RegularTimePeriod;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
@@ -76,8 +75,9 @@ public class SymbolicXYItemLabelGenerator implements XYItemLabelGenerator,
      * @param series  the series number (zero-based index).
      * @param item  the item number (zero-based index).
      *
-     * @return The tool tip text (possibly <code>null</code>).
+     * @return The tool tip text (possibly {@code null}).
      */
+    @Override
     public String generateToolTip(XYDataset data, int series, int item) {
 
         String xStr, yStr;
@@ -108,12 +108,13 @@ public class SymbolicXYItemLabelGenerator implements XYItemLabelGenerator,
      * Generates a label for the specified item. The label is typically a
      * formatted version of the data value, but any text can be used.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series index (zero-based).
      * @param category  the category index (zero-based).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
+    @Override
     public String generateLabel(XYDataset dataset, int series, int category) {
         return null;  //TODO: implement this method properly
     }
@@ -142,6 +143,7 @@ public class SymbolicXYItemLabelGenerator implements XYItemLabelGenerator,
      *
      * @throws CloneNotSupportedException if cloning is not supported.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -153,6 +155,7 @@ public class SymbolicXYItemLabelGenerator implements XYItemLabelGenerator,
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -168,6 +171,7 @@ public class SymbolicXYItemLabelGenerator implements XYItemLabelGenerator,
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 127;
         return result;

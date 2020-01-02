@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,21 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * -----------------
- * TextMeasurer.java
- * -----------------
- * (C) Copyright 2004-2008, by Object Refinery Limited and Contributors.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes
- * -------
- * 07-Jan-2004 : Version 1 (DG);
- * 20-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -47,8 +34,8 @@ package org.jfree.chart.text;
 public interface TextMeasurer {
 
     /**
-     * Calculates the width of a <code>String</code> in the current
-     * <code>Graphics</code> context.
+     * Calculates the width of a {@code String} in the current 
+     * {@code Graphics} context.
      *
      * @param text  the text.
      * @param start  the start position of the substring to be measured.
@@ -57,5 +44,6 @@ public interface TextMeasurer {
      * @return The width of the string in Java2D units.
      */
     public float getStringWidth(String text, int start, int end);
-
+    
 }
+

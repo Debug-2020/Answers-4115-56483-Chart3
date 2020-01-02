@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * KeyedObject2D.java
  * ------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,6 +39,7 @@
  *               Serializable (DG);
  * 03-Oct-2007 : Updated getObject() to handle modified behaviour in
  *               KeyedObjects class, added clear() method (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -48,6 +49,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import org.jfree.chart.util.Args;
 
 /**
  * A data structure that stores zero, one or many objects, where each object is
@@ -104,7 +106,7 @@ public class KeyedObjects2D implements Cloneable, Serializable {
      * @param row  the row index (in the range 0 to getRowCount() - 1).
      * @param column  the column index (in the range 0 to getColumnCount() - 1).
      *
-     * @return The object (possibly <code>null</code>).
+     * @return The object (possibly {@code null}).
      *
      * @see #getObject(Comparable, Comparable)
      */
@@ -137,26 +139,24 @@ public class KeyedObjects2D implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the row index for a given key, or <code>-1</code> if the key
+     * Returns the row index for a given key, or {@code -1} if the key
      * is not recognised.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The row index.
      *
      * @see #getRowKey(int)
      */
     public int getRowIndex(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         return this.rowKeys.indexOf(key);
     }
 
     /**
      * Returns the row keys.
      *
-     * @return The row keys (never <code>null</code>).
+     * @return The row keys (never {@code null}).
      *
      * @see #getRowKeys()
      */
@@ -178,26 +178,24 @@ public class KeyedObjects2D implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the column index for a given key, or <code>-1</code> if the key
+     * Returns the column index for a given key, or {@code -1} if the key
      * is not recognised.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The column index.
      *
      * @see #getColumnKey(int)
      */
     public int getColumnIndex(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         return this.columnKeys.indexOf(key);
     }
 
     /**
      * Returns the column keys.
      *
-     * @return The column keys (never <code>null</code>).
+     * @return The column keys (never {@code null}).
      *
      * @see #getRowKeys()
      */
@@ -208,23 +206,19 @@ public class KeyedObjects2D implements Cloneable, Serializable {
     /**
      * Returns the object for the given row and column keys.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
-     * @return The object (possibly <code>null</code>).
+     * @return The object (possibly {@code null}).
      *
-     * @throws IllegalArgumentException if <code>rowKey<code> or
-     *         <code>columnKey</code> is <code>null</code>.
-     * @throws UnknownKeyException if <code>rowKey</code> or
-     *         <code>columnKey</code> is not recognised.
+     * @throws IllegalArgumentException if {@code rowKey} or
+     *         {@code columnKey} is {@code null}.
+     * @throws UnknownKeyException if {@code rowKey} or
+     *         {@code columnKey} is not recognised.
      */
     public Object getObject(Comparable rowKey, Comparable columnKey) {
-        if (rowKey == null) {
-            throw new IllegalArgumentException("Null 'rowKey' argument.");
-        }
-        if (columnKey == null) {
-            throw new IllegalArgumentException("Null 'columnKey' argument.");
-        }
+        Args.nullNotPermitted(rowKey, "rowKey");
+        Args.nullNotPermitted(columnKey, "columnKey");
         int row = this.rowKeys.indexOf(rowKey);
         if (row < 0) {
             throw new UnknownKeyException("Row key (" + rowKey
@@ -249,8 +243,8 @@ public class KeyedObjects2D implements Cloneable, Serializable {
      * Adds an object to the table.  Performs the same function as setObject().
      *
      * @param object  the object.
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      */
     public void addObject(Object object, Comparable rowKey,
             Comparable columnKey) {
@@ -261,18 +255,13 @@ public class KeyedObjects2D implements Cloneable, Serializable {
      * Adds or updates an object.
      *
      * @param object  the object.
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      */
     public void setObject(Object object, Comparable rowKey,
             Comparable columnKey) {
-
-        if (rowKey == null) {
-            throw new IllegalArgumentException("Null 'rowKey' argument.");
-        }
-        if (columnKey == null) {
-            throw new IllegalArgumentException("Null 'columnKey' argument.");
-        }
+        Args.nullNotPermitted(rowKey, "rowKey");
+        Args.nullNotPermitted(columnKey, "columnKey");
         KeyedObjects row;
         int rowIndex = this.rowKeys.indexOf(rowKey);
         if (rowIndex >= 0) {
@@ -288,16 +277,15 @@ public class KeyedObjects2D implements Cloneable, Serializable {
         if (columnIndex < 0) {
             this.columnKeys.add(columnKey);
         }
-
     }
 
     /**
-     * Removes an object from the table by setting it to <code>null</code>.  If
+     * Removes an object from the table by setting it to {@code null}.  If
      * all the objects in the specified row and/or column are now
-     * <code>null</code>, the row and/or column is removed from the table.
+     * {@code null}, the row and/or column is removed from the table.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #addObject(Object, Comparable, Comparable)
      */
@@ -372,9 +360,9 @@ public class KeyedObjects2D implements Cloneable, Serializable {
     /**
      * Removes an entire row from the table.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
      *
-     * @throws UnknownKeyException if <code>rowKey</code> is not recognised.
+     * @throws UnknownKeyException if {@code rowKey} is not recognised.
      *
      * @see #removeColumn(Comparable)
      */
@@ -402,9 +390,9 @@ public class KeyedObjects2D implements Cloneable, Serializable {
     /**
      * Removes an entire column from the table.
      *
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
-     * @throws UnknownKeyException if <code>rowKey</code> is not recognised.
+     * @throws UnknownKeyException if {@code rowKey} is not recognised.
      *
      * @see #removeRow(Comparable)
      */
@@ -439,10 +427,11 @@ public class KeyedObjects2D implements Cloneable, Serializable {
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object to test (<code>null</code> permitted).
+     * @param obj  the object to test ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -490,6 +479,7 @@ public class KeyedObjects2D implements Cloneable, Serializable {
      *
      * @return A hashcode.
      */
+    @Override
     public int hashCode() {
         int result;
         result = this.rowKeys.hashCode();
@@ -506,6 +496,7 @@ public class KeyedObjects2D implements Cloneable, Serializable {
      * @throws CloneNotSupportedException  this class will not throw this
      *         exception, but subclasses (if any) might.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         KeyedObjects2D clone = (KeyedObjects2D) super.clone();
         clone.columnKeys = new java.util.ArrayList(this.columnKeys);

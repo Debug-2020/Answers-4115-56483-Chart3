@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------------
  * LegendItemBlockContainer.java
@@ -37,7 +37,6 @@
  * 20-Jul-2006 : Version 1 (DG);
  * 06-Oct-2006 : Added tooltip and URL text fields (DG);
  * 18-May-2007 : Added seriesKey and dataset fields (DG);
- * 20-Jun-2007 : Removed deprecated code (DG);
  *
  */
 
@@ -78,10 +77,16 @@ public class LegendItemBlockContainer extends BlockContainer {
      */
     private Comparable seriesKey;
 
-    /** The tool tip text (can be <code>null</code>). */
+    /** The dataset index. */
+    private int datasetIndex;
+
+    /** The series index. */
+    private int series;
+
+    /** The tool tip text (can be {@code null}). */
     private String toolTipText;
 
-    /** The URL text (can be <code>null</code>). */
+    /** The URL text (can be {@code null}). */
     private String urlText;
 
     /**
@@ -123,9 +128,18 @@ public class LegendItemBlockContainer extends BlockContainer {
     }
 
     /**
+     * Returns the series index.
+     *
+     * @return The series index.
+     */
+    public int getSeriesIndex() {
+        return this.series;
+    }
+
+    /**
      * Returns the tool tip text.
      *
-     * @return The tool tip text (possibly <code>null</code>).
+     * @return The tool tip text (possibly {@code null}).
      *
      * @since 1.0.3
      */
@@ -136,7 +150,7 @@ public class LegendItemBlockContainer extends BlockContainer {
     /**
      * Sets the tool tip text.
      *
-     * @param text  the text (<code>null</code> permitted).
+     * @param text  the text ({@code null} permitted).
      *
      * @since 1.0.3
      */
@@ -147,7 +161,7 @@ public class LegendItemBlockContainer extends BlockContainer {
     /**
      * Returns the URL text.
      *
-     * @return The URL text (possibly <code>null</code>).
+     * @return The URL text (possibly {@code null}).
      *
      * @since 1.0.3
      */
@@ -158,7 +172,7 @@ public class LegendItemBlockContainer extends BlockContainer {
     /**
      * Sets the URL text.
      *
-     * @param text  the text (<code>null</code> permitted).
+     * @param text  the text ({@code null} permitted).
      *
      * @since 1.0.3
      */
@@ -172,14 +186,15 @@ public class LegendItemBlockContainer extends BlockContainer {
      * @param g2  the graphics device.
      * @param area  the area.
      * @param params  passed on to blocks within the container
-     *                (<code>null</code> permitted).
+     *                ({@code null} permitted).
      *
-     * @return An instance of {@link EntityBlockResult}, or <code>null</code>.
+     * @return An instance of {@link EntityBlockResult}, or {@code null}.
      */
+    @Override
     public Object draw(Graphics2D g2, Rectangle2D area, Object params) {
         // draw the block without collecting entities
         super.draw(g2, area, null);
-        EntityBlockParams ebp = null;
+        EntityBlockParams ebp;
         BlockResult r = new BlockResult();
         if (params instanceof EntityBlockParams) {
             ebp = (EntityBlockParams) params;

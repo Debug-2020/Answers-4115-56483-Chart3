@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------------
  * IntervalXYItemLabelGenerator.java
@@ -45,8 +45,8 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.Date;
-
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.xy.IntervalXYDataset;
 import org.jfree.data.xy.XYDataset;
 
@@ -74,11 +74,11 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
     /**
      * Creates an item label generator using the specified number formatters.
      *
-     * @param formatString  the item label format string (<code>null</code> not
+     * @param formatString  the item label format string ({@code null} not
      *                      permitted).
-     * @param xFormat  the format object for the x values (<code>null</code>
+     * @param xFormat  the format object for the x values ({@code null}
      *                 not permitted).
-     * @param yFormat  the format object for the y values (<code>null</code>
+     * @param yFormat  the format object for the y values ({@code null}
      *                 not permitted).
      */
     public IntervalXYItemLabelGenerator(String formatString,
@@ -90,11 +90,11 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
     /**
      * Creates an item label generator using the specified formatters.
      *
-     * @param formatString  the item label format string (<code>null</code>
+     * @param formatString  the item label format string ({@code null}
      *                      not permitted).
-     * @param xFormat  the format object for the x values (<code>null</code>
+     * @param xFormat  the format object for the x values ({@code null}
      *                 not permitted).
-     * @param yFormat  the format object for the y values (<code>null</code>
+     * @param yFormat  the format object for the y values ({@code null}
      *                 not permitted).
      */
     public IntervalXYItemLabelGenerator(String formatString,
@@ -108,11 +108,11 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
      * number formatter for the x-values and a date formatter for the
      * y-values).
      *
-     * @param formatString  the item label format string (<code>null</code>
+     * @param formatString  the item label format string ({@code null}
      *                      not permitted).
-     * @param xFormat  the format object for the x values (<code>null</code>
+     * @param xFormat  the format object for the x values ({@code null}
      *                 permitted).
-     * @param yFormat  the format object for the y values (<code>null</code>
+     * @param yFormat  the format object for the y values ({@code null}
      *                 not permitted).
      */
     public IntervalXYItemLabelGenerator(String formatString,
@@ -124,11 +124,11 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
     /**
      * Creates a label generator using the specified date formatters.
      *
-     * @param formatString  the label format string (<code>null</code> not
+     * @param formatString  the label format string ({@code null} not
      *                      permitted).
-     * @param xFormat  the format object for the x values (<code>null</code>
+     * @param xFormat  the format object for the x values ({@code null}
      *                 not permitted).
-     * @param yFormat  the format object for the y values (<code>null</code>
+     * @param yFormat  the format object for the y values ({@code null}
      *                 not permitted).
      */
     public IntervalXYItemLabelGenerator(String formatString,
@@ -141,13 +141,14 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
      * Creates the array of items that can be passed to the
      * {@link MessageFormat} class for creating labels.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
      * @return An array of seven items from the dataset formatted as
-     *         <code>String</code> objects (never <code>null</code>).
+     *         {@code String} objects (never {@code null}).
      */
+    @Override
     protected Object[] createItemArray(XYDataset dataset, int series,
                                        int item) {
 
@@ -197,7 +198,7 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
                 result[4] = ynf.format(y);
             }
         }
-        if (Double.isNaN(ys)
+        if (Double.isNaN(ys) && intervalDataset != null
                 && intervalDataset.getStartY(series, item) == null) {
             result[5] = getNullYString();
         }
@@ -209,7 +210,7 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
                 result[5] = ynf.format(ys);
             }
         }
-        if (Double.isNaN(ye)
+        if (Double.isNaN(ye) && intervalDataset != null
                 && intervalDataset.getEndY(series, item) == null) {
             result[6] = getNullYString();
         }
@@ -227,12 +228,13 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
     /**
      * Generates the item label text for an item in a dataset.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
      *
-     * @return The label text (possibly <code>null</code>).
+     * @return The label text (possibly {@code null}).
      */
+    @Override
     public String generateLabel(XYDataset dataset, int series, int item) {
         return generateLabelString(dataset, series, item);
     }
@@ -244,6 +246,7 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
      *
      * @throws CloneNotSupportedException if cloning is not supported.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -251,10 +254,11 @@ public class IntervalXYItemLabelGenerator extends AbstractXYItemLabelGenerator
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

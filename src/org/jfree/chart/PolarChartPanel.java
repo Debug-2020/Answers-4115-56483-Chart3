@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,22 +21,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * PolarChartPanel.java
  * --------------------
- * (C) Copyright 2004-2008, by Solution Engineering, Inc. and Contributors.
+ * (C) Copyright 2004-2016, by Solution Engineering, Inc. and Contributors.
  *
  * Original Author:  Daniel Bridenbecker, Solution Engineering, Inc.;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
+ *                   Martin Hoeller;
  *
  * Changes
  * -------
  * 19-Jan-2004 : Version 1, contributed by DB with minor changes by DG (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
+ * 10-Oct-2011 : bug #3165708: localization (MH);
  *
  */
 
@@ -52,17 +54,17 @@ import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PolarPlot;
 
 /**
- * <code>PolarChartPanel</code> is the top level object for using the
- * {@link PolarPlot}. Since this class has a <code>JPanel</code> in the
+ * {@code PolarChartPanel} is the top level object for using the
+ * {@link PolarPlot}. Since this class has a {@code JPanel} in the
  * inheritance hierarchy, one uses this class to integrate the Polar plot into
  * their application.
  * <p>
- * The main modification to <code>ChartPanel</code> is the popup menu.  It
- * removes <code>ChartPanel</code>'s versions of:
+ * The main modification to {@code ChartPanel} is the popup menu.  It
+ * removes {@code ChartPanel}'s versions of:
  * <ul>
- *    <li><code>Zoom In</code></li>
- *    <li><code>Zoom Out</code></li>
- *    <li><code>Auto Range</code></li>
+ *    <li>{@code Zoom In}</li>
+ *    <li>{@code Zoom Out}</li>
+ *    <li>{@code Auto Range}</li>
  * </ul>
  * and replaces them with versions more appropriate for {@link PolarPlot}.
  */
@@ -122,6 +124,7 @@ public class PolarChartPanel extends ChartPanel {
      *
      * @param chart  The chart.
      */
+    @Override
     public void setChart(JFreeChart chart) {
         checkChart(chart);
         super.setChart(chart);
@@ -137,25 +140,30 @@ public class PolarChartPanel extends ChartPanel {
      *
      * @return The popup menu.
      */
-    protected JPopupMenu createPopupMenu(boolean properties,
-                                         boolean save,
-                                         boolean print,
-                                         boolean zoom) {
+    @Override
+    protected JPopupMenu createPopupMenu(boolean properties, boolean save,
+            boolean print, boolean zoom) {
 
        JPopupMenu result = super.createPopupMenu(properties, save, print, zoom);
-       int zoomInIndex  = getPopupMenuItem(result, "Zoom In");
-       int zoomOutIndex = getPopupMenuItem(result, "Zoom Out");
-       int autoIndex     = getPopupMenuItem(result, "Auto Range");
+       int zoomInIndex = getPopupMenuItem(result,
+               localizationResources.getString("Zoom_In"));
+       int zoomOutIndex = getPopupMenuItem(result,
+               localizationResources.getString("Zoom_Out"));
+       int autoIndex = getPopupMenuItem(result,
+               localizationResources.getString("Auto_Range"));
        if (zoom) {
-           JMenuItem zoomIn = new JMenuItem("Zoom In");
+           JMenuItem zoomIn = new JMenuItem(
+                   localizationResources.getString("Zoom_In"));
            zoomIn.setActionCommand(POLAR_ZOOM_IN_ACTION_COMMAND);
            zoomIn.addActionListener(this);
 
-           JMenuItem zoomOut = new JMenuItem("Zoom Out");
+           JMenuItem zoomOut = new JMenuItem(
+                   localizationResources.getString("Zoom_Out"));
            zoomOut.setActionCommand(POLAR_ZOOM_OUT_ACTION_COMMAND);
            zoomOut.addActionListener(this);
 
-           JMenuItem auto = new JMenuItem("Auto Range");
+           JMenuItem auto = new JMenuItem(
+                   localizationResources.getString("Auto_Range"));
            auto.setActionCommand(POLAR_AUTO_RANGE_ACTION_COMMAND);
            auto.addActionListener(this);
 
@@ -189,6 +197,7 @@ public class PolarChartPanel extends ChartPanel {
      *
      * @param event  the event.
      */
+    @Override
     public void actionPerformed(ActionEvent event) {
        String command = event.getActionCommand();
 

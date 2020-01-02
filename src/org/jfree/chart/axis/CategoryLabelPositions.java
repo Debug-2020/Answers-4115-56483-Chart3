@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * CategoryLabelPositions.java
  * ---------------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2004-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -37,18 +37,19 @@
  * 06-Jan-2004 : Version 1 (DG);
  * 17-Feb-2004 : Added equals() method (DG);
  * 05-Nov-2004 : Adjusted settings for UP_90 and DOWN_90 (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.chart.axis;
 
 import java.io.Serializable;
-
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.chart.util.RectangleAnchor;
-import org.jfree.chart.util.RectangleEdge;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.Args;
+
 
 /**
  * Records the label positions for a category axis.  Instances of this class
@@ -63,19 +64,15 @@ public class CategoryLabelPositions implements Serializable {
     public static final CategoryLabelPositions
         STANDARD = new CategoryLabelPositions(
             new CategoryLabelPosition(
-                RectangleAnchor.BOTTOM, TextBlockAnchor.BOTTOM_CENTER
-            ), // TOP
+                RectangleAnchor.BOTTOM, TextBlockAnchor.BOTTOM_CENTER), // TOP
             new CategoryLabelPosition(
-                RectangleAnchor.TOP, TextBlockAnchor.TOP_CENTER
-            ), // BOTTOM
+                RectangleAnchor.TOP, TextBlockAnchor.TOP_CENTER), // BOTTOM
             new CategoryLabelPosition(
                 RectangleAnchor.RIGHT, TextBlockAnchor.CENTER_RIGHT,
-                CategoryLabelWidthType.RANGE, 0.30f
-            ), // LEFT
+                CategoryLabelWidthType.RANGE, 0.30f), // LEFT
             new CategoryLabelPosition(
                 RectangleAnchor.LEFT, TextBlockAnchor.CENTER_LEFT,
-                CategoryLabelWidthType.RANGE, 0.30f
-            ) // RIGHT
+                CategoryLabelWidthType.RANGE, 0.30f) // RIGHT
         );
 
     /** UP_90 category label positions. */
@@ -84,23 +81,19 @@ public class CategoryLabelPositions implements Serializable {
             new CategoryLabelPosition(
                 RectangleAnchor.BOTTOM, TextBlockAnchor.CENTER_LEFT,
                 TextAnchor.CENTER_LEFT, -Math.PI / 2.0,
-                CategoryLabelWidthType.RANGE, 0.30f
-            ), // TOP
+                CategoryLabelWidthType.RANGE, 0.30f), // TOP
             new CategoryLabelPosition(
                 RectangleAnchor.TOP, TextBlockAnchor.CENTER_RIGHT,
                 TextAnchor.CENTER_RIGHT, -Math.PI / 2.0,
-                CategoryLabelWidthType.RANGE, 0.30f
-            ), // BOTTOM
+                CategoryLabelWidthType.RANGE, 0.30f), // BOTTOM
             new CategoryLabelPosition(
                 RectangleAnchor.RIGHT, TextBlockAnchor.BOTTOM_CENTER,
                 TextAnchor.BOTTOM_CENTER, -Math.PI / 2.0,
-                CategoryLabelWidthType.CATEGORY, 0.9f
-            ), // LEFT
+                CategoryLabelWidthType.CATEGORY, 0.9f), // LEFT
             new CategoryLabelPosition(
                 RectangleAnchor.LEFT, TextBlockAnchor.TOP_CENTER,
                 TextAnchor.TOP_CENTER, -Math.PI / 2.0,
-                CategoryLabelWidthType.CATEGORY, 0.90f
-            ) // RIGHT
+                CategoryLabelWidthType.CATEGORY, 0.90f) // RIGHT
         );
 
     /** DOWN_90 category label positions. */
@@ -109,23 +102,19 @@ public class CategoryLabelPositions implements Serializable {
             new CategoryLabelPosition(
                 RectangleAnchor.BOTTOM, TextBlockAnchor.CENTER_RIGHT,
                 TextAnchor.CENTER_RIGHT, Math.PI / 2.0,
-                CategoryLabelWidthType.RANGE, 0.30f
-            ), // TOP
+                CategoryLabelWidthType.RANGE, 0.30f), // TOP
             new CategoryLabelPosition(
                 RectangleAnchor.TOP, TextBlockAnchor.CENTER_LEFT,
                 TextAnchor.CENTER_LEFT, Math.PI / 2.0,
-                CategoryLabelWidthType.RANGE, 0.30f
-            ), // BOTTOM
+                CategoryLabelWidthType.RANGE, 0.30f), // BOTTOM
             new CategoryLabelPosition(
                 RectangleAnchor.RIGHT, TextBlockAnchor.TOP_CENTER,
                 TextAnchor.TOP_CENTER, Math.PI / 2.0,
-                CategoryLabelWidthType.CATEGORY, 0.90f
-            ), // LEFT
+                CategoryLabelWidthType.CATEGORY, 0.90f), // LEFT
             new CategoryLabelPosition(
                 RectangleAnchor.LEFT, TextBlockAnchor.BOTTOM_CENTER,
                 TextAnchor.BOTTOM_CENTER, Math.PI / 2.0,
-                CategoryLabelWidthType.CATEGORY, 0.90f
-            ) // RIGHT
+                CategoryLabelWidthType.CATEGORY, 0.90f) // RIGHT
         );
 
     /** UP_45 category label positions. */
@@ -140,7 +129,7 @@ public class CategoryLabelPositions implements Serializable {
      * Creates a new instance where the category labels angled upwards by the
      * specified amount.
      *
-     * @param angle  the rotation angle (should be < Math.PI / 2.0).
+     * @param angle  the rotation angle (should be &lt; Math.PI / 2.0).
      *
      * @return A category label position specification.
      */
@@ -150,23 +139,19 @@ public class CategoryLabelPositions implements Serializable {
             new CategoryLabelPosition(
                 RectangleAnchor.BOTTOM, TextBlockAnchor.BOTTOM_LEFT,
                 TextAnchor.BOTTOM_LEFT, -angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ), // TOP
+                CategoryLabelWidthType.RANGE, 0.50f), // TOP
             new CategoryLabelPosition(
                 RectangleAnchor.TOP, TextBlockAnchor.TOP_RIGHT,
                 TextAnchor.TOP_RIGHT, -angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ), // BOTTOM
+                CategoryLabelWidthType.RANGE, 0.50f), // BOTTOM
             new CategoryLabelPosition(
                 RectangleAnchor.RIGHT, TextBlockAnchor.BOTTOM_RIGHT,
                 TextAnchor.BOTTOM_RIGHT, -angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ), // LEFT
+                CategoryLabelWidthType.RANGE, 0.50f), // LEFT
             new CategoryLabelPosition(
                 RectangleAnchor.LEFT, TextBlockAnchor.TOP_LEFT,
                 TextAnchor.TOP_LEFT, -angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ) // RIGHT
+                CategoryLabelWidthType.RANGE, 0.50f) // RIGHT
         );
     }
 
@@ -174,7 +159,7 @@ public class CategoryLabelPositions implements Serializable {
      * Creates a new instance where the category labels angled downwards by the
      * specified amount.
      *
-     * @param angle  the rotation angle (should be < Math.PI / 2.0).
+     * @param angle  the rotation angle (should be &lt; Math.PI / 2.0).
      *
      * @return A category label position specification.
      */
@@ -184,23 +169,19 @@ public class CategoryLabelPositions implements Serializable {
             new CategoryLabelPosition(
                 RectangleAnchor.BOTTOM, TextBlockAnchor.BOTTOM_RIGHT,
                 TextAnchor.BOTTOM_RIGHT, angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ), // TOP
+                CategoryLabelWidthType.RANGE, 0.50f), // TOP
             new CategoryLabelPosition(
                 RectangleAnchor.TOP, TextBlockAnchor.TOP_LEFT,
                 TextAnchor.TOP_LEFT, angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ), // BOTTOM
+                CategoryLabelWidthType.RANGE, 0.50f), // BOTTOM
             new CategoryLabelPosition(
                 RectangleAnchor.RIGHT, TextBlockAnchor.TOP_RIGHT,
                 TextAnchor.TOP_RIGHT, angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ), // LEFT
+                CategoryLabelWidthType.RANGE, 0.50f), // LEFT
             new CategoryLabelPosition(
                 RectangleAnchor.LEFT, TextBlockAnchor.BOTTOM_LEFT,
                 TextAnchor.BOTTOM_LEFT, angle,
-                CategoryLabelWidthType.RANGE, 0.50f
-            ) // RIGHT
+                CategoryLabelWidthType.RANGE, 0.50f) // RIGHT
         );
     }
 
@@ -242,37 +223,27 @@ public class CategoryLabelPositions implements Serializable {
      * Creates a new position specification.
      *
      * @param top  the label position info used when an axis is at the top
-     *             (<code>null</code> not permitted).
+     *             ({@code null} not permitted).
      * @param bottom  the label position info used when an axis is at the
-     *                bottom (<code>null</code> not permitted).
+     *                bottom ({@code null} not permitted).
      * @param left  the label position info used when an axis is at the left
-     *              (<code>null</code> not permitted).
+     *              ({@code null} not permitted).
      * @param right  the label position info used when an axis is at the right
-     *               (<code>null</code> not permitted).
+     *               ({@code null} not permitted).
      */
     public CategoryLabelPositions(CategoryLabelPosition top,
-                                  CategoryLabelPosition bottom,
-                                  CategoryLabelPosition left,
-                                  CategoryLabelPosition right) {
+            CategoryLabelPosition bottom, CategoryLabelPosition left,
+            CategoryLabelPosition right) {
 
-        if (top == null) {
-            throw new IllegalArgumentException("Null 'top' argument.");
-        }
-        if (bottom == null) {
-            throw new IllegalArgumentException("Null 'bottom' argument.");
-        }
-        if (left == null) {
-            throw new IllegalArgumentException("Null 'left' argument.");
-        }
-        if (right == null) {
-            throw new IllegalArgumentException("Null 'right' argument.");
-        }
+        Args.nullNotPermitted(top, "top");
+        Args.nullNotPermitted(bottom, "bottom");
+        Args.nullNotPermitted(left, "left");
+        Args.nullNotPermitted(right, "right");
 
         this.positionForAxisAtTop = top;
         this.positionForAxisAtBottom = bottom;
         this.positionForAxisAtLeft = left;
         this.positionForAxisAtRight = right;
-
     }
 
     /**
@@ -304,120 +275,98 @@ public class CategoryLabelPositions implements Serializable {
      * Returns a new instance based on an existing instance but with the top
      * position changed.
      *
-     * @param base  the base (<code>null</code> not permitted).
-     * @param top  the top position (<code>null</code> not permitted).
+     * @param base  the base ({@code null} not permitted).
+     * @param top  the top position ({@code null} not permitted).
      *
-     * @return A new instance (never <code>null</code>).
+     * @return A new instance (never {@code null}).
      */
     public static CategoryLabelPositions replaceTopPosition(
             CategoryLabelPositions base, CategoryLabelPosition top) {
 
-        if (base == null) {
-            throw new IllegalArgumentException("Null 'base' argument.");
-        }
-        if (top == null) {
-            throw new IllegalArgumentException("Null 'top' argument.");
-        }
+        Args.nullNotPermitted(base, "base");
+        Args.nullNotPermitted(top, "top");
 
-        return new CategoryLabelPositions(
-            top,
+        return new CategoryLabelPositions(top,
             base.getLabelPosition(RectangleEdge.BOTTOM),
             base.getLabelPosition(RectangleEdge.LEFT),
-            base.getLabelPosition(RectangleEdge.RIGHT)
-        );
+            base.getLabelPosition(RectangleEdge.RIGHT));
     }
 
     /**
      * Returns a new instance based on an existing instance but with the bottom
      * position changed.
      *
-     * @param base  the base (<code>null</code> not permitted).
-     * @param bottom  the bottom position (<code>null</code> not permitted).
+     * @param base  the base ({@code null} not permitted).
+     * @param bottom  the bottom position ({@code null} not permitted).
      *
-     * @return A new instance (never <code>null</code>).
+     * @return A new instance (never {@code null}).
      */
     public static CategoryLabelPositions replaceBottomPosition(
             CategoryLabelPositions base, CategoryLabelPosition bottom) {
 
-        if (base == null) {
-            throw new IllegalArgumentException("Null 'base' argument.");
-        }
-        if (bottom == null) {
-            throw new IllegalArgumentException("Null 'bottom' argument.");
-        }
+        Args.nullNotPermitted(base, "base");
+        Args.nullNotPermitted(bottom, "bottom");
 
         return new CategoryLabelPositions(
             base.getLabelPosition(RectangleEdge.TOP),
             bottom,
             base.getLabelPosition(RectangleEdge.LEFT),
-            base.getLabelPosition(RectangleEdge.RIGHT)
-        );
+            base.getLabelPosition(RectangleEdge.RIGHT));
     }
 
     /**
      * Returns a new instance based on an existing instance but with the left
      * position changed.
      *
-     * @param base  the base (<code>null</code> not permitted).
-     * @param left  the left position (<code>null</code> not permitted).
+     * @param base  the base ({@code null} not permitted).
+     * @param left  the left position ({@code null} not permitted).
      *
-     * @return A new instance (never <code>null</code>).
+     * @return A new instance (never {@code null}).
      */
     public static CategoryLabelPositions replaceLeftPosition(
             CategoryLabelPositions base, CategoryLabelPosition left) {
 
-        if (base == null) {
-            throw new IllegalArgumentException("Null 'base' argument.");
-        }
-        if (left == null) {
-            throw new IllegalArgumentException("Null 'left' argument.");
-        }
+        Args.nullNotPermitted(base, "base");
+        Args.nullNotPermitted(left, "left");
 
         return new CategoryLabelPositions(
             base.getLabelPosition(RectangleEdge.TOP),
             base.getLabelPosition(RectangleEdge.BOTTOM),
             left,
-            base.getLabelPosition(RectangleEdge.RIGHT)
-        );
+            base.getLabelPosition(RectangleEdge.RIGHT));
     }
 
     /**
      * Returns a new instance based on an existing instance but with the right
      * position changed.
      *
-     * @param base  the base (<code>null</code> not permitted).
-     * @param right  the right position (<code>null</code> not permitted).
+     * @param base  the base ({@code null} not permitted).
+     * @param right  the right position ({@code null} not permitted).
      *
-     * @return A new instance (never <code>null</code>).
+     * @return A new instance (never {@code null}).
      */
     public static CategoryLabelPositions replaceRightPosition(
             CategoryLabelPositions base, CategoryLabelPosition right) {
 
-        if (base == null) {
-            throw new IllegalArgumentException("Null 'base' argument.");
-        }
-        if (right == null) {
-            throw new IllegalArgumentException("Null 'right' argument.");
-        }
-
+        Args.nullNotPermitted(base, "base");
+        Args.nullNotPermitted(right, "right");
         return new CategoryLabelPositions(
             base.getLabelPosition(RectangleEdge.TOP),
             base.getLabelPosition(RectangleEdge.BOTTOM),
             base.getLabelPosition(RectangleEdge.LEFT),
-            right
-        );
+            right);
     }
 
     /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
+     * Returns {@code true} if this object is equal to the specified
+     * object, and {@code false} otherwise.
      *
      * @param obj  the other object.
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
-
         if (this == obj) {
             return true;
         }
@@ -439,9 +388,7 @@ public class CategoryLabelPositions implements Serializable {
         if (!this.positionForAxisAtRight.equals(that.positionForAxisAtRight)) {
             return false;
         }
-
         return true;
-
     }
 
     /**
@@ -449,6 +396,7 @@ public class CategoryLabelPositions implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 19;
         result = 37 * result + this.positionForAxisAtTop.hashCode();

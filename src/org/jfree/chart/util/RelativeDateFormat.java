@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * RelativeDateFormat.java
  * -----------------------
- * (C) Copyright 2006-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2006-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Michael Siemer;
@@ -41,6 +41,7 @@
  *               modifications (DG);
  * 01-Sep-2008 : Added new fields for hour and minute formatting, based on
  *               patch 2033092 (DG);
+ * 02-Jul-2013 : Use ParamChecks, and fix NB warnings (DG);
  *
  */
 
@@ -134,12 +135,13 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * A constant for the number of milliseconds in one hour.
      */
-    private static long MILLISECONDS_IN_ONE_HOUR = 60 * 60 * 1000L;
+    private static final long MILLISECONDS_IN_ONE_HOUR = 60 * 60 * 1000L;
 
     /**
      * A constant for the number of milliseconds in one day.
      */
-    private static long MILLISECONDS_IN_ONE_DAY = 24 * MILLISECONDS_IN_ONE_HOUR;
+    private static final long MILLISECONDS_IN_ONE_DAY 
+            = 24 * MILLISECONDS_IN_ONE_HOUR;
 
     /**
      * Creates a new instance with base milliseconds set to zero.
@@ -151,7 +153,7 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Creates a new instance.
      *
-     * @param time  the date/time (<code>null</code> not permitted).
+     * @param time  the date/time ({@code null} not permitted).
      */
     public RelativeDateFormat(Date time) {
         this(time.getTime());
@@ -160,7 +162,7 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Creates a new instance.
      *
-     * @param baseMillis  the time zone (<code>null</code> not permitted).
+     * @param baseMillis  the time zone ({@code null} not permitted).
      */
     public RelativeDateFormat(long baseMillis) {
         super();
@@ -200,7 +202,7 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Sets the base date/time used to calculate the elapsed time for display.
      * This should be specified in milliseconds using the same encoding as
-     * <code>java.util.Date</code>.
+     * {@code java.util.Date}.
      *
      * @param baseMillis  the base date/time in milliseconds.
      *
@@ -266,7 +268,7 @@ public class RelativeDateFormat extends DateFormat {
      * Returns the string that is prepended to the format if the relative time
      * is positive.
      *
-     * @return The string (never <code>null</code>).
+     * @return The string (never {@code null}).
      *
      * @see #setPositivePrefix(String)
      *
@@ -280,30 +282,26 @@ public class RelativeDateFormat extends DateFormat {
      * Sets the string that is prepended to the format if the relative time is
      * positive.
      *
-     * @param prefix  the prefix (<code>null</code> not permitted).
+     * @param prefix  the prefix ({@code null} not permitted).
      *
      * @see #getPositivePrefix()
      *
      * @since 1.0.10
      */
     public void setPositivePrefix(String prefix) {
-        if (prefix == null) {
-            throw new IllegalArgumentException("Null 'prefix' argument.");
-        }
+        Args.nullNotPermitted(prefix, "prefix");
         this.positivePrefix = prefix;
     }
 
     /**
      * Sets the formatter for the days.
      *
-     * @param formatter  the formatter (<code>null</code> not permitted).
+     * @param formatter  the formatter ({@code null} not permitted).
      *
      * @since 1.0.11
      */
     public void setDayFormatter(NumberFormat formatter) {
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         this.dayFormatter = formatter;
     }
 
@@ -321,28 +319,24 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Sets the string that is appended to the day count.
      *
-     * @param suffix  the suffix (<code>null</code> not permitted).
+     * @param suffix  the suffix ({@code null} not permitted).
      *
      * @see #getDaySuffix()
      */
     public void setDaySuffix(String suffix) {
-        if (suffix == null) {
-            throw new IllegalArgumentException("Null 'suffix' argument.");
-        }
+        Args.nullNotPermitted(suffix, "suffix");
         this.daySuffix = suffix;
     }
 
     /**
      * Sets the formatter for the hours.
      *
-     * @param formatter  the formatter (<code>null</code> not permitted).
+     * @param formatter  the formatter ({@code null} not permitted).
      *
      * @since 1.0.11
      */
     public void setHourFormatter(NumberFormat formatter) {
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         this.hourFormatter = formatter;
     }
 
@@ -360,28 +354,24 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Sets the string that is appended to the hour count.
      *
-     * @param suffix  the suffix (<code>null</code> not permitted).
+     * @param suffix  the suffix ({@code null} not permitted).
      *
      * @see #getHourSuffix()
      */
     public void setHourSuffix(String suffix) {
-        if (suffix == null) {
-            throw new IllegalArgumentException("Null 'suffix' argument.");
-        }
+        Args.nullNotPermitted(suffix, "suffix");
         this.hourSuffix = suffix;
     }
 
     /**
      * Sets the formatter for the minutes.
      *
-     * @param formatter  the formatter (<code>null</code> not permitted).
+     * @param formatter  the formatter ({@code null} not permitted).
      *
      * @since 1.0.11
      */
     public void setMinuteFormatter(NumberFormat formatter) {
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         this.minuteFormatter = formatter;
     }
 
@@ -399,14 +389,12 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Sets the string that is appended to the minute count.
      *
-     * @param suffix  the suffix (<code>null</code> not permitted).
+     * @param suffix  the suffix ({@code null} not permitted).
      *
      * @see #getMinuteSuffix()
      */
     public void setMinuteSuffix(String suffix) {
-        if (suffix == null) {
-            throw new IllegalArgumentException("Null 'suffix' argument.");
-        }
+        Args.nullNotPermitted(suffix, "suffix");
         this.minuteSuffix = suffix;
     }
 
@@ -424,26 +412,22 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Sets the string that is appended to the second count.
      *
-     * @param suffix  the suffix (<code>null</code> not permitted).
+     * @param suffix  the suffix ({@code null} not permitted).
      *
      * @see #getSecondSuffix()
      */
     public void setSecondSuffix(String suffix) {
-        if (suffix == null) {
-            throw new IllegalArgumentException("Null 'suffix' argument.");
-        }
+        Args.nullNotPermitted(suffix, "suffix");
         this.secondSuffix = suffix;
     }
 
     /**
      * Sets the formatter for the seconds and milliseconds.
      *
-     * @param formatter  the formatter (<code>null</code> not permitted).
+     * @param formatter  the formatter ({@code null} not permitted).
      */
     public void setSecondFormatter(NumberFormat formatter) {
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         this.secondFormatter = formatter;
     }
 
@@ -457,6 +441,7 @@ public class RelativeDateFormat extends DateFormat {
      *
      * @return The formatted date.
      */
+    @Override
     public StringBuffer format(Date date, StringBuffer toAppendTo,
                                FieldPosition fieldPosition) {
         long currentMillis = date.getTime();
@@ -480,16 +465,17 @@ public class RelativeDateFormat extends DateFormat {
 
         toAppendTo.append(signPrefix);
         if (days != 0 || this.showZeroDays) {
-            toAppendTo.append(this.dayFormatter.format(days) + getDaySuffix());
+            toAppendTo.append(this.dayFormatter.format(days))
+                    .append(getDaySuffix());
         }
         if (hours != 0 || this.showZeroHours) {
-            toAppendTo.append(this.hourFormatter.format(hours)
-                    + getHourSuffix());
+            toAppendTo.append(this.hourFormatter.format(hours))
+                    .append(getHourSuffix());
         }
-        toAppendTo.append(this.minuteFormatter.format(minutes)
-                + getMinuteSuffix());
-        toAppendTo.append(this.secondFormatter.format(seconds)
-                + getSecondSuffix());
+        toAppendTo.append(this.minuteFormatter.format(minutes))
+                .append(getMinuteSuffix());
+        toAppendTo.append(this.secondFormatter.format(seconds))
+                .append(getSecondSuffix());
         return toAppendTo;
     }
 
@@ -499,8 +485,9 @@ public class RelativeDateFormat extends DateFormat {
      * @param source  the date string.
      * @param pos  the parse position.
      *
-     * @return <code>null</code>, as this method has not been implemented.
+     * @return {@code null}, as this method has not been implemented.
      */
+    @Override
     public Date parse(String source, ParsePosition pos) {
         return null;
     }
@@ -508,10 +495,11 @@ public class RelativeDateFormat extends DateFormat {
     /**
      * Tests this formatter for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -567,6 +555,7 @@ public class RelativeDateFormat extends DateFormat {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
         result = 37 * result
@@ -585,6 +574,7 @@ public class RelativeDateFormat extends DateFormat {
      *
      * @return A clone.
      */
+    @Override
     public Object clone() {
         RelativeDateFormat clone = (RelativeDateFormat) super.clone();
         clone.dayFormatter = (NumberFormat) this.dayFormatter.clone();
@@ -592,38 +582,4 @@ public class RelativeDateFormat extends DateFormat {
         return clone;
     }
 
-    /**
-     * Some test code.
-     *
-     * @param args  ignored.
-     */
-    public static void main(String[] args) {
-        GregorianCalendar c0 = new GregorianCalendar(2006, 10, 1, 0, 0, 0);
-        GregorianCalendar c1 = new GregorianCalendar(2006, 10, 1, 11, 37, 43);
-        c1.set(Calendar.MILLISECOND, 123);
-
-        System.out.println("Default: ");
-        RelativeDateFormat rdf = new RelativeDateFormat(c0.getTimeInMillis());
-        System.out.println(rdf.format(c1.getTime()));
-        System.out.println();
-
-        System.out.println("Hide milliseconds: ");
-        rdf.setSecondFormatter(new DecimalFormat("0"));
-        System.out.println(rdf.format(c1.getTime()));
-        System.out.println();
-
-        System.out.println("Show zero day output: ");
-        rdf.setShowZeroDays(true);
-        System.out.println(rdf.format(c1.getTime()));
-        System.out.println();
-
-        System.out.println("Alternative suffixes: ");
-        rdf.setShowZeroDays(false);
-        rdf.setDaySuffix(":");
-        rdf.setHourSuffix(":");
-        rdf.setMinuteSuffix(":");
-        rdf.setSecondSuffix("");
-        System.out.println(rdf.format(c1.getTime()));
-        System.out.println();
-    }
 }

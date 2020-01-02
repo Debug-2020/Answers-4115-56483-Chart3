@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------
  * Week.java
  * ---------
- * (C) Copyright 2001-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2001-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Aimin Han;
@@ -67,6 +67,8 @@
  *               instances (DG);
  * 19-Dec-2007 : Fixed bug in deprecated constructor (DG);
  * 16-Sep-2008 : Deprecated DEFAULT_TIME_ZONE (DG);
+ * 05-Jul-2012 : Replaced getTime().getTime() with getTimeInMillis() (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -77,13 +79,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.jfree.chart.util.Args;
 
 /**
  * A calendar week.  All years are considered to have 53 weeks, numbered from 1
  * to 53, although in many cases the 53rd week is empty.  Most of the time, the
  * 1st week of the year *begins* in the previous calendar year, but it always
  * finishes in the current year (this behaviour matches the workings of the
- * <code>GregorianCalendar</code> class).
+ * {@code GregorianCalendar} class).
  * <P>
  * This class is immutable, which is a requirement for all
  * {@link RegularTimePeriod} subclasses.
@@ -157,7 +160,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      * day-of-the-week that marks the beginning of the week, as well as the
      * minimal number of days in the first week of the year).
      *
-     * @param time  the time (<code>null</code> not permitted).
+     * @param time  the time ({@code null} not permitted).
      *
      * @see #Week(Date, TimeZone, Locale)
      */
@@ -170,36 +173,16 @@ public class Week extends RegularTimePeriod implements Serializable {
      * Creates a time period for the week in which the specified date/time
      * falls, calculated relative to the specified time zone.
      *
-     * @param time  the date/time (<code>null</code> not permitted).
-     * @param zone  the time zone (<code>null</code> not permitted).
-     *
-     * @deprecated As of 1.0.7, use {@link #Week(Date, TimeZone, Locale)}.
-     */
-    public Week(Date time, TimeZone zone) {
-        // defer argument checking...
-        this(time, zone, Locale.getDefault());
-    }
-
-    /**
-     * Creates a time period for the week in which the specified date/time
-     * falls, calculated relative to the specified time zone.
-     *
-     * @param time  the date/time (<code>null</code> not permitted).
-     * @param zone  the time zone (<code>null</code> not permitted).
-     * @param locale  the locale (<code>null</code> not permitted).
+     * @param time  the date/time ({@code null} not permitted).
+     * @param zone  the time zone ({@code null} not permitted).
+     * @param locale  the locale ({@code null} not permitted).
      *
      * @since 1.0.7
      */
     public Week(Date time, TimeZone zone, Locale locale) {
-        if (time == null) {
-            throw new IllegalArgumentException("Null 'time' argument.");
-        }
-        if (zone == null) {
-            throw new IllegalArgumentException("Null 'zone' argument.");
-        }
-        if (locale == null) {
-            throw new IllegalArgumentException("Null 'locale' argument.");
-        }
+        Args.nullNotPermitted(time, "time");
+        Args.nullNotPermitted(zone, "zone");
+        Args.nullNotPermitted(locale, "locale");
         Calendar calendar = Calendar.getInstance(zone, locale);
         calendar.setTime(time);
 
@@ -229,7 +212,7 @@ public class Week extends RegularTimePeriod implements Serializable {
     /**
      * Returns the year in which the week falls.
      *
-     * @return The year (never <code>null</code>).
+     * @return The year (never {@code null}).
      */
     public Year getYear() {
         return new Year(this.year);
@@ -263,6 +246,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @see #getLastMillisecond()
      */
+    @Override
     public long getFirstMillisecond() {
         return this.firstMillisecond;
     }
@@ -277,6 +261,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @see #getFirstMillisecond()
      */
+    @Override
     public long getLastMillisecond() {
         return this.lastMillisecond;
     }
@@ -285,10 +270,11 @@ public class Week extends RegularTimePeriod implements Serializable {
      * Recalculates the start date/time and end date/time for this time period
      * relative to the supplied calendar (which incorporates a time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @since 1.0.3
      */
+    @Override
     public void peg(Calendar calendar) {
         this.firstMillisecond = getFirstMillisecond(calendar);
         this.lastMillisecond = getLastMillisecond(calendar);
@@ -296,12 +282,13 @@ public class Week extends RegularTimePeriod implements Serializable {
 
     /**
      * Returns the week preceding this one.  This method will return
-     * <code>null</code> for some lower limit on the range of weeks (currently
+     * {@code null} for some lower limit on the range of weeks (currently
      * week 1, 1900).  For week 1 of any year, the previous week is always week
      * 53, but week 53 may not contain any days (you should check for this).
      *
-     * @return The preceding week (possibly <code>null</code>).
+     * @return The preceding week (possibly {@code null}).
      */
+    @Override
     public RegularTimePeriod previous() {
 
         Week result;
@@ -327,13 +314,14 @@ public class Week extends RegularTimePeriod implements Serializable {
 
     /**
      * Returns the week following this one.  This method will return
-     * <code>null</code> for some upper limit on the range of weeks (currently
+     * {@code null} for some upper limit on the range of weeks (currently
      * week 53, 9999).  For week 52 of any year, the following week is always
      * week 53, but week 53 may not contain any days (you should check for
      * this).
      *
-     * @return The following week (possibly <code>null</code>).
+     * @return The following week (possibly {@code null}).
      */
+    @Override
     public RegularTimePeriod next() {
 
         Week result;
@@ -366,6 +354,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @return The serial index number.
      */
+    @Override
     public long getSerialIndex() {
         return this.year * 53L + this.week;
     }
@@ -374,13 +363,14 @@ public class Week extends RegularTimePeriod implements Serializable {
      * Returns the first millisecond of the week, evaluated using the supplied
      * calendar (which determines the time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The first millisecond of the week.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getFirstMillisecond(Calendar calendar) {
         Calendar c = (Calendar) calendar.clone();
         c.clear();
@@ -391,21 +381,21 @@ public class Week extends RegularTimePeriod implements Serializable {
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        //return c.getTimeInMillis();  // this won't work for JDK 1.3
-        return c.getTime().getTime();
+        return c.getTimeInMillis();
     }
 
     /**
      * Returns the last millisecond of the week, evaluated using the supplied
      * calendar (which determines the time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The last millisecond of the week.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getLastMillisecond(Calendar calendar) {
         Calendar c = (Calendar) calendar.clone();
         c.clear();
@@ -416,8 +406,7 @@ public class Week extends RegularTimePeriod implements Serializable {
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        //return c.getTimeInMillis();  // this won't work for JDK 1.3
-        return c.getTime().getTime() - 1;
+        return c.getTimeInMillis() - 1;
     }
 
     /**
@@ -427,6 +416,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @return A string representing the week.
      */
+    @Override
     public String toString() {
         return "Week " + this.week + ", " + this.year;
     }
@@ -436,11 +426,12 @@ public class Week extends RegularTimePeriod implements Serializable {
      * true if the target is a Week instance representing the same week as this
      * object.  In all other cases, returns false.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> if week and year of this and object are the
+     * @return {@code true} if week and year of this and object are the
      *         same.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj == this) {
@@ -464,11 +455,12 @@ public class Week extends RegularTimePeriod implements Serializable {
      * Returns a hash code for this object instance.  The approach described by
      * Joshua Bloch in "Effective Java" has been used here:
      * <p>
-     * <code>http://developer.java.sun.com/developer/Books/effectivejava
-     * /Chapter3.pdf</code>
+     * {@code http://developer.java.sun.com/developer/Books/effectivejava
+     * /Chapter3.pdf}
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + this.week;
@@ -486,6 +478,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @return negative == before, zero == same, positive == after.
      */
+    @Override
     public int compareTo(Object o1) {
 
         int result;
@@ -526,7 +519,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @param s  string to parse.
      *
-     * @return <code>null</code> if the string is not parseable, the week
+     * @return {@code null} if the string is not parseable, the week
      *         otherwise.
      */
     public static Week parseWeek(String s) {
@@ -584,7 +577,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @param s  the string to parse.
      *
-     * @return <code>-1</code> if none of the characters was found, the
+     * @return {@code -1} if none of the characters was found, the
      *      index of the first occurrence otherwise.
      */
     private static int findSeparator(String s) {
@@ -608,7 +601,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      *
      * @param s  string to parse.
      *
-     * @return <code>null</code> if the string is not parseable, the year
+     * @return {@code null} if the string is not parseable, the year
      *         otherwise.
      */
     private static Year evaluateAsYear(String s) {
@@ -628,7 +621,7 @@ public class Week extends RegularTimePeriod implements Serializable {
      * Converts a string to a week.
      *
      * @param s  the string to parse.
-     * @return <code>-1</code> if the string does not contain a week number,
+     * @return {@code -1} if the string does not contain a week number,
      *         the number of the week otherwise.
      */
     private static int stringToWeek(String s) {

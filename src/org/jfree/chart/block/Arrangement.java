@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * Arrangement.java
@@ -37,15 +37,13 @@
  * 22-Oct-2004 : Version 1 (DG);
  * 11-Feb-2005 : Modified arrange() method to return Size2D (DG);
  * 22-Apr-2005 : Reordered arguments in arrange() method (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
 package org.jfree.chart.block;
 
 import java.awt.Graphics2D;
-
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.ui.Size2D;
 
 /**
  * An object that is responsible for arranging a collection of {@link Block}s
@@ -60,7 +58,7 @@ public interface Arrangement {
      * an opportunity to record the details if they are required.
      *
      * @param block  the block.
-     * @param key  the key (<code>null</code> permitted).
+     * @param key  the key ({@code null} permitted).
      */
     public void add(Block block, Object key);
 
@@ -68,7 +66,7 @@ public interface Arrangement {
      * Arranges the blocks within the specified container, subject to the given
      * constraint.
      *
-     * @param container  the container (<code>null</code> not permitted).
+     * @param container  the container ({@code null} not permitted).
      * @param g2  the graphics device.
      * @param constraint  the constraint.
      *

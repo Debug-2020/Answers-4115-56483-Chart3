@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * VectorSeriesCollection.java
  * ---------------------------
- * (C) Copyright 2007, 2008, by Object Refinery Limited.
+ * (C) Copyright 2007-2013, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -38,8 +38,8 @@
  * 24-May-2007 : Added indexOf(), removeSeries() and removeAllSeries()
  *               methods (DG);
  * 25-May-2007 : Moved from experimental to the main source tree (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 22-Apr-2008 : Implemented PublicCloneable (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -47,11 +47,11 @@ package org.jfree.data.xy;
 
 import java.io.Serializable;
 import java.util.List;
-
-import org.jfree.chart.event.DatasetChangeInfo;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.data.event.DatasetChangeEvent;
+
+import org.jfree.data.general.DatasetChangeEvent;
 
 /**
  * A collection of {@link VectorSeries} objects.
@@ -65,7 +65,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
     private List data;
 
     /**
-     * Creates a new instance of <code>VectorSeriesCollection</code>.
+     * Creates a new {@code VectorSeriesCollection} instance.
      */
     public VectorSeriesCollection() {
         this.data = new java.util.ArrayList();
@@ -75,36 +75,30 @@ public class VectorSeriesCollection extends AbstractXYDataset
      * Adds a series to the collection and sends a {@link DatasetChangeEvent}
      * to all registered listeners.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      */
     public void addSeries(VectorSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
+        Args.nullNotPermitted(series, "series");
         this.data.add(series);
         series.addChangeListener(this);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
      * Removes the specified series from the collection and sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      *
      * @return A boolean indicating whether the series has actually been
      *         removed.
      */
     public boolean removeSeries(VectorSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
+        Args.nullNotPermitted(series, "series");
         boolean removed = this.data.remove(series);
         if (removed) {
             series.removeChangeListener(this);
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
         return removed;
     }
@@ -124,8 +118,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
 
         // remove all the series from the collection and notify listeners.
         this.data.clear();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
 
     }
 
@@ -134,6 +127,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The series count.
      */
+    @Override
     public int getSeriesCount() {
         return this.data.size();
     }
@@ -145,8 +139,8 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The series.
      *
-     * @throws IllegalArgumentException if <code>series</code> is not in the
-     *     range <code>0</code> to <code>getSeriesCount() - 1</code>.
+     * @throws IllegalArgumentException if {@code series} is not in the
+     *     range {@code 0} to {@code getSeriesCount() - 1}.
      */
     public VectorSeries getSeries(int series) {
         if ((series < 0) || (series >= getSeriesCount())) {
@@ -158,14 +152,15 @@ public class VectorSeriesCollection extends AbstractXYDataset
     /**
      * Returns the key for a series.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
      *
      * @return The key for a series.
      *
-     * @throws IllegalArgumentException if <code>series</code> is not in the
+     * @throws IllegalArgumentException if {@code series} is not in the
      *     specified range.
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         // defer argument checking
         return getSeries(series).getKey();
@@ -175,14 +170,12 @@ public class VectorSeriesCollection extends AbstractXYDataset
      * Returns the index of the specified series, or -1 if that series is not
      * present in the dataset.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      *
      * @return The series index.
      */
     public int indexOf(VectorSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
+        Args.nullNotPermitted(series, "series");
         return this.data.indexOf(series);
     }
 
@@ -193,9 +186,10 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The item count.
      *
-     * @throws IllegalArgumentException if <code>series</code> is not in the
-     *     range <code>0</code> to <code>getSeriesCount() - 1</code>.
+     * @throws IllegalArgumentException if {@code series} is not in the
+     *     range {@code 0} to {@code getSeriesCount() - 1}.
      */
+    @Override
     public int getItemCount(int series) {
         // defer argument checking
         return getSeries(series).getItemCount();
@@ -209,6 +203,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The x-value.
      */
+    @Override
     public double getXValue(int series, int item) {
         VectorSeries s = (VectorSeries) this.data.get(series);
         VectorDataItem di = (VectorDataItem) s.getDataItem(item);
@@ -225,6 +220,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The x-value.
      */
+    @Override
     public Number getX(int series, int item) {
         return new Double(getXValue(series, item));
     }
@@ -237,6 +233,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The y-value.
      */
+    @Override
     public double getYValue(int series, int item) {
         VectorSeries s = (VectorSeries) this.data.get(series);
         VectorDataItem di = (VectorDataItem) s.getDataItem(item);
@@ -253,6 +250,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The y-value.
      */
+    @Override
     public Number getY(int series, int item) {
         return new Double(getYValue(series, item));
     }
@@ -263,8 +261,9 @@ public class VectorSeriesCollection extends AbstractXYDataset
      * @param series  the series index.
      * @param item  the item index.
      *
-     * @return The vector (possibly <code>null</code>).
+     * @return The vector (possibly {@code null}).
      */
+    @Override
     public Vector getVector(int series, int item) {
         VectorSeries s = (VectorSeries) this.data.get(series);
         VectorDataItem di = (VectorDataItem) s.getDataItem(item);
@@ -279,6 +278,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The x-component of the vector.
      */
+    @Override
     public double getVectorXValue(int series, int item) {
         VectorSeries s = (VectorSeries) this.data.get(series);
         VectorDataItem di = (VectorDataItem) s.getDataItem(item);
@@ -293,6 +293,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @return The y-component of the vector.
      */
+    @Override
     public double getVectorYValue(int series, int item) {
         VectorSeries s = (VectorSeries) this.data.get(series);
         VectorDataItem di = (VectorDataItem) s.getDataItem(item);
@@ -302,10 +303,11 @@ public class VectorSeriesCollection extends AbstractXYDataset
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -314,7 +316,7 @@ public class VectorSeriesCollection extends AbstractXYDataset
             return false;
         }
         VectorSeriesCollection that = (VectorSeriesCollection) obj;
-        return ObjectUtilities.equal(this.data, that.data);
+        return ObjectUtils.equal(this.data, that.data);
     }
 
     /**
@@ -324,10 +326,11 @@ public class VectorSeriesCollection extends AbstractXYDataset
      *
      * @throws CloneNotSupportedException if there is a problem.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         VectorSeriesCollection clone
                 = (VectorSeriesCollection) super.clone();
-        clone.data = (List) ObjectUtilities.deepClone(this.data);
+        clone.data = (List) ObjectUtils.deepClone(this.data);
         return clone;
     }
 

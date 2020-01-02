@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------------
  * CustomXYItemLabelGenerator.java
@@ -41,7 +41,6 @@
  * 17-Nov-2003 : Implemented PublicCloneable (DG);
  * 25-Feb-2004 : Renamed XYToolTipGenerator --> XYItemLabelGenerator (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -49,8 +48,8 @@ package org.jfree.chart.labels;
 
 import java.io.Serializable;
 import java.util.List;
-
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.xy.XYDataset;
 
 /**
@@ -141,10 +140,9 @@ public class CustomXYToolTipGenerator implements XYToolTipGenerator,
      *
      * @return The tooltip text.
      */
+    @Override
     public String generateToolTip(XYDataset data, int series, int item) {
-
         return getToolTipText(series, item);
-
     }
 
     /**
@@ -154,16 +152,16 @@ public class CustomXYToolTipGenerator implements XYToolTipGenerator,
      *
      * @throws CloneNotSupportedException if cloning is not supported.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
-
         CustomXYToolTipGenerator clone
             = (CustomXYToolTipGenerator) super.clone();
         if (this.toolTipSeries != null) {
             clone.toolTipSeries = new java.util.ArrayList(this.toolTipSeries);
         }
         return clone;
-
     }
+
     /**
      * Tests if this object is equal to another.
      *
@@ -171,12 +169,11 @@ public class CustomXYToolTipGenerator implements XYToolTipGenerator,
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
-
         if (obj == this) {
             return true;
         }
-
         if (obj instanceof CustomXYToolTipGenerator) {
             CustomXYToolTipGenerator generator = (CustomXYToolTipGenerator) obj;
             boolean result = true;
@@ -194,9 +191,7 @@ public class CustomXYToolTipGenerator implements XYToolTipGenerator,
             }
             return result;
         }
-
         return false;
-
     }
 
 }

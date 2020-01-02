@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * TimePeriod.java
@@ -46,7 +46,7 @@ import java.util.Date;
 
 /**
  * A period of time measured to millisecond precision using two instances of
- * <code>java.util.Date</code>.
+ * {@code java.util.Date}.
  */
 public interface TimePeriod extends Comparable {
 
@@ -54,7 +54,7 @@ public interface TimePeriod extends Comparable {
      * Returns the start date/time.  This will always be on or before the
      * end date.
      *
-     * @return The start date/time (never <code>null</code>).
+     * @return The start date/time (never {@code null}).
      */
     public Date getStart();
 
@@ -62,7 +62,7 @@ public interface TimePeriod extends Comparable {
      * Returns the end date/time.  This will always be on or after the
      * start date.
      *
-     * @return The end date/time (never <code>null</code>).
+     * @return The end date/time (never {@code null}).
      */
     public Date getEnd();
 

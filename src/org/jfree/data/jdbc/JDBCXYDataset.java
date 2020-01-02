@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * JDBCXYDataset.java
  * ------------------
- * (C) Copyright 2002-2008, by Bryan Scott and Contributors.
+ * (C) Copyright 2002-2009, by Bryan Scott and Contributors.
  *
  * Original Author:  Bryan Scott;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -66,7 +66,7 @@
  *               release (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 17-Oct-2006 : Deprecated unused methods - see bug 1578293 (DG);
- * 20-Jun-2007 : Removed deprecated code (DG);
+ * 19-May-2009 : Fixed FindBugs warnings, patch by Michal Wozniak (DG);
  *
  */
 
@@ -82,9 +82,9 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.data.Range;
 import org.jfree.data.RangeInfo;
+import org.jfree.data.general.Dataset;
 import org.jfree.data.xy.AbstractXYDataset;
 import org.jfree.data.xy.TableXYDataset;
 import org.jfree.data.xy.XYDataset;
@@ -178,8 +178,8 @@ public class JDBCXYDataset extends AbstractXYDataset
     }
 
     /**
-     * Returns <code>true</code> if the dataset represents time series data,
-     * and <code>false</code> otherwise.
+     * Returns {@code true} if the dataset represents time series data,
+     * and {@code false} otherwise.
      *
      * @return A boolean.
      */
@@ -351,7 +351,7 @@ public class JDBCXYDataset extends AbstractXYDataset
             }
 
             /// a kludge to make everything work when no rows returned
-            if (this.rows.size() == 0) {
+            if (this.rows.isEmpty()) {
                 ArrayList newRow = new ArrayList();
                 for (int column = 0; column < numberOfColumns; column++) {
                     if (columnTypes[column] != Types.NULL) {
@@ -367,11 +367,10 @@ public class JDBCXYDataset extends AbstractXYDataset
                 this.minValue = 0.0;
             }
             else {
-                ArrayList row = (ArrayList) this.rows.get(0);
                 this.maxValue = Double.NEGATIVE_INFINITY;
                 this.minValue = Double.POSITIVE_INFINITY;
                 for (int rowNum = 0; rowNum < this.rows.size(); ++rowNum) {
-                    row = (ArrayList) this.rows.get(rowNum);
+                    ArrayList row = (ArrayList) this.rows.get(rowNum);
                     for (int column = 1; column < numberOfColumns; column++) {
                         Object testValue = row.get(column);
                         if (testValue != null) {
@@ -388,8 +387,7 @@ public class JDBCXYDataset extends AbstractXYDataset
                 }
             }
 
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged(); // Tell the listeners a new table has arrived.
         }
         finally {
             if (resultSet != null) {
@@ -424,6 +422,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      *
      * @see XYDataset
      */
+    @Override
     public Number getX(int seriesIndex, int itemIndex) {
         ArrayList row = (ArrayList) this.rows.get(itemIndex);
         return (Number) row.get(0);
@@ -439,6 +438,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      *
      * @see XYDataset
      */
+    @Override
     public Number getY(int seriesIndex, int itemIndex) {
         ArrayList row = (ArrayList) this.rows.get(itemIndex);
         return (Number) row.get(seriesIndex + 1);
@@ -453,6 +453,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      *
      * @see XYDataset
      */
+    @Override
     public int getItemCount(int seriesIndex) {
         return this.rows.size();
     }
@@ -463,6 +464,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount() {
         return getItemCount(0);
     }
@@ -475,6 +477,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      * @see XYDataset
      * @see Dataset
      */
+    @Override
     public int getSeriesCount() {
         return this.columnNames.length;
     }
@@ -489,6 +492,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      * @see XYDataset
      * @see Dataset
      */
+    @Override
     public Comparable getSeriesKey(int seriesIndex) {
 
         if ((seriesIndex < this.columnNames.length)
@@ -523,6 +527,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      *
      * @return The minimum value.
      */
+    @Override
     public double getRangeLowerBound(boolean includeInterval) {
         return this.minValue;
     }
@@ -535,6 +540,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      *
      * @return The maximum value.
      */
+    @Override
     public double getRangeUpperBound(boolean includeInterval) {
         return this.maxValue;
     }
@@ -547,6 +553,7 @@ public class JDBCXYDataset extends AbstractXYDataset
      *
      * @return The range.
      */
+    @Override
     public Range getRangeBounds(boolean includeInterval) {
         return new Range(this.minValue, this.maxValue);
     }

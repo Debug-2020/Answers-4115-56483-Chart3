@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,23 +21,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------------
  * CategoryPointerAnnotation.java
  * ------------------------------
- * (C) Copyright 2006-2009, by Object Refinery Limited.
+ * (C) Copyright 2006-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
+ * Contributor(s):   Peter Kolb (patch 2809117);
  *
  * Changes:
  * --------
  * 02-Oct-2006 : Version 1 (DG);
  * 06-Mar-2007 : Implemented hashCode() (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 24-Jun-2009 : Fire change events (see patch 2809117 by PK) (DG);
+ * 30-Mar-2010 : Correct calculation of pointer line (see patch 2954302) (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -56,17 +57,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.AnnotationChangeEvent;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 import org.jfree.data.category.CategoryDataset;
 
 /**
@@ -138,7 +141,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
     /**
      * Creates a new label and arrow annotation.
      *
-     * @param label  the label (<code>null</code> permitted).
+     * @param label  the label ({@code null} permitted).
      * @param key  the category key.
      * @param value  the y-value (measured against the chart's range axis).
      * @param angle  the angle of the arrow's line (in radians).
@@ -154,7 +157,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
         this.arrowWidth = DEFAULT_ARROW_WIDTH;
         this.labelOffset = DEFAULT_LABEL_OFFSET;
         this.arrowStroke = new BasicStroke(1.0f);
-        this.arrowPaint = Color.black;
+        this.arrowPaint = Color.BLACK;
 
     }
 
@@ -276,6 +279,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
      */
     public void setArrowLength(double length) {
         this.arrowLength = length;
+        fireAnnotationChanged();
     }
 
     /**
@@ -305,7 +309,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
     /**
      * Returns the stroke used to draw the arrow line.
      *
-     * @return The arrow stroke (never <code>null</code>).
+     * @return The arrow stroke (never {@code null}).
      *
      * @see #setArrowStroke(Stroke)
      */
@@ -317,14 +321,12 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
      * Sets the stroke used to draw the arrow line and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      *
      * @see #getArrowStroke()
      */
     public void setArrowStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' not permitted.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.arrowStroke = stroke;
         fireAnnotationChanged();
     }
@@ -332,7 +334,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
     /**
      * Returns the paint used for the arrow.
      *
-     * @return The arrow paint (never <code>null</code>).
+     * @return The arrow paint (never {@code null}).
      *
      * @see #setArrowPaint(Paint)
      */
@@ -344,14 +346,12 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
      * Sets the paint used for the arrow and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param paint  the arrow paint (<code>null</code> not permitted).
+     * @param paint  the arrow paint ({@code null} not permitted).
      *
      * @see #getArrowPaint()
      */
     public void setArrowPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.arrowPaint = paint;
         fireAnnotationChanged();
     }
@@ -365,6 +365,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
      * @param domainAxis  the domain axis.
      * @param rangeAxis  the range axis.
      */
+    @Override
     public void draw(Graphics2D g2, CategoryPlot plot, Rectangle2D dataArea,
             CategoryAxis domainAxis, ValueAxis rangeAxis) {
 
@@ -411,7 +412,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
 
         g2.setStroke(this.arrowStroke);
         g2.setPaint(this.arrowPaint);
-        Line2D line = new Line2D.Double(startX, startY, endX, endY);
+        Line2D line = new Line2D.Double(startX, startY, arrowBaseX, arrowBaseY);
         g2.draw(line);
         g2.fill(arrow);
 
@@ -422,7 +423,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
             + Math.cos(this.angle) * (this.baseRadius + this.labelOffset);
         double labelY = j2DY
             + Math.sin(this.angle) * (this.baseRadius + this.labelOffset);
-        /* Rectangle2D hotspot = */ TextUtilities.drawAlignedString(getText(),
+        /* Rectangle2D hotspot = */ TextUtils.drawAlignedString(getText(),
                 g2, (float) labelX, (float) labelY, getTextAnchor());
         // TODO: implement the entity for the annotation
 
@@ -431,10 +432,11 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
     /**
      * Tests this annotation for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj == this) {
@@ -465,7 +467,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
         if (!this.arrowPaint.equals(that.arrowPaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.arrowStroke, that.arrowStroke)) {
+        if (!ObjectUtils.equal(this.arrowStroke, that.arrowStroke)) {
             return false;
         }
         if (this.labelOffset != that.labelOffset) {
@@ -479,6 +481,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
         long temp = Double.doubleToLongBits(this.angle);
@@ -491,7 +494,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
         result = 37 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(this.arrowWidth);
         result = 37 * result + (int) (temp ^ (temp >>> 32));
-        result = 37 * result + HashUtilities.hashCodeForPaint(this.arrowPaint);
+        result = 37 * result + HashUtils.hashCodeForPaint(this.arrowPaint);
         result = 37 * result + this.arrowStroke.hashCode();
         temp = Double.doubleToLongBits(this.labelOffset);
         result = 37 * result + (int) (temp ^ (temp >>> 32));
@@ -505,6 +508,7 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
      *
      * @throws CloneNotSupportedException  if the annotation can't be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -518,8 +522,8 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.arrowPaint, stream);
-        SerialUtilities.writeStroke(this.arrowStroke, stream);
+        SerialUtils.writePaint(this.arrowPaint, stream);
+        SerialUtils.writeStroke(this.arrowStroke, stream);
     }
 
     /**
@@ -533,8 +537,8 @@ public class CategoryPointerAnnotation extends CategoryTextAnnotation
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.arrowPaint = SerialUtilities.readPaint(stream);
-        this.arrowStroke = SerialUtilities.readStroke(stream);
+        this.arrowPaint = SerialUtils.readPaint(stream);
+        this.arrowStroke = SerialUtils.readStroke(stream);
     }
 
 }

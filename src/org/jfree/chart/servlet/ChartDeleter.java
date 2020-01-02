@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * ChartDeleter.java
  * -----------------
-  * (C) Copyright 2002-2008, by Richard Atkinson and Contributors.
+  * (C) Copyright 2002-2016, by Richard Atkinson and Contributors.
  *
  * Original Author:  Richard Atkinson;
  * Contributor(s):   -;
@@ -94,8 +94,9 @@ public class ChartDeleter implements HttpSessionBindingListener, Serializable {
      *
      * @param event  the session bind event.
      */
+    @Override
     public void valueBound(HttpSessionBindingEvent event) {
-        return;
+        // nothing to do
     }
 
     /**
@@ -105,8 +106,8 @@ public class ChartDeleter implements HttpSessionBindingListener, Serializable {
      *
      * @param event  the session unbind event.
      */
+    @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-
         Iterator iter = this.chartNames.listIterator();
         while (iter.hasNext()) {
             String filename = (String) iter.next();
@@ -117,8 +118,6 @@ public class ChartDeleter implements HttpSessionBindingListener, Serializable {
                 file.delete();
             }
         }
-        return;
-
     }
 
 }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,22 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * --------------
- * ShapeList.java
- * --------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes
- * -------
- * 13-Aug-2003 : Version 1 (DG);
- * 21-Jun-2007 : Copied from JCommon (DG);
- * 17-Jun-2008 : Fixed bug in equals() (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -96,7 +82,7 @@ public class ShapeList extends AbstractObjectList {
     /**
      * Tests the list for equality with another object (typically also a list).
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
@@ -111,7 +97,7 @@ public class ShapeList extends AbstractObjectList {
         ShapeList that = (ShapeList) obj;
         int listSize = size();
         for (int i = 0; i < listSize; i++) {
-           if (!ShapeUtilities.equal((Shape) get(i), (Shape) that.get(i))) {
+           if (!ShapeUtils.equal((Shape) get(i), (Shape) that.get(i))) {
                return false;
            }
         }
@@ -124,6 +110,7 @@ public class ShapeList extends AbstractObjectList {
      *
      * @return the hashcode
      */
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
@@ -138,13 +125,13 @@ public class ShapeList extends AbstractObjectList {
     private void writeObject(ObjectOutputStream stream) throws IOException {
 
         stream.defaultWriteObject();
-        int count = size();
+        final int count = size();
         stream.writeInt(count);
         for (int i = 0; i < count; i++) {
-            Shape shape = getShape(i);
+            final Shape shape = getShape(i);
             if (shape != null) {
                 stream.writeInt(i);
-                SerialUtilities.writeShape(shape, stream);
+                SerialUtils.writeShape(shape, stream);
             }
             else {
                 stream.writeInt(-1);
@@ -161,19 +148,19 @@ public class ShapeList extends AbstractObjectList {
      * @throws IOException  if there is an I/O error.
      * @throws ClassNotFoundException  if there is a classpath problem.
      */
-    private void readObject(ObjectInputStream stream) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 
         stream.defaultReadObject();
-        int count = stream.readInt();
+        final int count = stream.readInt();
         for (int i = 0; i < count; i++) {
-            int index = stream.readInt();
+            final int index = stream.readInt();
             if (index != -1) {
-                setShape(index, SerialUtilities.readShape(stream));
+                setShape(index, SerialUtils.readShape(stream));
             }
         }
 
     }
 
 }
+
 

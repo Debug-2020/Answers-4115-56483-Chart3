@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * SunJPEGEncoderAdapter.java
  * --------------------------
- * (C) Copyright 2004-2008, by Richard Atkinson and Contributors.
+ * (C) Copyright 2004-2016, by Richard Atkinson and Contributors.
  *
  * Original Author:  Richard Atkinson;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -38,9 +38,10 @@
  * 01-Nov-2005 : To remove the dependency on non-supported APIs, use ImageIO
  *               instead of com.sun.image.codec.jpeg.JPEGImageEncoder - this
  *               adapter will only be available on JDK 1.4 or later (DG);
- * ------------- JFREECHART 1.0.0 ---------------------------------------------
+ * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 20-Jul-2006 : Pass quality setting to ImageIO. Also increased default
  *               value to 0.95 (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -57,6 +58,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
+import org.jfree.chart.util.Args;
 
 /**
  * Adapter class for the Sun JPEG Encoder.  The {@link ImageEncoderFactory}
@@ -69,7 +71,7 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
     private float quality = 0.95f;
 
     /**
-     * Creates a new <code>SunJPEGEncoderAdapter</code> instance.
+     * Creates a new {@code SunJPEGEncoderAdapter} instance.
      */
     public SunJPEGEncoderAdapter() {
     }
@@ -83,6 +85,7 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
      *
      * @see #setQuality(float)
      */
+    @Override
     public float getQuality() {
         return this.quality;
     }
@@ -95,6 +98,7 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
      *
      * @see #getQuality()
      */
+    @Override
     public void setQuality(float quality) {
         if (quality < 0.0f || quality > 1.0f) {
             throw new IllegalArgumentException(
@@ -104,11 +108,12 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
     }
 
     /**
-     * Returns <code>false</code> always, indicating that this encoder does not
+     * Returns {@code false} always, indicating that this encoder does not
      * encode alpha transparency.
      *
-     * @return <code>false</code>.
+     * @return {@code false}.
      */
+    @Override
     public boolean isEncodingAlpha() {
         return false;
     }
@@ -119,6 +124,7 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
      *
      * @param encodingAlpha  ignored.
      */
+    @Override
     public void setEncodingAlpha(boolean encodingAlpha) {
         //  No op
     }
@@ -126,15 +132,16 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
     /**
      * Encodes an image in JPEG format.
      *
-     * @param bufferedImage  the image to be encoded (<code>null</code> not
+     * @param bufferedImage  the image to be encoded ({@code null} not
      *     permitted).
      *
      * @return The byte[] that is the encoded image.
      *
      * @throws IOException if there is an I/O problem.
-     * @throws NullPointerException if <code>bufferedImage</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code bufferedImage} is
+     *     {@code null}.
      */
+    @Override
     public byte[] encode(BufferedImage bufferedImage) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         encode(bufferedImage, outputStream);
@@ -144,23 +151,19 @@ public class SunJPEGEncoderAdapter implements ImageEncoder {
     /**
      * Encodes an image in JPEG format and writes it to an output stream.
      *
-     * @param bufferedImage  the image to be encoded (<code>null</code> not
+     * @param bufferedImage  the image to be encoded ({@code null} not
      *     permitted).
      * @param outputStream  the OutputStream to write the encoded image to
-     *     (<code>null</code> not permitted).
+     *     ({@code null} not permitted).
      *
      * @throws IOException if there is an I/O problem.
-     * @throws NullPointerException if <code>bufferedImage</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code bufferedImage} is {@code null}.
      */
+    @Override
     public void encode(BufferedImage bufferedImage, OutputStream outputStream)
             throws IOException {
-        if (bufferedImage == null) {
-            throw new IllegalArgumentException("Null 'image' argument.");
-        }
-        if (outputStream == null) {
-            throw new IllegalArgumentException("Null 'outputStream' argument.");
-        }
+        Args.nullNotPermitted(bufferedImage, "bufferedImage");
+        Args.nullNotPermitted(outputStream, "outputStream");
         Iterator iterator = ImageIO.getImageWritersByFormatName("jpeg");
         ImageWriter writer = (ImageWriter) iterator.next();
         ImageWriteParam p = writer.getDefaultWriteParam();

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,45 +21,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
- * ---------------
- * TableOrder.java
- * ---------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes:
- * --------
- * 29-Jan-2004 : Version 1 (DG);
- * 21-Jun-2007 : Copied from JCommon (DG);
  */
 
 package org.jfree.chart.util;
 
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-
 /**
  * Used to indicate the processing order for a table (by row or by column).
  */
-public final class TableOrder implements Serializable {
-
-    /** For serialization. */
-    private static final long serialVersionUID = 525193294068177057L;
+public enum TableOrder {
 
     /** By row. */
-    public static final TableOrder BY_ROW = new TableOrder("TableOrder.BY_ROW");
+    BY_ROW("TableOrder.BY_ROW"),
 
     /** By column. */
-    public static final TableOrder BY_COLUMN
-            = new TableOrder("TableOrder.BY_COLUMN");
+    BY_COLUMN("TableOrder.BY_COLUMN");
 
     /** The name. */
-    private String name;
+    private final String name;
 
     /**
      * Private constructor.
@@ -75,56 +56,9 @@ public final class TableOrder implements Serializable {
      *
      * @return The string.
      */
+    @Override
     public String toString() {
         return this.name;
     }
-
-    /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
-     *
-     * @param obj  the other object.
-     *
-     * @return A boolean.
-     */
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof TableOrder)) {
-            return false;
-        }
-        TableOrder that = (TableOrder) obj;
-        if (!this.name.equals(that.name)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Returns a hash code value for the object.
-     *
-     * @return The hashcode
-     */
-    public int hashCode() {
-        return this.name.hashCode();
-    }
-
-    /**
-     * Ensures that serialization returns the unique instances.
-     *
-     * @return The object.
-     *
-     * @throws ObjectStreamException if there is a problem.
-     */
-    private Object readResolve() throws ObjectStreamException {
-        if (this.equals(TableOrder.BY_ROW)) {
-            return TableOrder.BY_ROW;
-        }
-        else if (this.equals(TableOrder.BY_COLUMN)) {
-            return TableOrder.BY_COLUMN;
-        }
-        return null;
-    }
-
 }
+

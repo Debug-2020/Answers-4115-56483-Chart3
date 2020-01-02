@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * DefaultTableXYDataset.java
  * --------------------------
- * (C) Copyright 2003-2009, by Richard Atkinson and Contributors.
+ * (C) Copyright 2003-2016, by Richard Atkinson and Contributors.
  *
  * Original Author:  Richard Atkinson;
  * Contributor(s):   Jody Brownell;
@@ -55,10 +55,10 @@
  *               release (DG);
  * 05-Oct-2005 : Made the interval delegate a dataset listener (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 22-Apr-2008 : Implemented PublicCloneable (DG);
  * 10-Jun-2009 : Simplified getX() and getY() (DG);
- *
+ * 02-Jul-2013 : Use ParamChecks (DG);
+ * 
  */
 
 package org.jfree.data.xy;
@@ -67,15 +67,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
-import org.jfree.chart.event.DatasetChangeInfo;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.DomainInfo;
 import org.jfree.data.Range;
-import org.jfree.data.event.DatasetChangeEvent;
-import org.jfree.data.general.DatasetUtilities;
-import org.jfree.data.event.SeriesChangeEvent;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetUtils;
+import org.jfree.data.general.SeriesChangeEvent;
 
 /**
  * An {@link XYDataset} where every series shares the same x-values (required
@@ -115,7 +115,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @param autoPrune  a flag that controls whether or not x-values are
      *                   removed whenever the corresponding y-values are all
-     *                   <code>null</code>.
+     *                   {@code null}.
      */
     public DefaultTableXYDataset(boolean autoPrune) {
         this.autoPrune = autoPrune;
@@ -127,7 +127,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
 
     /**
      * Returns the flag that controls whether or not x-values are removed from
-     * the dataset when the corresponding y-values are all <code>null</code>.
+     * the dataset when the corresponding y-values are all {@code null}.
      *
      * @return A boolean.
      */
@@ -140,12 +140,10 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      * to all registered listeners.  The series should be configured to NOT
      * allow duplicate x-values.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      */
     public void addSeries(XYSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
+        Args.nullNotPermitted(series, "series");
         if (series.getAllowDuplicateXValues()) {
             throw new IllegalArgumentException(
                 "Cannot accept XYSeries that allow duplicate values. "
@@ -155,20 +153,17 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
         updateXPoints(series);
         this.data.add(series);
         series.addChangeListener(this);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
      * Adds any unique x-values from 'series' to the dataset, and also adds any
      * x-values that are in the dataset but not in 'series' to the series.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      */
     private void updateXPoints(XYSeries series) {
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' not permitted.");
-        }
+        Args.nullNotPermitted(series, "series");
         HashSet seriesXPoints = new HashSet();
         boolean savedState = this.propagateEvents;
         this.propagateEvents = false;
@@ -215,6 +210,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The series count.
      */
+    @Override
     public int getSeriesCount() {
         return this.data.size();
     }
@@ -224,6 +220,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The number of x values in the dataset.
      */
+    @Override
     public int getItemCount() {
         if (this.xPoints == null) {
             return 0;
@@ -238,7 +235,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @param series  the series (zero-based index).
      *
-     * @return The series (never <code>null</code>).
+     * @return The series (never {@code null}).
      */
     public XYSeries getSeries(int series) {
         if ((series < 0) || (series >= getSeriesCount())) {
@@ -254,6 +251,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The key for a series.
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         // check arguments...delegated
         return getSeries(series).getKey();
@@ -266,6 +264,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The number of items in the specified series.
      */
+    @Override
     public int getItemCount(int series) {
         // check arguments...delegated
         return getSeries(series).getItemCount();
@@ -279,9 +278,11 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The x-value for the specified series and item.
      */
+    @Override
     public Number getX(int series, int item) {
         XYSeries s = (XYSeries) this.data.get(series);
         return s.getX(item);
+
     }
 
     /**
@@ -292,6 +293,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The starting X value.
      */
+    @Override
     public Number getStartX(int series, int item) {
         return this.intervalDelegate.getStartX(series, item);
     }
@@ -304,6 +306,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The ending X value.
      */
+    @Override
     public Number getEndX(int series, int item) {
         return this.intervalDelegate.getEndX(series, item);
     }
@@ -315,8 +318,9 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      * @param index  the index of the item of interest (zero-based).
      *
      * @return The y-value for the specified series and item (possibly
-     *         <code>null</code>).
+     *         {@code null}).
      */
+    @Override
     public Number getY(int series, int index) {
         XYSeries s = (XYSeries) this.data.get(series);
         return s.getY(index);
@@ -330,6 +334,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The starting Y value.
      */
+    @Override
     public Number getStartY(int series, int item) {
         return getY(series, item);
     }
@@ -342,6 +347,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The ending Y value.
      */
+    @Override
     public Number getEndY(int series, int item) {
         return getY(series, item);
     }
@@ -362,34 +368,25 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
         // Remove all the series from the collection and notify listeners.
         this.data.clear();
         this.xPoints.clear();
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
      * Removes a series from the collection and sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param series  the series (<code>null</code> not permitted).
+     * @param series  the series ({@code null} not permitted).
      */
     public void removeSeries(XYSeries series) {
-
-        // check arguments...
-        if (series == null) {
-            throw new IllegalArgumentException("Null 'series' argument.");
-        }
-
-        // remove the series...
+        Args.nullNotPermitted(series, "series");
         if (this.data.contains(series)) {
             series.removeChangeListener(this);
             this.data.remove(series);
-            if (this.data.size() == 0) {
+            if (this.data.isEmpty()) {
                 this.xPoints.clear();
             }
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
-
     }
 
     /**
@@ -409,14 +406,13 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
         XYSeries s = (XYSeries) this.data.get(series);
         s.removeChangeListener(this);
         this.data.remove(series);
-        if (this.data.size() == 0) {
+        if (this.data.isEmpty()) {
             this.xPoints.clear();
         }
         else if (this.autoPrune) {
             prune();
         }
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
 
     }
 
@@ -426,9 +422,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      * @param x  the x-value.
      */
     public void removeAllValuesForX(Number x) {
-        if (x == null) {
-            throw new IllegalArgumentException("Null 'x' argument.");
-        }
+        Args.nullNotPermitted(x, "x");
         boolean savedState = this.propagateEvents;
         this.propagateEvents = false;
         for (int s = 0; s < this.data.size(); s++) {
@@ -437,13 +431,12 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
         }
         this.propagateEvents = savedState;
         this.xPoints.remove(x);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
-     * Returns <code>true</code> if all the y-values for the specified x-value
-     * are <code>null</code> and <code>false</code> otherwise.
+     * Returns {@code true} if all the y-values for the specified x-value
+     * are {@code null} and {@code false} otherwise.
      *
      * @param x  the x-value.
      *
@@ -460,7 +453,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
     }
 
     /**
-     * Removes all x-values for which all the y-values are <code>null</code>.
+     * Removes all x-values for which all the y-values are {@code null}.
      */
     public void prune() {
         HashSet hs = (HashSet) this.xPoints.clone();
@@ -480,21 +473,22 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @param event  information about the change.
      */
+    @Override
     public void seriesChanged(SeriesChangeEvent event) {
         if (this.propagateEvents) {
             updateXPoints();
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
     /**
      * Tests this collection for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -512,7 +506,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
         if (!this.intervalDelegate.equals(that.intervalDelegate)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.data, that.data)) {
+        if (!ObjectUtils.equal(this.data, that.data)) {
             return false;
         }
         return true;
@@ -523,6 +517,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         result = (this.data != null ? this.data.hashCode() : 0);
@@ -541,10 +536,11 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      * @throws CloneNotSupportedException if there is some reason that cloning
      *     cannot be performed.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultTableXYDataset clone = (DefaultTableXYDataset) super.clone();
         int seriesCount = this.data.size();
-        clone.data = new ArrayList(seriesCount);
+        clone.data = new java.util.ArrayList(seriesCount);
         for (int i = 0; i < seriesCount; i++) {
             XYSeries series = (XYSeries) this.data.get(i);
             clone.data.add(series.clone());
@@ -568,6 +564,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The minimum value.
      */
+    @Override
     public double getDomainLowerBound(boolean includeInterval) {
         return this.intervalDelegate.getDomainLowerBound(includeInterval);
     }
@@ -580,6 +577,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The maximum value.
      */
+    @Override
     public double getDomainUpperBound(boolean includeInterval) {
         return this.intervalDelegate.getDomainUpperBound(includeInterval);
     }
@@ -592,12 +590,13 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The range.
      */
+    @Override
     public Range getDomainBounds(boolean includeInterval) {
         if (includeInterval) {
             return this.intervalDelegate.getDomainBounds(includeInterval);
         }
         else {
-            return DatasetUtilities.iterateDomainBounds(this, includeInterval);
+            return DatasetUtils.iterateDomainBounds(this, includeInterval);
         }
     }
 
@@ -620,8 +619,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      */
     public void setIntervalPositionFactor(double d) {
         this.intervalDelegate.setIntervalPositionFactor(d);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -637,12 +635,11 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      * Sets the interval width to a fixed value, and sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param d  the new interval width (must be > 0).
+     * @param d  the new interval width (must be &gt; 0).
      */
     public void setIntervalWidth(double d) {
         this.intervalDelegate.setFixedIntervalWidth(d);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -663,8 +660,7 @@ public class DefaultTableXYDataset extends AbstractIntervalXYDataset
      */
     public void setAutoWidth(boolean b) {
         this.intervalDelegate.setAutoWidth(b);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
 }

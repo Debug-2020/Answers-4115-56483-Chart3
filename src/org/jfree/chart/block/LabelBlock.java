@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * LabelBlock.java
  * ---------------
- * (C) Copyright 2004-2009, by Object Refinery Limited.
+ * (C) Copyright 2004-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Pierre-Marie Le Biot;
@@ -45,6 +45,7 @@
  * 20-Jul-2006 : Fixed entity area in draw() method (DG);
  * 16-Mar-2007 : Fixed serialization when using GradientPaint (DG);
  * 10-Feb-2009 : Added alignment fields (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -65,13 +66,14 @@ import org.jfree.chart.entity.ChartEntity;
 import org.jfree.chart.entity.StandardEntityCollection;
 import org.jfree.chart.text.TextBlock;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleAnchor;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A block containing a label.
@@ -94,14 +96,14 @@ public class LabelBlock extends AbstractBlock
     /** The font. */
     private Font font;
 
-    /** The tool tip text (can be <code>null</code>). */
+    /** The tool tip text (can be {@code null}). */
     private String toolTipText;
 
-    /** The URL text (can be <code>null</code>). */
+    /** The URL text (can be {@code null}). */
     private String urlText;
 
     /** The default color. */
-    public static final Paint DEFAULT_PAINT = Color.black;
+    public static final Paint DEFAULT_PAINT = Color.BLACK;
 
     /** The paint. */
     private transient Paint paint;
@@ -123,17 +125,17 @@ public class LabelBlock extends AbstractBlock
     /**
      * Creates a new label block.
      *
-     * @param label  the label (<code>null</code> not permitted).
+     * @param label  the label ({@code null} not permitted).
      */
     public LabelBlock(String label) {
-        this(label, new Font("Tahoma", Font.PLAIN, 10), DEFAULT_PAINT);
+        this(label, new Font("SansSerif", Font.PLAIN, 10), DEFAULT_PAINT);
     }
 
     /**
      * Creates a new label block.
      *
-     * @param text  the text for the label (<code>null</code> not permitted).
-     * @param font  the font (<code>null</code> not permitted).
+     * @param text  the text for the label ({@code null} not permitted).
+     * @param font  the font ({@code null} not permitted).
      */
     public LabelBlock(String text, Font font) {
         this(text, font, DEFAULT_PAINT);
@@ -142,14 +144,14 @@ public class LabelBlock extends AbstractBlock
     /**
      * Creates a new label block.
      *
-     * @param text  the text for the label (<code>null</code> not permitted).
-     * @param font  the font (<code>null</code> not permitted).
-     * @param paint the paint (<code>null</code> not permitted).
+     * @param text  the text for the label ({@code null} not permitted).
+     * @param font  the font ({@code null} not permitted).
+     * @param paint the paint ({@code null} not permitted).
      */
     public LabelBlock(String text, Font font, Paint paint) {
         this.text = text;
         this.paint = paint;
-        this.label = TextUtilities.createTextBlock(text, font, this.paint);
+        this.label = TextUtils.createTextBlock(text, font, this.paint);
         this.font = font;
         this.toolTipText = null;
         this.urlText = null;
@@ -160,7 +162,7 @@ public class LabelBlock extends AbstractBlock
     /**
      * Returns the font.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setFont(Font)
      */
@@ -171,22 +173,20 @@ public class LabelBlock extends AbstractBlock
     /**
      * Sets the font and regenerates the label.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getFont()
      */
     public void setFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.font = font;
-        this.label = TextUtilities.createTextBlock(this.text, font, this.paint);
+        this.label = TextUtils.createTextBlock(this.text, font, this.paint);
     }
 
     /**
      * Returns the paint.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setPaint(Paint)
      */
@@ -197,23 +197,21 @@ public class LabelBlock extends AbstractBlock
     /**
      * Sets the paint and regenerates the label.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPaint()
      */
     public void setPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.paint = paint;
-        this.label = TextUtilities.createTextBlock(this.text, this.font,
+        this.label = TextUtils.createTextBlock(this.text, this.font,
                 this.paint);
     }
 
     /**
      * Returns the tool tip text.
      *
-     * @return The tool tip text (possibly <code>null</code>).
+     * @return The tool tip text (possibly {@code null}).
      *
      * @see #setToolTipText(String)
      */
@@ -224,7 +222,7 @@ public class LabelBlock extends AbstractBlock
     /**
      * Sets the tool tip text.
      *
-     * @param text  the text (<code>null</code> permitted).
+     * @param text  the text ({@code null} permitted).
      *
      * @see #getToolTipText()
      */
@@ -235,7 +233,7 @@ public class LabelBlock extends AbstractBlock
     /**
      * Returns the URL text.
      *
-     * @return The URL text (possibly <code>null</code>).
+     * @return The URL text (possibly {@code null}).
      *
      * @see #setURLText(String)
      */
@@ -246,7 +244,7 @@ public class LabelBlock extends AbstractBlock
     /**
      * Sets the URL text.
      *
-     * @param text  the text (<code>null</code> permitted).
+     * @param text  the text ({@code null} permitted).
      *
      * @see #getURLText()
      */
@@ -257,7 +255,7 @@ public class LabelBlock extends AbstractBlock
     /**
      * Returns the content alignment point.
      *
-     * @return The content alignment point (never <code>null</code>).
+     * @return The content alignment point (never {@code null}).
      *
      * @since 1.0.13
      */
@@ -269,19 +267,17 @@ public class LabelBlock extends AbstractBlock
      * Sets the content alignment point.
      *
      * @param anchor  the anchor used to determine the alignment point (never
-     *         <code>null</code>).
+     *         {@code null}).
      *
      * @since 1.0.13
      */
     public void setContentAlignmentPoint(TextBlockAnchor anchor) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(anchor, "anchor");
         this.contentAlignmentPoint = anchor;
     }
 
     /**
-     * Returns the text anchor (never <code>null</code>).
+     * Returns the text anchor (never {@code null}).
      *
      * @return The text anchor.
      *
@@ -294,7 +290,7 @@ public class LabelBlock extends AbstractBlock
     /**
      * Sets the text anchor.
      *
-     * @param anchor  the anchor (<code>null</code> not permitted).
+     * @param anchor  the anchor ({@code null} not permitted).
      *
      * @since 1.0.13
      */
@@ -307,10 +303,11 @@ public class LabelBlock extends AbstractBlock
      * returns the block size.
      *
      * @param g2  the graphics device.
-     * @param constraint  the constraint (<code>null</code> not permitted).
+     * @param constraint  the constraint ({@code null} not permitted).
      *
-     * @return The block size (in Java2D units, never <code>null</code>).
+     * @return The block size (in Java2D units, never {@code null}).
      */
+    @Override
     public Size2D arrange(Graphics2D g2, RectangleConstraint constraint) {
         g2.setFont(this.font);
         Size2D s = this.label.calculateDimensions(g2);
@@ -324,6 +321,7 @@ public class LabelBlock extends AbstractBlock
      * @param g2  the graphics device.
      * @param area  the area.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area) {
         draw(g2, area, null);
     }
@@ -333,10 +331,11 @@ public class LabelBlock extends AbstractBlock
      *
      * @param g2  the graphics device.
      * @param area  the area.
-     * @param params  ignored (<code>null</code> permitted).
+     * @param params  ignored ({@code null} permitted).
      *
-     * @return Always <code>null</code>.
+     * @return Always {@code null}.
      */
+    @Override
     public Object draw(Graphics2D g2, Rectangle2D area, Object params) {
         area = trimMargin(area);
         drawBorder(g2, area);
@@ -356,7 +355,7 @@ public class LabelBlock extends AbstractBlock
         }
         g2.setPaint(this.paint);
         g2.setFont(this.font);
-        Point2D pt = RectangleAnchor.coordinates(area, this.textAnchor);
+        Point2D pt = this.textAnchor.getAnchorPoint(area);
         this.label.draw(g2, (float) pt.getX(), (float) pt.getY(),
                 this.contentAlignmentPoint);
         BlockResult result = null;
@@ -373,13 +372,13 @@ public class LabelBlock extends AbstractBlock
     }
 
     /**
-     * Tests this <code>LabelBlock</code> for equality with an arbitrary
-     * object.
+     * Tests this {@code LabelBlock} for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof LabelBlock)) {
             return false;
@@ -391,13 +390,13 @@ public class LabelBlock extends AbstractBlock
         if (!this.font.equals(that.font)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.paint, that.paint)) {
+        if (!PaintUtils.equal(this.paint, that.paint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.toolTipText, that.toolTipText)) {
+        if (!ObjectUtils.equal(this.toolTipText, that.toolTipText)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.urlText, that.urlText)) {
+        if (!ObjectUtils.equal(this.urlText, that.urlText)) {
             return false;
         }
         if (!this.contentAlignmentPoint.equals(that.contentAlignmentPoint)) {
@@ -410,12 +409,13 @@ public class LabelBlock extends AbstractBlock
     }
 
     /**
-     * Returns a clone of this <code>LabelBlock</code> instance.
+     * Returns a clone of this {@code LabelBlock} instance.
      *
      * @return A clone.
      *
      * @throws CloneNotSupportedException if there is a problem cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -429,7 +429,7 @@ public class LabelBlock extends AbstractBlock
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
+        SerialUtils.writePaint(this.paint, stream);
     }
 
     /**
@@ -443,7 +443,7 @@ public class LabelBlock extends AbstractBlock
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
+        this.paint = SerialUtils.readPaint(stream);
     }
 
 }

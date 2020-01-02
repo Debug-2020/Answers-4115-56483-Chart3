@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------
  * LegendItemEntity.java
@@ -39,7 +39,6 @@
  *               Serializable (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 18-May-2007 : Added dataset and seriesKey fields (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -47,8 +46,8 @@ package org.jfree.chart.entity;
 
 import java.awt.Shape;
 import java.io.Serializable;
+import org.jfree.chart.util.ObjectUtils;
 
-import org.jfree.chart.util.ObjectUtilities;
 import org.jfree.data.general.Dataset;
 
 /**
@@ -73,6 +72,9 @@ public class LegendItemEntity extends ChartEntity
      * @since 1.0.6
      */
     private Comparable seriesKey;
+
+    /** The series index. */
+    private int seriesIndex;
 
     /**
      * Creates a legend item entity.
@@ -137,10 +139,11 @@ public class LegendItemEntity extends ChartEntity
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -149,10 +152,13 @@ public class LegendItemEntity extends ChartEntity
             return false;
         }
         LegendItemEntity that = (LegendItemEntity) obj;
-        if (!ObjectUtilities.equal(this.seriesKey, that.seriesKey)) {
+        if (!ObjectUtils.equal(this.seriesKey, that.seriesKey)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.dataset, that.dataset)) {
+        if (this.seriesIndex != that.seriesIndex) {
+            return false;
+        }
+        if (!ObjectUtils.equal(this.dataset, that.dataset)) {
             return false;
         }
         return super.equals(obj);
@@ -166,6 +172,7 @@ public class LegendItemEntity extends ChartEntity
      * @throws CloneNotSupportedException if there is a problem cloning the
      *         object.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -174,8 +181,9 @@ public class LegendItemEntity extends ChartEntity
      * Returns a string representing this object (useful for debugging
      * purposes).
      *
-     * @return A string (never <code>null</code>).
+     * @return A string (never {@code null}).
      */
+    @Override
     public String toString() {
         return "LegendItemEntity: seriesKey=" + this.seriesKey
                 + ", dataset=" + this.dataset;

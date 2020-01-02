@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------
  * Values2D.java
@@ -65,10 +65,10 @@ public interface Values2D {
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      *
-     * @throws IndexOutOfBoundsException if the <code>row</code>
-     *         or <code>column</code> is out of bounds.
+     * @throws IndexOutOfBoundsException if the {@code row}
+     *         or {@code column} is out of bounds.
      */
     public Number getValue(int row, int column);
 

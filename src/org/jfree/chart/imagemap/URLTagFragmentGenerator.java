@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------------
  * URLTagFragmentGenerator.java
@@ -53,7 +53,7 @@ public interface URLTagFragmentGenerator {
     /**
      * Generates a URL string to go in an HTML image map.
      * <br><br>
-     * Note that the <code>urlText</code> will be created by a URL generator
+     * Note that the {@code urlText} will be created by a URL generator
      * (such as {@link CategoryURLGenerator}, {@link PieURLGenerator},
      * {@link XYURLGenerator} or {@link XYZURLGenerator}) and that generator is
      * responsible for ensuring that the URL text is correctly escaped.

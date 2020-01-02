@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------------------
  * AbstractCategoryItemLabelGenerator.java
  * ---------------------------------------
- * (C) Copyright 2005-2008, by Object Refinery Limited.
+ * (C) Copyright 2005-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,8 +39,8 @@
  * 17-May-2005 : Added percentage to item array (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 03-May-2006 : Added new constructor (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 23-Nov-2007 : Implemented hashCode() (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -51,10 +51,11 @@ import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.data.DataUtilities;
+import org.jfree.data.DataUtils;
 import org.jfree.data.category.CategoryDataset;
 
 /**
@@ -69,7 +70,7 @@ public abstract class AbstractCategoryItemLabelGenerator
     private static final long serialVersionUID = -7108591260223293197L;
 
     /**
-     * The label format string used by a <code>MessageFormat</code> object to
+     * The label format string used by a {@code MessageFormat} object to
      * combine the standard items:  {0} = series name, {1} = category,
      * {2} = value, {3} = value as a percentage of the column total.
      */
@@ -99,9 +100,9 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Creates a label generator with the specified number formatter.
      *
-     * @param labelFormat  the label format string (<code>null</code> not
+     * @param labelFormat  the label format string ({@code null} not
      *                     permitted).
-     * @param formatter  the number formatter (<code>null</code> not permitted).
+     * @param formatter  the number formatter ({@code null} not permitted).
      */
     protected AbstractCategoryItemLabelGenerator(String labelFormat,
                                                  NumberFormat formatter) {
@@ -111,26 +112,19 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Creates a label generator with the specified number formatter.
      *
-     * @param labelFormat  the label format string (<code>null</code> not
+     * @param labelFormat  the label format string ({@code null} not
      *                     permitted).
-     * @param formatter  the number formatter (<code>null</code> not permitted).
-     * @param percentFormatter  the percent formatter (<code>null</code> not
+     * @param formatter  the number formatter ({@code null} not permitted).
+     * @param percentFormatter  the percent formatter ({@code null} not
      *     permitted).
      *
      * @since 1.0.2
      */
     protected AbstractCategoryItemLabelGenerator(String labelFormat,
             NumberFormat formatter, NumberFormat percentFormatter) {
-        if (labelFormat == null) {
-            throw new IllegalArgumentException("Null 'labelFormat' argument.");
-        }
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
-        if (percentFormatter == null) {
-            throw new IllegalArgumentException(
-                    "Null 'percentFormatter' argument.");
-        }
+        Args.nullNotPermitted(labelFormat, "labelFormat");
+        Args.nullNotPermitted(formatter, "formatter");
+        Args.nullNotPermitted(percentFormatter, "percentFormatter");
         this.labelFormat = labelFormat;
         this.numberFormat = formatter;
         this.percentFormat = percentFormatter;
@@ -141,18 +135,14 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Creates a label generator with the specified date formatter.
      *
-     * @param labelFormat  the label format string (<code>null</code> not
+     * @param labelFormat  the label format string ({@code null} not
      *                     permitted).
-     * @param formatter  the date formatter (<code>null</code> not permitted).
+     * @param formatter  the date formatter ({@code null} not permitted).
      */
     protected AbstractCategoryItemLabelGenerator(String labelFormat,
-                                                 DateFormat formatter) {
-        if (labelFormat == null) {
-            throw new IllegalArgumentException("Null 'labelFormat' argument.");
-        }
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+            DateFormat formatter) {
+        Args.nullNotPermitted(labelFormat, "labelFormat");
+        Args.nullNotPermitted(formatter, "formatter");
         this.labelFormat = labelFormat;
         this.numberFormat = null;
         this.percentFormat = NumberFormat.getPercentInstance();
@@ -163,7 +153,7 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Generates a label for the specified row.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param row  the row index (zero-based).
      *
      * @return The label.
@@ -175,7 +165,7 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Generates a label for the specified row.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param column  the column index (zero-based).
      *
      * @return The label.
@@ -187,7 +177,7 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Returns the label format string.
      *
-     * @return The label format string (never <code>null</code>).
+     * @return The label format string (never {@code null}).
      */
     public String getLabelFormat() {
         return this.labelFormat;
@@ -196,7 +186,7 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Returns the number formatter.
      *
-     * @return The number formatter (possibly <code>null</code>).
+     * @return The number formatter (possibly {@code null}).
      */
     public NumberFormat getNumberFormat() {
         return this.numberFormat;
@@ -205,7 +195,7 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Returns the date formatter.
      *
-     * @return The date formatter (possibly <code>null</code>).
+     * @return The date formatter (possibly {@code null}).
      */
     public DateFormat getDateFormat() {
         return this.dateFormat;
@@ -214,18 +204,16 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Generates a for the specified item.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
     protected String generateLabelString(CategoryDataset dataset,
                                          int row, int column) {
-        if (dataset == null) {
-            throw new IllegalArgumentException("Null 'dataset' argument.");
-        }
-        String result = null;
+        Args.nullNotPermitted(dataset, "dataset");
+        String result;
         Object[] items = createItemArray(dataset, row, column);
         result = MessageFormat.format(this.labelFormat, items);
         return result;
@@ -236,11 +224,11 @@ public abstract class AbstractCategoryItemLabelGenerator
      * Creates the array of items that can be passed to the
      * {@link MessageFormat} class for creating labels.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param row  the row index (zero-based).
      * @param column  the column index (zero-based).
      *
-     * @return The items (never <code>null</code>).
+     * @return The items (never {@code null}).
      */
     protected Object[] createItemArray(CategoryDataset dataset,
                                        int row, int column) {
@@ -260,7 +248,7 @@ public abstract class AbstractCategoryItemLabelGenerator
             result[2] = this.nullValueString;
         }
         if (value != null) {
-            double total = DataUtilities.calculateColumnTotal(dataset, column);
+            double total = DataUtils.calculateColumnTotal(dataset, column);
             double percent = value.doubleValue() / total;
             result[3] = this.percentFormat.format(percent);
         }
@@ -271,10 +259,11 @@ public abstract class AbstractCategoryItemLabelGenerator
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -288,10 +277,10 @@ public abstract class AbstractCategoryItemLabelGenerator
         if (!this.labelFormat.equals(that.labelFormat)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.dateFormat, that.dateFormat)) {
+        if (!ObjectUtils.equal(this.dateFormat, that.dateFormat)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.numberFormat, that.numberFormat)) {
+        if (!ObjectUtils.equal(this.numberFormat, that.numberFormat)) {
             return false;
         }
         return true;
@@ -302,13 +291,14 @@ public abstract class AbstractCategoryItemLabelGenerator
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 127;
-        result = HashUtilities.hashCode(result, this.labelFormat);
-        result = HashUtilities.hashCode(result, this.nullValueString);
-        result = HashUtilities.hashCode(result, this.dateFormat);
-        result = HashUtilities.hashCode(result, this.numberFormat);
-        result = HashUtilities.hashCode(result, this.percentFormat);
+        result = HashUtils.hashCode(result, this.labelFormat);
+        result = HashUtils.hashCode(result, this.nullValueString);
+        result = HashUtils.hashCode(result, this.dateFormat);
+        result = HashUtils.hashCode(result, this.numberFormat);
+        result = HashUtils.hashCode(result, this.percentFormat);
         return result;
     }
 
@@ -319,6 +309,7 @@ public abstract class AbstractCategoryItemLabelGenerator
      *
      * @throws CloneNotSupportedException  should not happen.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         AbstractCategoryItemLabelGenerator clone
             = (AbstractCategoryItemLabelGenerator) super.clone();

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------------
  * PieSectionLabelGenerator.java
@@ -58,7 +58,7 @@ import java.awt.Paint;
 import java.awt.font.TextAttribute;
 import java.text.AttributedString;
 
-import org.jfree.data.pie.PieDataset;
+import org.jfree.data.general.PieDataset;
 
 /**
  * Interface for a label generator for plots that use data from
@@ -69,16 +69,16 @@ public interface PieSectionLabelGenerator {
     /**
      * Generates a label for a pie section.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
-     * @param key  the section key (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param key  the section key ({@code null} not permitted).
      *
-     * @return The label (possibly <code>null</code>).
+     * @return The label (possibly {@code null}).
      */
     public String generateSectionLabel(PieDataset dataset, Comparable key);
 
     /**
      * Generates an attributed label for the specified series, or
-     * <code>null</code> if no attributed label is available (in which case,
+     * {@code null} if no attributed label is available (in which case,
      * the string returned by
      * {@link #generateSectionLabel(PieDataset, Comparable)} will
      * provide the fallback).  Only certain attributes are recognised by the
@@ -101,7 +101,7 @@ public interface PieSectionLabelGenerator {
      * @param dataset  the dataset.
      * @param key  the key.
      *
-     * @return An attributed label (possibly <code>null</code>).
+     * @return An attributed label (possibly {@code null}).
      */
     public AttributedString generateAttributedSectionLabel(PieDataset dataset,
                                                            Comparable key);

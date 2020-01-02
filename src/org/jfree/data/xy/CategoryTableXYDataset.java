@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * CategoryTableXYDataset.java
  * ---------------------------
- * (C) Copyright 2004-2008, by Andreas Schroeder and Contributors.
+ * (C) Copyright 2004-2016, by Andreas Schroeder and Contributors.
  *
  * Original Author:  Andreas Schroeder;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -43,18 +43,18 @@
  * 05-Oct-2005 : Made the interval delegate a dataset change listener (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
  * 22-Apr-2008 : Implemented PublicCloneable, and fixed clone() method (DG);
+ * 18-Oct-2011 : Fixed bug 3190615 - added clear() method (DG);
  *
  */
 
 package org.jfree.data.xy;
 
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.util.PublicCloneable;
 import org.jfree.data.DefaultKeyedValues2D;
 import org.jfree.data.DomainInfo;
 import org.jfree.data.Range;
-import org.jfree.data.event.DatasetChangeEvent;
-import org.jfree.data.general.DatasetUtilities;
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetUtils;
 
 /**
  * An implementation variant of the {@link TableXYDataset} where every series
@@ -114,8 +114,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
     public void add(Number x, Number y, String seriesName, boolean notify) {
         this.values.addValue(y, (Comparable) x, seriesName);
         if (notify) {
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
@@ -139,17 +138,27 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
     public void remove(Number x, String seriesName, boolean notify) {
         this.values.removeValue((Comparable) x, seriesName);
         if (notify) {
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
     }
 
+    /**
+     * Clears all data from the dataset and sends a {@link DatasetChangeEvent}
+     * to all registered listeners.
+     * 
+     * @since 1.0.14
+     */
+    public void clear() {
+        this.values.clear();
+        fireDatasetChanged();
+    }
 
     /**
      * Returns the number of series in the collection.
      *
      * @return The series count.
      */
+    @Override
     public int getSeriesCount() {
         return this.values.getColumnCount();
     }
@@ -161,6 +170,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The key for a series.
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         return this.values.getColumnKey(series);
     }
@@ -170,6 +180,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount() {
         return this.values.getRowCount();
     }
@@ -182,6 +193,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount(int series) {
         return getItemCount();  // all series have the same number of items in
                                 // this dataset
@@ -195,6 +207,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The value.
      */
+    @Override
     public Number getX(int series, int item) {
         return (Number) this.values.getRowKey(item);
     }
@@ -207,6 +220,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The starting X value.
      */
+    @Override
     public Number getStartX(int series, int item) {
         return this.intervalDelegate.getStartX(series, item);
     }
@@ -219,6 +233,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The ending X value.
      */
+    @Override
     public Number getEndX(int series, int item) {
         return this.intervalDelegate.getEndX(series, item);
     }
@@ -229,8 +244,9 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      * @param series  the series index (zero-based).
      * @param item  the item index (zero-based).
      *
-     * @return The y value (possibly <code>null</code>).
+     * @return The y value (possibly {@code null}).
      */
+    @Override
     public Number getY(int series, int item) {
         return this.values.getValue(item, series);
     }
@@ -243,6 +259,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The starting Y value.
      */
+    @Override
     public Number getStartY(int series, int item) {
         return getY(series, item);
     }
@@ -255,6 +272,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The ending Y value.
      */
+    @Override
     public Number getEndY(int series, int item) {
         return getY(series, item);
     }
@@ -267,6 +285,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The minimum value.
      */
+    @Override
     public double getDomainLowerBound(boolean includeInterval) {
         return this.intervalDelegate.getDomainLowerBound(includeInterval);
     }
@@ -279,6 +298,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The maximum value.
      */
+    @Override
     public double getDomainUpperBound(boolean includeInterval) {
         return this.intervalDelegate.getDomainUpperBound(includeInterval);
     }
@@ -291,12 +311,13 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      *
      * @return The range.
      */
+    @Override
     public Range getDomainBounds(boolean includeInterval) {
         if (includeInterval) {
             return this.intervalDelegate.getDomainBounds(includeInterval);
         }
         else {
-            return DatasetUtilities.iterateDomainBounds(this, includeInterval);
+            return DatasetUtils.iterateDomainBounds(this, includeInterval);
         }
     }
 
@@ -319,8 +340,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      */
     public void setIntervalPositionFactor(double d) {
         this.intervalDelegate.setIntervalPositionFactor(d);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -336,12 +356,11 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      * Sets the interval width to a fixed value, and sends a
      * {@link DatasetChangeEvent} to all registered listeners.
      *
-     * @param d  the new interval width (must be > 0).
+     * @param d  the new interval width (must be &gt; 0).
      */
     public void setIntervalWidth(double d) {
         this.intervalDelegate.setFixedIntervalWidth(d);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -361,17 +380,17 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      */
     public void setAutoWidth(boolean b) {
         this.intervalDelegate.setAutoWidth(b);
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
      * Tests this dataset for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof CategoryTableXYDataset)) {
             return false;
@@ -394,6 +413,7 @@ public class CategoryTableXYDataset extends AbstractIntervalXYDataset
      * @throws CloneNotSupportedException if there is some reason that cloning
      *     cannot be performed.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         CategoryTableXYDataset clone = (CategoryTableXYDataset) super.clone();
         clone.values = (DefaultKeyedValues2D) this.values.clone();

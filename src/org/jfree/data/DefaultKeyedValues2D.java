@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * DefaultKeyedValues2D.java
  * -------------------------
- * (C) Copyright 2002-2008, by Object Refinery Limited.
+ * (C) Copyright 2002-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Andreas Schroeder;
@@ -49,11 +49,11 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 18-Jan-2007 : Fixed bug in getValue() method (DG);
  * 30-Mar-2007 : Fixed bug 1690654, problem with removeValue() (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 21-Nov-2007 : Fixed bug (1835955) in removeColumn(Comparable) method (DG);
  * 23-Nov-2007 : Added argument checks to removeRow(Comparable) to make it
  *               consistent with the removeRow(Comparable) method (DG);
- *
+ * 03-Jul-2013 : Use ParamChecks (DG);
+ * 
  */
 
 package org.jfree.data;
@@ -62,8 +62,8 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -115,6 +115,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      *
      * @see #getColumnCount()
      */
+    @Override
     public int getRowCount() {
         return this.rowKeys.size();
     }
@@ -126,6 +127,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      *
      * @see #getRowCount()
      */
+    @Override
     public int getColumnCount() {
         return this.columnKeys.size();
     }
@@ -140,6 +142,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      *
      * @see #getValue(Comparable, Comparable)
      */
+    @Override
     public Number getValue(int row, int column) {
         Number result = null;
         DefaultKeyedValues rowData = (DefaultKeyedValues) this.rows.get(row);
@@ -165,6 +168,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      * @see #getRowIndex(Comparable)
      * @see #getColumnKey(int)
      */
+    @Override
     public Comparable getRowKey(int row) {
         return (Comparable) this.rowKeys.get(row);
     }
@@ -172,17 +176,16 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
     /**
      * Returns the row index for a given key.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The row index.
      *
      * @see #getRowKey(int)
      * @see #getColumnIndex(Comparable)
      */
+    @Override
     public int getRowIndex(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         if (this.sortRowKeys) {
             return Collections.binarySearch(this.rowKeys, key);
         }
@@ -198,6 +201,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      *
      * @see #getColumnKeys()
      */
+    @Override
     public List getRowKeys() {
         return Collections.unmodifiableList(this.rowKeys);
     }
@@ -213,6 +217,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      * @see #getColumnIndex(Comparable)
      * @see #getRowKey(int)
      */
+    @Override
     public Comparable getColumnKey(int column) {
         return (Comparable) this.columnKeys.get(column);
     }
@@ -220,17 +225,16 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
     /**
      * Returns the column index for a given key.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @return The column index.
      *
      * @see #getColumnKey(int)
      * @see #getRowIndex(Comparable)
      */
+    @Override
     public int getColumnIndex(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         return this.columnKeys.indexOf(key);
     }
 
@@ -241,6 +245,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      *
      * @see #getRowKeys()
      */
+    @Override
     public List getColumnKeys() {
         return Collections.unmodifiableList(this.columnKeys);
     }
@@ -250,21 +255,18 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      * throw an {@link UnknownKeyException} if either key is not defined in the
      * data structure.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
-     * @return The value (possibly <code>null</code>).
+     * @return The value (possibly {@code null}).
      *
      * @see #addValue(Number, Comparable, Comparable)
      * @see #removeValue(Comparable, Comparable)
      */
+    @Override
     public Number getValue(Comparable rowKey, Comparable columnKey) {
-        if (rowKey == null) {
-            throw new IllegalArgumentException("Null 'rowKey' argument.");
-        }
-        if (columnKey == null) {
-            throw new IllegalArgumentException("Null 'columnKey' argument.");
-        }
+        Args.nullNotPermitted(rowKey, "rowKey");
+        Args.nullNotPermitted(columnKey, "columnKey");
 
         // check that the column key is defined in the 2D structure
         if (!(this.columnKeys.contains(columnKey))) {
@@ -291,9 +293,9 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      * Adds a value to the table.  Performs the same function as
      * #setValue(Number, Comparable, Comparable).
      *
-     * @param value  the value (<code>null</code> permitted).
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param value  the value ({@code null} permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #setValue(Number, Comparable, Comparable)
      * @see #removeValue(Comparable, Comparable)
@@ -307,9 +309,9 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
     /**
      * Adds or updates a value.
      *
-     * @param value  the value (<code>null</code> permitted).
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param value  the value ({@code null} permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #addValue(Number, Comparable, Comparable)
      * @see #removeValue(Comparable, Comparable)
@@ -344,12 +346,12 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
     }
 
     /**
-     * Removes a value from the table by setting it to <code>null</code>.  If
+     * Removes a value from the table by setting it to {@code null}.  If
      * all the values in the specified row and/or column are now
-     * <code>null</code>, the row and/or column is removed from the table.
+     * {@code null}, the row and/or column is removed from the table.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @see #addValue(Number, Comparable, Comparable)
      */
@@ -417,18 +419,16 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
     /**
      * Removes a row from the table.
      *
-     * @param rowKey  the row key (<code>null</code> not permitted).
+     * @param rowKey  the row key ({@code null} not permitted).
      *
      * @see #removeRow(int)
      * @see #removeColumn(Comparable)
      *
-     * @throws UnknownKeyException if <code>rowKey</code> is not defined in the
+     * @throws UnknownKeyException if {@code rowKey} is not defined in the
      *         table.
      */
     public void removeRow(Comparable rowKey) {
-        if (rowKey == null) {
-            throw new IllegalArgumentException("Null 'rowKey' argument.");
-        }
+        Args.nullNotPermitted(rowKey, "rowKey");
         int index = getRowIndex(rowKey);
         if (index >= 0) {
             removeRow(index);
@@ -454,20 +454,18 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
     /**
      * Removes a column from the table.
      *
-     * @param columnKey  the column key (<code>null</code> not permitted).
+     * @param columnKey  the column key ({@code null} not permitted).
      *
      * @throws UnknownKeyException if the table does not contain a column with
      *     the specified key.
-     * @throws IllegalArgumentException if <code>columnKey</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code columnKey} is
+     *     {@code null}.
      *
      * @see #removeColumn(int)
      * @see #removeRow(Comparable)
      */
     public void removeColumn(Comparable columnKey) {
-        if (columnKey == null) {
-            throw new IllegalArgumentException("Null 'columnKey' argument.");
-        }
+        Args.nullNotPermitted(columnKey, "columnKey");
         if (!this.columnKeys.contains(columnKey)) {
             throw new UnknownKeyException("Unknown key: " + columnKey);
         }
@@ -494,10 +492,11 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
     /**
      * Tests if this object is equal to another.
      *
-     * @param o  the other object (<code>null</code> permitted).
+     * @param o  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object o) {
 
         if (o == null) {
@@ -551,6 +550,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         result = this.rowKeys.hashCode();
@@ -567,6 +567,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
      * @throws CloneNotSupportedException  this class will not throw this
      *         exception, but subclasses (if any) might.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultKeyedValues2D clone = (DefaultKeyedValues2D) super.clone();
         // for the keys, a shallow copy should be fine because keys
@@ -575,7 +576,7 @@ public class DefaultKeyedValues2D implements KeyedValues2D, PublicCloneable,
         clone.rowKeys = new java.util.ArrayList(this.rowKeys);
 
         // but the row data requires a deep copy
-        clone.rows = (List) ObjectUtilities.deepClone(this.rows);
+        clone.rows = (List) ObjectUtils.deepClone(this.rows);
         return clone;
     }
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------------------
  * DefaultBoxAndWhiskerXYDataset.java
@@ -63,12 +63,11 @@ package org.jfree.data.statistics;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.jfree.chart.util.ObjectUtils;
 
-import org.jfree.chart.event.DatasetChangeInfo;
-import org.jfree.chart.util.ObjectUtilities;
 import org.jfree.data.Range;
 import org.jfree.data.RangeInfo;
-import org.jfree.data.event.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.xy.AbstractXYDataset;
 
 /**
@@ -136,11 +135,12 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      * of values included. Currently only used to ensure farout coefficient is
      * greater than the outlier coefficient
      *
-     * @return A <code>double</code> representing the value used to calculate
+     * @return A {@code double} representing the value used to calculate
      *         outliers.
      *
      * @see #setOutlierCoefficient(double)
      */
+    @Override
     public double getOutlierCoefficient() {
         return this.outlierCoefficient;
     }
@@ -148,7 +148,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
     /**
      * Sets the value used as the outlier coefficient
      *
-     * @param outlierCoefficient  being a <code>double</code> representing the
+     * @param outlierCoefficient  being a {@code double} representing the
      *                            value used to calculate outliers.
      *
      * @see #getOutlierCoefficient()
@@ -161,11 +161,12 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      * Returns the value used as the farout coefficient. The farout coefficient
      * allows the calculation of which values will be off the graph.
      *
-     * @return A <code>double</code> representing the value used to calculate
+     * @return A {@code double} representing the value used to calculate
      *         farouts.
      *
      * @see #setFaroutCoefficient(double)
      */
+    @Override
     public double getFaroutCoefficient() {
         return this.faroutCoefficient;
     }
@@ -174,7 +175,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      * Sets the value used as the farouts coefficient. The farout coefficient
      * must b greater than the outlier coefficient.
      *
-     * @param faroutCoefficient being a <code>double</code> representing the
+     * @param faroutCoefficient being a {@code double} representing the
      *                          value used to calculate farouts.
      *
      * @see #getFaroutCoefficient()
@@ -198,6 +199,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The number of series.
      */
+    @Override
     public int getSeriesCount() {
         return 1;
     }
@@ -209,6 +211,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The number of items in the specified series.
      */
+    @Override
     public int getItemCount(int series) {
         return this.dates.size();
     }
@@ -217,8 +220,8 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      * Adds an item to the dataset and sends a {@link DatasetChangeEvent} to
      * all registered listeners.
      *
-     * @param date  the date (<code>null</code> not permitted).
-     * @param item  the item (<code>null</code> not permitted).
+     * @param date  the date ({@code null} not permitted).
+     * @param item  the item ({@code null} not permitted).
      */
     public void add(Date date, BoxAndWhiskerItem item) {
         this.dates.add(date);
@@ -243,8 +246,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
         }
         this.rangeBounds = new Range(this.minimumRangeValue.doubleValue(),
                 this.maximumRangeValue.doubleValue());
-        fireDatasetChanged(new DatasetChangeInfo());
-        //TODO: fill in real change info
+        fireDatasetChanged();
     }
 
     /**
@@ -254,6 +256,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The name of this series.
      */
+    @Override
     public Comparable getSeriesKey(int i) {
         return this.seriesKey;
     }
@@ -282,6 +285,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The x-value.
      */
+    @Override
     public Number getX(int series, int item) {
         return new Long(((Date) this.dates.get(item)).getTime());
     }
@@ -311,6 +315,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The y-value.
      */
+    @Override
     public Number getY(int series, int item) {
         return getMeanValue(series, item);
     }
@@ -323,6 +328,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The mean for the specified series and item.
      */
+    @Override
     public Number getMeanValue(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -340,6 +346,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The median-value for the specified series and item.
      */
+    @Override
     public Number getMedianValue(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -357,6 +364,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The Q1 median-value for the specified series and item.
      */
+    @Override
     public Number getQ1Value(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -374,6 +382,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The Q3 median-value for the specified series and item.
      */
+    @Override
     public Number getQ3Value(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -391,6 +400,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The min-value for the specified series and item.
      */
+    @Override
     public Number getMinRegularValue(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -408,6 +418,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The max-value for the specified series and item.
      */
+    @Override
     public Number getMaxRegularValue(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -422,8 +433,9 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return A <code>Number</code> representing the maximum non-farout value.
+     * @return A {@code Number} representing the maximum non-farout value.
      */
+    @Override
     public Number getMinOutlier(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -440,8 +452,9 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return A <code>Number</code> representing the maximum non-farout value.
+     * @return A {@code Number} representing the maximum non-farout value.
      */
+    @Override
     public Number getMaxOutlier(int series, int item) {
         Number result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -452,13 +465,15 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
     }
 
     /**
-     * Returns an array of outliers for the specified series and item.
+     * Returns a list of outliers for the specified series and item.
      *
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return The array of outliers for the specified series and item.
+     * @return The list of outliers for the specified series and item
+     *         (possibly {@code null}).
      */
+    @Override
     public List getOutliers(int series, int item) {
         List result = null;
         BoxAndWhiskerItem stats = (BoxAndWhiskerItem) this.items.get(item);
@@ -476,6 +491,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The minimum value.
      */
+    @Override
     public double getRangeLowerBound(boolean includeInterval) {
         double result = Double.NaN;
         if (this.minimumRangeValue != null) {
@@ -492,6 +508,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The maximum value.
      */
+    @Override
     public double getRangeUpperBound(boolean includeInterval) {
         double result = Double.NaN;
         if (this.maximumRangeValue != null) {
@@ -508,6 +525,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @return The range.
      */
+    @Override
     public Range getRangeBounds(boolean includeInterval) {
         return this.rangeBounds;
     }
@@ -515,10 +533,11 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
     /**
      * Tests this dataset for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -528,7 +547,7 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
         }
         DefaultBoxAndWhiskerXYDataset that
                 = (DefaultBoxAndWhiskerXYDataset) obj;
-        if (!ObjectUtilities.equal(this.seriesKey, that.seriesKey)) {
+        if (!ObjectUtils.equal(this.seriesKey, that.seriesKey)) {
             return false;
         }
         if (!this.dates.equals(that.dates)) {
@@ -547,11 +566,12 @@ public class DefaultBoxAndWhiskerXYDataset extends AbstractXYDataset
      *
      * @throws CloneNotSupportedException  if the cloning is not supported.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         DefaultBoxAndWhiskerXYDataset clone
                 = (DefaultBoxAndWhiskerXYDataset) super.clone();
-        clone.dates = new ArrayList(this.dates);
-        clone.items = new ArrayList(this.items);
+        clone.dates = new java.util.ArrayList(this.dates);
+        clone.items = new java.util.ArrayList(this.items);
         return clone;
     }
 

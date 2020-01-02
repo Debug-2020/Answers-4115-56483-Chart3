@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * HexNumberFormat.java
@@ -112,6 +112,7 @@ public class HexNumberFormat extends NumberFormat {
      *
      * @return The string buffer.
      */
+    @Override
     public StringBuffer format(double number, StringBuffer toAppendTo,
             FieldPosition pos) {
         return format((long) number, toAppendTo, pos);
@@ -127,6 +128,7 @@ public class HexNumberFormat extends NumberFormat {
      *
      * @return The string buffer.
      */
+    @Override
     public StringBuffer format(long number, StringBuffer toAppendTo,
             FieldPosition pos) {
         String l_hex = Long.toHexString(number).toUpperCase();
@@ -145,13 +147,14 @@ public class HexNumberFormat extends NumberFormat {
 
     /**
      * Parsing is not implemented, so this method always returns
-     * <code>null</code>.
+     * {@code null}.
      *
      * @param source  ignored.
      * @param parsePosition  ignored.
      *
-     * @return Always <code>null</code>.
+     * @return Always {@code null}.
      */
+    @Override
     public Number parse (String source, ParsePosition parsePosition) {
         return null; // don't bother with parsing
     }

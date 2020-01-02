@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * LongNeedle.java
  * ---------------
- * (C) Copyright 2002-2008, by the Australian Antarctic Division and
+ * (C) Copyright 2002-2016, by the Australian Antarctic Division and
  *                          Contributors.
  *
  * Original Author:  Bryan Scott (for the Australian Antarctic Division);
@@ -46,17 +46,16 @@
 package org.jfree.chart.needle;
 
 import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.Shape;
 import java.io.Serializable;
 
 /**
  * A needle that is represented by a long line.
  */
-public class LongNeedle extends MeterNeedle
-                        implements Cloneable, Serializable {
+public class LongNeedle extends MeterNeedle implements Cloneable, Serializable {
 
     /** For serialization. */
     private static final long serialVersionUID = -4319985779783688159L;
@@ -77,8 +76,9 @@ public class LongNeedle extends MeterNeedle
      * @param rotate  the rotation point.
      * @param angle  the angle.
      */
+    @Override
     protected void drawNeedle(Graphics2D g2, Rectangle2D plotArea,
-                              Point2D rotate, double angle) {
+            Point2D rotate, double angle) {
 
         GeneralPath shape1 = new GeneralPath();
         GeneralPath shape2 = new GeneralPath();
@@ -124,7 +124,6 @@ public class LongNeedle extends MeterNeedle
             s3 = shape3.createTransformedShape(transform);
         }
 
-
         if (getHighlightPaint() != null) {
             g2.setPaint(getHighlightPaint());
             g2.fill(s3);
@@ -135,7 +134,6 @@ public class LongNeedle extends MeterNeedle
             g2.fill(s1);
             g2.fill(s2);
         }
-
 
         if (getOutlinePaint() != null) {
             g2.setStroke(getOutlineStroke());
@@ -149,10 +147,11 @@ public class LongNeedle extends MeterNeedle
     /**
      * Tests another object for equality with this object.
      *
-     * @param obj  the object to test (<code>null</code> permitted).
+     * @param obj  the object to test ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -168,6 +167,7 @@ public class LongNeedle extends MeterNeedle
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
@@ -177,9 +177,10 @@ public class LongNeedle extends MeterNeedle
      *
      * @return A clone.
      *
-     * @throws CloneNotSupportedException if the <code>LongNeedle</code>
+     * @throws CloneNotSupportedException if the {@code LongNeedle}
      *     cannot be cloned (in theory, this should not happen).
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

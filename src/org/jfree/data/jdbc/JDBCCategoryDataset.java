@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------
  * JDBCCategoryDataset.java
@@ -72,7 +72,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
@@ -88,8 +87,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
  * <p>
  * NOTE: Many people have found this class too restrictive in general use.
  * For the greatest flexibility, please consider writing your own code to read
- * data from a <code>ResultSet</code> and populate a
- * {@link DefaultCategoryDataset} directly.
+ * data from a{@code ResultSet} and populate a {@link DefaultCategoryDataset} 
+ * directly.
  */
 public class JDBCCategoryDataset extends DefaultCategoryDataset {
 
@@ -294,8 +293,7 @@ public class JDBCCategoryDataset extends DefaultCategoryDataset {
                 }
             }
 
-            fireDatasetChanged(new DatasetChangeInfo());
-            //TODO: fill in real change info
+            fireDatasetChanged();
         }
         finally {
             if (resultSet != null) {

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * DialTextAnnotation.java
  * -----------------------
- * (C) Copyright 2006-2008, by Object Refinery Limited.
+ * (C) Copyright 2006-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,9 +36,9 @@
  * -------
  * 03-Nov-2006 : Version 1 (DG);
  * 08-Mar-2007 : Fix in hashCode() (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 17-Oct-2007 : Updated equals() (DG);
  * 24-Oct-2007 : Added getAnchor() and setAnchor() methods (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -56,12 +56,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.jfree.chart.text.TextAnchor;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A text annotation for a {@link DialPlot}.
@@ -96,18 +97,16 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
     private TextAnchor anchor;
 
     /**
-     * Creates a new instance of <code>DialTextAnnotation</code>.
+     * Creates a new instance of {@code DialTextAnnotation}.
      *
-     * @param label  the label (<code>null</code> not permitted).
+     * @param label  the label ({@code null} not permitted).
      */
     public DialTextAnnotation(String label) {
-        if (label == null) {
-            throw new IllegalArgumentException("Null 'label' argument.");
-        }
+        Args.nullNotPermitted(label, "label");
         this.angle = -90.0;
         this.radius = 0.3;
-        this.font = new Font("Tahoma", Font.BOLD, 14);
-        this.paint = Color.black;
+        this.font = new Font("Dialog", Font.BOLD, 14);
+        this.paint = Color.BLACK;
         this.label = label;
         this.anchor = TextAnchor.TOP_CENTER;
     }
@@ -115,7 +114,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
     /**
      * Returns the label text.
      *
-     * @return The label text (never <code>null</code).
+     * @return The label text (never {@code null}).
      *
      * @see #setLabel(String)
      */
@@ -127,14 +126,12 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      * Sets the label and sends a {@link DialLayerChangeEvent} to all
      * registered listeners.
      *
-     * @param label  the label (<code>null</code> not permitted).
+     * @param label  the label ({@code null} not permitted).
      *
      * @see #getLabel()
      */
     public void setLabel(String label) {
-        if (label == null) {
-            throw new IllegalArgumentException("Null 'label' argument.");
-        }
+        Args.nullNotPermitted(label, "label");
         this.label = label;
         notifyListeners(new DialLayerChangeEvent(this));
     }
@@ -142,7 +139,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
     /**
      * Returns the font used to display the label.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setFont(Font)
      */
@@ -154,14 +151,12 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      * Sets the font used to display the label and sends a
      * {@link DialLayerChangeEvent} to all registered listeners.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getFont()
      */
     public void setFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.font = font;
         notifyListeners(new DialLayerChangeEvent(this));
     }
@@ -169,7 +164,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
     /**
      * Returns the paint used to display the label.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setPaint(Paint)
      */
@@ -181,14 +176,12 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      * Sets the paint used to display the label and sends a
      * {@link DialLayerChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPaint()
      */
     public void setPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.paint = paint;
         notifyListeners(new DialLayerChangeEvent(this));
     }
@@ -267,24 +260,23 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      * Sets the text anchor point and sends a {@link DialLayerChangeEvent} to
      * all registered listeners.
      *
-     * @param anchor  the anchor point (<code>null</code> not permitted).
+     * @param anchor  the anchor point ({@code null} not permitted).
      *
      * @see #getAnchor()
      */
     public void setAnchor(TextAnchor anchor) {
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(anchor, "anchor");
         this.anchor = anchor;
         notifyListeners(new DialLayerChangeEvent(this));
     }
 
     /**
-     * Returns <code>true</code> to indicate that this layer should be
+     * Returns {@code true} to indicate that this layer should be
      * clipped within the dial window.
      *
-     * @return <code>true</code>.
+     * @return {@code true}.
      */
+    @Override
     public boolean isClippedToWindow() {
         return true;
     }
@@ -294,11 +286,12 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      * frame specifies a window, the clipping region will already have been
      * set to this window before this method is called.
      *
-     * @param g2  the graphics device (<code>null</code> not permitted).
+     * @param g2  the graphics device ({@code null} not permitted).
      * @param plot  the plot (ignored here).
      * @param frame  the dial frame (ignored here).
-     * @param view  the view rectangle (<code>null</code> not permitted).
+     * @param view  the view rectangle ({@code null} not permitted).
      */
+    @Override
     public void draw(Graphics2D g2, DialPlot plot, Rectangle2D frame,
             Rectangle2D view) {
 
@@ -309,7 +302,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
         Point2D pt = arc.getStartPoint();
         g2.setPaint(this.paint);
         g2.setFont(this.font);
-        TextUtilities.drawAlignedString(this.label, g2, (float) pt.getX(),
+        TextUtils.drawAlignedString(this.label, g2, (float) pt.getX(),
                 (float) pt.getY(), this.anchor);
 
     }
@@ -317,10 +310,11 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -335,7 +329,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
         if (!this.font.equals(that.font)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.paint, that.paint)) {
+        if (!PaintUtils.equal(this.paint, that.paint)) {
             return false;
         }
         if (this.radius != that.radius) {
@@ -355,9 +349,10 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      *
      * @return The hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
-        result = 37 * result + HashUtilities.hashCodeForPaint(this.paint);
+        result = 37 * result + HashUtils.hashCodeForPaint(this.paint);
         result = 37 * result + this.font.hashCode();
         result = 37 * result + this.label.hashCode();
         result = 37 * result + this.anchor.hashCode();
@@ -376,6 +371,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      * @throws CloneNotSupportedException if some attribute of this instance
      *     cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -389,7 +385,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
+        SerialUtils.writePaint(this.paint, stream);
     }
 
     /**
@@ -403,7 +399,7 @@ public class DialTextAnnotation extends AbstractDialLayer implements DialLayer,
     private void readObject(ObjectInputStream stream)
             throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
+        this.paint = SerialUtils.readPaint(stream);
     }
 
 }

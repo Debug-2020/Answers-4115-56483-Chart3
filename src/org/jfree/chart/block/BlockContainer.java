@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * BlockContainer.java
  * -------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -39,10 +39,10 @@
  * 04-Feb-2005 : Added equals(), clone() and implemented Serializable (DG);
  * 08-Feb-2005 : Updated for changes in RectangleConstraint (DG);
  * 20-Apr-2005 : Added new draw() method (DG);
- * ------------- JFREECHART 1.0.0 ---------------------------------------------
+ * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 20-Jul-2006 : Perform translation directly on drawing area, not via
  *               Graphics2D (DG);
- * 20-Jul-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -58,8 +58,9 @@ import java.util.List;
 
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.entity.StandardEntityCollection;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.Size2D;
 
 /**
  * A container for a collection of {@link Block} objects.  The container uses
@@ -87,13 +88,11 @@ public class BlockContainer extends AbstractBlock
     /**
      * Creates a new instance with the specified arrangement.
      *
-     * @param arrangement  the arrangement manager (<code>null</code> not
+     * @param arrangement  the arrangement manager ({@code null} not
      *                     permitted).
      */
     public BlockContainer(Arrangement arrangement) {
-        if (arrangement == null) {
-            throw new IllegalArgumentException("Null 'arrangement' argument.");
-        }
+        Args.nullNotPermitted(arrangement, "arrangement");
         this.arrangement = arrangement;
         this.blocks = new ArrayList();
     }
@@ -101,7 +100,7 @@ public class BlockContainer extends AbstractBlock
     /**
      * Returns the arrangement (layout) manager for the container.
      *
-     * @return The arrangement manager (never <code>null</code>).
+     * @return The arrangement manager (never {@code null}).
      */
     public Arrangement getArrangement() {
         return this.arrangement;
@@ -110,18 +109,16 @@ public class BlockContainer extends AbstractBlock
     /**
      * Sets the arrangement (layout) manager.
      *
-     * @param arrangement  the arrangement (<code>null</code> not permitted).
+     * @param arrangement  the arrangement ({@code null} not permitted).
      */
     public void setArrangement(Arrangement arrangement) {
-        if (arrangement == null) {
-            throw new IllegalArgumentException("Null 'arrangement' argument.");
-        }
+        Args.nullNotPermitted(arrangement, "arrangement");
         this.arrangement = arrangement;
     }
 
     /**
-     * Returns <code>true</code> if there are no blocks in the container, and
-     * <code>false</code> otherwise.
+     * Returns {@code true} if there are no blocks in the container, and
+     * {@code false} otherwise.
      *
      * @return A boolean.
      */
@@ -142,7 +139,7 @@ public class BlockContainer extends AbstractBlock
     /**
      * Adds a block to the container.
      *
-     * @param block  the block (<code>null</code> permitted).
+     * @param block  the block ({@code null} permitted).
      */
     public void add(Block block) {
         add(block, null);
@@ -151,8 +148,8 @@ public class BlockContainer extends AbstractBlock
     /**
      * Adds a block to the container.
      *
-     * @param block  the block (<code>null</code> permitted).
-     * @param key  the key (<code>null</code> permitted).
+     * @param block  the block ({@code null} permitted).
+     * @param key  the key ({@code null} permitted).
      */
     public void add(Block block, Object key) {
         this.blocks.add(block);
@@ -172,10 +169,11 @@ public class BlockContainer extends AbstractBlock
      * returns the block size.
      *
      * @param g2  the graphics device.
-     * @param constraint  the constraint (<code>null</code> not permitted).
+     * @param constraint  the constraint ({@code null} not permitted).
      *
-     * @return The block size (in Java2D units, never <code>null</code>).
+     * @return The block size (in Java2D units, never {@code null}).
      */
+    @Override
     public Size2D arrange(Graphics2D g2, RectangleConstraint constraint) {
         return this.arrangement.arrange(this, g2, constraint);
     }
@@ -186,6 +184,7 @@ public class BlockContainer extends AbstractBlock
      * @param g2  the graphics device.
      * @param area  the area.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area) {
         draw(g2, area, null);
     }
@@ -196,13 +195,14 @@ public class BlockContainer extends AbstractBlock
      * @param g2  the graphics device.
      * @param area  the area.
      * @param params  passed on to blocks within the container
-     *                (<code>null</code> permitted).
+     *                ({@code null} permitted).
      *
-     * @return An instance of {@link EntityBlockResult}, or <code>null</code>.
+     * @return An instance of {@link EntityBlockResult}, or {@code null}.
      */
+    @Override
     public Object draw(Graphics2D g2, Rectangle2D area, Object params) {
         // check if we need to collect chart entities from the container
-        EntityBlockParams ebp = null;
+        EntityBlockParams ebp;
         StandardEntityCollection sec = null;
         if (params instanceof EntityBlockParams) {
             ebp = (EntityBlockParams) params;
@@ -242,10 +242,11 @@ public class BlockContainer extends AbstractBlock
     /**
      * Tests this container for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -273,6 +274,7 @@ public class BlockContainer extends AbstractBlock
      *
      * @throws CloneNotSupportedException if there is a problem cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         BlockContainer clone = (BlockContainer) super.clone();
         // TODO : complete this

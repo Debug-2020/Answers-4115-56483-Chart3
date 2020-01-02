@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * AxisLocation.java
  * -----------------
- * (C) Copyright 2003-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Nick Guenther;
@@ -40,6 +40,7 @@
  * 24-Mar-2004 : Added static getOpposite() method (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 22-Mar-2007 : Added getOpposite() method, suggested by Nick Guenther (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -47,6 +48,7 @@ package org.jfree.chart.axis;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import org.jfree.chart.util.Args;
 
 /**
  * Used to indicate the location of an axis on a 2D plot, prior to knowing the
@@ -101,20 +103,21 @@ public final class AxisLocation implements Serializable {
      *
      * @return The string.
      */
+    @Override
     public String toString() {
         return this.name;
     }
 
     /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
+     * Returns {@code true} if this object is equal to the specified
+     * object, and {@code false} otherwise.
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
-
         if (this == obj) {
             return true;
         }
@@ -126,20 +129,29 @@ public final class AxisLocation implements Serializable {
             return false;
         }
         return true;
+    }
 
+    /**
+     * Returns a hash code for this instance.
+     * 
+     * @return A hash code.
+     */
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 83 * hash + this.name.hashCode();
+        return hash;
     }
 
     /**
      * Returns the location that is opposite to the supplied location.
      *
-     * @param location  the location (<code>null</code> not permitted).
+     * @param location  the location ({@code null} not permitted).
      *
      * @return The opposite location.
      */
     public static AxisLocation getOpposite(AxisLocation location) {
-        if (location == null) {
-            throw new IllegalArgumentException("Null 'location' argument.");
-        }
+        Args.nullNotPermitted(location, "location");
         AxisLocation result = null;
         if (location == AxisLocation.TOP_OR_LEFT) {
             result = AxisLocation.BOTTOM_OR_RIGHT;

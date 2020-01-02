@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,14 +21,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * WaferMapPlot.java
  * -----------------
  *
- * (C) Copyright 2003-2008, by Robert Redburn and Contributors.
+ * (C) Copyright 2003-2017, by Robert Redburn and Contributors.
  *
  * Original Author:  Robert Redburn;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -40,7 +40,8 @@
  * 10-Jun-2005 : Changed private --> protected for drawChipGrid(),
  *               drawWaferEdge() and getWafterEdge() (DG);
  * 16-Jun-2005 : Added default constructor and setDataset() method (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 18-Dec-2008 : Use ResourceBundleWrapper - see patch 1607918 by
+ *               Jess Thrysoee (DG);
  *
  */
 
@@ -60,14 +61,13 @@ import java.io.Serializable;
 import java.util.ResourceBundle;
 
 import org.jfree.chart.LegendItemCollection;
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.event.RendererChangeEvent;
 import org.jfree.chart.event.RendererChangeListener;
 import org.jfree.chart.renderer.WaferMapRenderer;
-import org.jfree.chart.util.RectangleInsets;
+import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.util.ResourceBundleWrapper;
-import org.jfree.data.event.DatasetChangeEvent;
+import org.jfree.data.general.DatasetChangeEvent;
 import org.jfree.data.general.WaferMapDataset;
 
 /**
@@ -88,21 +88,21 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
         0.0f);
 
     /** The default grid line paint. */
-    public static final Paint DEFAULT_GRIDLINE_PAINT = Color.lightGray;
+    public static final Paint DEFAULT_GRIDLINE_PAINT = Color.LIGHT_GRAY;
 
     /** The default crosshair visibility. */
     public static final boolean DEFAULT_CROSSHAIR_VISIBLE = false;
 
     /** The default crosshair stroke. */
     public static final Stroke DEFAULT_CROSSHAIR_STROKE
-        = DEFAULT_GRIDLINE_STROKE;
+            = DEFAULT_GRIDLINE_STROKE;
 
     /** The default crosshair paint. */
-    public static final Paint DEFAULT_CROSSHAIR_PAINT = Color.blue;
+    public static final Paint DEFAULT_CROSSHAIR_PAINT = Color.BLUE;
 
     /** The resourceBundle for the localization. */
-    protected static ResourceBundle localizationResources =
-            ResourceBundleWrapper.getBundle(
+    protected static ResourceBundle localizationResources
+            = ResourceBundleWrapper.getBundle(
                     "org.jfree.chart.plot.LocalizationBundle");
 
     /** The plot orientation.
@@ -130,7 +130,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
     /**
      * Creates a new plot.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public WaferMapPlot(WaferMapDataset dataset) {
         this(dataset, null);
@@ -139,8 +139,8 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
     /**
      * Creates a new plot.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
-     * @param renderer  the renderer (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
+     * @param renderer  the renderer ({@code null} permitted).
      */
     public WaferMapPlot(WaferMapDataset dataset, WaferMapRenderer renderer) {
 
@@ -166,6 +166,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
      *
      * @return A short string describing the type of plot.
      */
+    @Override
     public String getPlotType() {
         return ("WMAP_Plot");
     }
@@ -173,7 +174,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
     /**
      * Returns the dataset
      *
-     * @return The dataset (possibly <code>null</code>).
+     * @return The dataset (possibly {@code null}).
      */
     public WaferMapDataset getDataset() {
         return this.dataset;
@@ -183,7 +184,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
      * Sets the dataset used by the plot and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public void setDataset(WaferMapDataset dataset) {
         // if there is an existing dataset, remove the plot from the list of
@@ -200,17 +201,15 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
         }
 
         // send a dataset change event to self to trigger plot change event
-        datasetChanged(new DatasetChangeEvent(this, dataset, 
-                new DatasetChangeInfo()));
-        // TODO: fill in real change details
+        datasetChanged(new DatasetChangeEvent(this, dataset));
     }
 
     /**
      * Sets the item renderer, and notifies all listeners of a change to the
-     * plot.  If the renderer is set to <code>null</code>, no chart will be
+     * plot.  If the renderer is set to {@code null}, no chart will be
      * drawn.
      *
-     * @param renderer  the new renderer (<code>null</code> permitted).
+     * @param renderer  the new renderer ({@code null} permitted).
      */
     public void setRenderer(WaferMapRenderer renderer) {
         if (this.renderer != null) {
@@ -228,10 +227,11 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
      *
      * @param g2  the graphics device.
      * @param area  the plot area.
-     * @param anchor  the anchor point (<code>null</code> permitted).
+     * @param anchor  the anchor point ({@code null} permitted).
      * @param state  the plot state.
      * @param info  the plot rendering info.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
                      PlotState state,
                      PlotRenderingInfo info) {
@@ -281,8 +281,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
         double chipWidth = 1d;
         double chipHeight = 1d;
         if (plotArea.getWidth() != plotArea.getHeight()) {
-            double major = 0d;
-            double minor = 0d;
+            double major, minor;
             if (plotArea.getWidth() > plotArea.getHeight()) {
                 major = plotArea.getWidth();
                 minor = plotArea.getHeight();
@@ -315,7 +314,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
                 double upperLeftY = (startY - chipHeight) + (chipHeight * y)
                     + (space * (y - 1));
                 chip.setFrame(upperLeftX, upperLeftY, chipWidth, chipHeight);
-                g2.setColor(Color.white);
+                g2.setColor(Color.WHITE);
                 if (this.dataset.getChipValue(x - 1, ychips - y - 1) != null) {
                     g2.setPaint(
                         this.renderer.getChipColor(
@@ -324,7 +323,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
                     );
                 }
                 g2.fill(chip);
-                g2.setColor(Color.lightGray);
+                g2.setColor(Color.LIGHT_GRAY);
                 g2.draw(chip);
             }
         }
@@ -345,8 +344,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
         double upperLeftY = plotArea.getY();
         //get major dimension
         if (plotArea.getWidth() != plotArea.getHeight()) {
-            double major = 0d;
-            double minor = 0d;
+            double major, minor;
             if (plotArea.getWidth() > plotArea.getHeight()) {
                 major = plotArea.getWidth();
                 minor = plotArea.getHeight();
@@ -378,12 +376,12 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
     protected void drawWaferEdge(Graphics2D g2, Rectangle2D plotArea) {
         // draw the wafer
         Ellipse2D waferEdge = getWaferEdge(plotArea);
-        g2.setColor(Color.black);
+        g2.setColor(Color.BLACK);
         g2.draw(waferEdge);
         // calculate and draw the notch
         // horizontal orientation is considered notch right
         // vertical orientation is considered notch down
-        Arc2D notch = null;
+        Arc2D notch;
         Rectangle2D waferFrame = waferEdge.getFrame();
         double notchDiameter = waferFrame.getWidth() * 0.04;
         if (this.orientation == PlotOrientation.HORIZONTAL) {
@@ -406,9 +404,9 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
                 );
             notch = new Arc2D.Double(notchFrame, 0d, 180d, Arc2D.OPEN);
         }
-        g2.setColor(Color.white);
+        g2.setColor(Color.WHITE);
         g2.fill(notch);
-        g2.setColor(Color.black);
+        g2.setColor(Color.BLACK);
         g2.draw(notch);
 
     }
@@ -418,6 +416,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
      *
      * @return The legend items.
      */
+    @Override
     public LegendItemCollection getLegendItems() {
         return this.renderer.getLegendCollection();
     }
@@ -427,6 +426,7 @@ public class WaferMapPlot extends Plot implements RendererChangeListener,
      *
      * @param event  the event.
      */
+    @Override
     public void rendererChanged(RendererChangeEvent event) {
         fireChangeEvent();
     }

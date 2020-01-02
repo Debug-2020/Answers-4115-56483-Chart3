@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------
  * Month.java
  * ----------
- * (C) Copyright 2001-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2001-2012, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Chris Boek;
@@ -55,12 +55,12 @@
  * 05-Oct-2006 : Updated API docs (DG);
  * 06-Oct-2006 : Refactored to cache first and last millisecond values (DG);
  * 04-Apr-2007 : Fixed bug in Month(Date, TimeZone) constructor (CB);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 01-Sep-2008 : Added clarification for previous() and next() methods (DG);
  * 16-Sep-2008 : Deprecated DEFAULT_TIME_ZONE, and updated parsing to handle
  *               extended range in Year (DG);
  * 25-Nov-2008 : Added new constructor with Locale (DG);
  * 04-Feb-2009 : Fix for new constructor with Locale - bug 2564636 (DG);
+ * 05-Jul-2012 : Removed JDK 1.3.1 supporting code (DG);
  *
  */
 
@@ -71,6 +71,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.jfree.chart.date.MonthConstants;
+import org.jfree.chart.date.SerialDate;
 
 /**
  * Represents a single month.  This class is immutable, which is a requirement
@@ -131,34 +133,19 @@ public class Month extends RegularTimePeriod implements Serializable {
     }
 
     /**
-     * Constructs a new <code>Month</code> instance, based on a date/time and
+     * Constructs a new {@code Month} instance, based on a date/time and
      * the default time zone.
      *
-     * @param time  the date/time (<code>null</code> not permitted).
+     * @param time  the date/time ({@code null} not permitted).
      *
-     * @see #Month(Date, TimeZone)
+     * @see #Month(Date, TimeZone, Locale)
      */
     public Month(Date time) {
-        this(time, TimeZone.getDefault());
+        this(time, TimeZone.getDefault(), Locale.getDefault());
     }
 
     /**
-     * Constructs a new <code>Month</code> instance, based on a date/time and
-     * a time zone.  The first and last millisecond values are initially
-     * pegged to the given time zone also.
-     *
-     * @param time  the date/time.
-     * @param zone  the time zone (<code>null</code> not permitted).
-     *
-     * @deprecated Since 1.0.12, use {@link #Month(Date, TimeZone, Locale)}
-     *     instead.
-     */
-    public Month(Date time, TimeZone zone) {
-        this(time, zone, Locale.getDefault());
-    }
-
-    /**
-     * Creates a new <code>Month</code> instance, based on the specified time,
+     * Creates a new {@code Month} instance, based on the specified time,
      * zone and locale.
      *
      * @param time  the current time.
@@ -212,6 +199,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @see #getLastMillisecond()
      */
+    @Override
     public long getFirstMillisecond() {
         return this.firstMillisecond;
     }
@@ -226,6 +214,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @see #getFirstMillisecond()
      */
+    @Override
     public long getLastMillisecond() {
         return this.lastMillisecond;
     }
@@ -234,10 +223,11 @@ public class Month extends RegularTimePeriod implements Serializable {
      * Recalculates the start date/time and end date/time for this time period
      * relative to the supplied calendar (which incorporates a time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @since 1.0.3
      */
+    @Override
     public void peg(Calendar calendar) {
         this.firstMillisecond = getFirstMillisecond(calendar);
         this.lastMillisecond = getLastMillisecond(calendar);
@@ -251,6 +241,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @return The month preceding this one.
      */
+    @Override
     public RegularTimePeriod previous() {
         Month result;
         if (this.month != MonthConstants.JANUARY) {
@@ -275,6 +266,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @return The month following this one.
      */
+    @Override
     public RegularTimePeriod next() {
         Month result;
         if (this.month != MonthConstants.DECEMBER) {
@@ -296,6 +288,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @return The serial index number.
      */
+    @Override
     public long getSerialIndex() {
         return this.year * 12L + this.month;
     }
@@ -307,6 +300,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @return A string representing the month.
      */
+    @Override
     public String toString() {
         return SerialDate.monthCodeToString(this.month) + " " + this.year;
     }
@@ -316,17 +310,18 @@ public class Month extends RegularTimePeriod implements Serializable {
      * Returns true if the target is a Month instance representing the same
      * month as this object.  In all other cases, returns false.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> if month and year of this and object are the
+     * @return {@code true} if month and year of this and object are the
      *         same.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
         }
         if (!(obj instanceof Month)) {
-                return false;
+            return false;
         }
         Month that = (Month) obj;
         if (this.month != that.month) {
@@ -342,11 +337,12 @@ public class Month extends RegularTimePeriod implements Serializable {
      * Returns a hash code for this object instance.  The approach described by
      * Joshua Bloch in "Effective Java" has been used here:
      * <p>
-     * <code>http://developer.java.sun.com/developer/Books/effectivejava
-     * /Chapter3.pdf</code>
+     * {@code http://developer.java.sun.com/developer/Books/effectivejava
+     * /Chapter3.pdf}
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + this.month;
@@ -363,6 +359,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @return negative == before, zero == same, positive == after.
      */
+    @Override
     public int compareTo(Object o1) {
 
         int result;
@@ -399,39 +396,37 @@ public class Month extends RegularTimePeriod implements Serializable {
      * Returns the first millisecond of the month, evaluated using the supplied
      * calendar (which determines the time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The first millisecond of the month.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getFirstMillisecond(Calendar calendar) {
         calendar.set(this.year, this.month - 1, 1, 0, 0, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        // in the following line, we'd rather call calendar.getTimeInMillis()
-        // to avoid object creation, but that isn't supported in Java 1.3.1
-        return calendar.getTime().getTime();
+        return calendar.getTimeInMillis();
     }
 
     /**
      * Returns the last millisecond of the month, evaluated using the supplied
      * calendar (which determines the time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The last millisecond of the month.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getLastMillisecond(Calendar calendar) {
         int eom = SerialDate.lastDayOfMonth(this.month, this.year);
         calendar.set(this.year, this.month - 1, eom, 23, 59, 59);
         calendar.set(Calendar.MILLISECOND, 999);
-        // in the following line, we'd rather call calendar.getTimeInMillis()
-        // to avoid object creation, but that isn't supported in Java 1.3.1
-        return calendar.getTime().getTime();
+        return calendar.getTimeInMillis();
     }
 
     /**
@@ -439,9 +434,9 @@ public class Month extends RegularTimePeriod implements Serializable {
      * accept the format "YYYY-MM".  It will also accept "MM-YYYY". Anything
      * else, at the moment, is a bonus.
      *
-     * @param s  the string to parse (<code>null</code> permitted).
+     * @param s  the string to parse ({@code null} permitted).
      *
-     * @return <code>null</code> if the string is not parseable, the month
+     * @return {@code null} if the string is not parseable, the month
      *         otherwise.
      */
     public static Month parseMonth(String s) {
@@ -505,7 +500,7 @@ public class Month extends RegularTimePeriod implements Serializable {
      *
      * @param s  the string to parse.
      *
-     * @return The position of the separator character, or <code>-1</code> if
+     * @return The position of the separator character, or {@code -1} if
      *     none of the characters were found.
      */
     private static int findSeparator(String s) {
@@ -523,12 +518,12 @@ public class Month extends RegularTimePeriod implements Serializable {
     }
 
     /**
-     * Creates a year from a string, or returns <code>null</code> (format
+     * Creates a year from a string, or returns {@code null} (format
      * exceptions suppressed).
      *
      * @param s  the string to parse.
      *
-     * @return <code>null</code> if the string is not parseable, the year
+     * @return {@code null} if the string is not parseable, the year
      *         otherwise.
      */
     private static Year evaluateAsYear(String s) {

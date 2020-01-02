@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * DefaultWindDataset.java
  * -----------------------
- * (C) Copyright 2001-2008, by Achilleus Mantzios and Contributors.
+ * (C) Copyright 2001-2016, by Achilleus Mantzios and Contributors.
  *
  * Original Author:  Achilleus Mantzios;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -41,6 +41,7 @@
  *               getYValue() (DG);
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
  * 22-Apr-2008 : Implemented PublicCloneable (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -51,7 +52,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -79,9 +80,9 @@ public class DefaultWindDataset extends AbstractXYDataset
     /**
      * Constructs a dataset based on the specified data array.
      *
-     * @param data  the data (<code>null</code> not permitted).
+     * @param data  the data ({@code null} not permitted).
      *
-     * @throws NullPointerException if <code>data</code> is <code>null</code>.
+     * @throws NullPointerException if {@code data} is {@code null}.
      */
     public DefaultWindDataset(Object[][][] data) {
         this(seriesNameListFromDataArray(data), data);
@@ -90,12 +91,11 @@ public class DefaultWindDataset extends AbstractXYDataset
     /**
      * Constructs a dataset based on the specified data array.
      *
-     * @param seriesNames  the names of the series (<code>null</code> not
+     * @param seriesNames  the names of the series ({@code null} not
      *     permitted).
      * @param data  the wind data.
      *
-     * @throws NullPointerException if <code>seriesNames</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code seriesNames} is {@code null}.
      */
     public DefaultWindDataset(String[] seriesNames, Object[][][] data) {
         this(Arrays.asList(seriesNames), data);
@@ -106,29 +106,27 @@ public class DefaultWindDataset extends AbstractXYDataset
      * can contain multiple series, each series can contain multiple items,
      * and each item is as follows:
      * <ul>
-     * <li><code>data[series][item][0]</code> - the date (either a
-     *   <code>Date</code> or a <code>Number</code> that is the milliseconds
+     * <li>{@code data[series][item][0]} - the date (either a
+     *   {@code Date} or a {@code Number} that is the milliseconds
      *   since 1-Jan-1970);</li>
-     * <li><code>data[series][item][1]</code> - the wind direction (1 - 12,
+     * <li>{@code data[series][item][1]} - the wind direction (1 - 12,
      *   like the numbers on a clock face);</li>
-     * <li><code>data[series][item][2]</code> - the wind force (1 - 12 on the
+     * <li>{@code data[series][item][2]} - the wind force (1 - 12 on the
      *   Beaufort scale)</li>
      * </ul>
      *
-     * @param seriesKeys  the names of the series (<code>null</code> not
+     * @param seriesKeys  the names of the series ({@code null} not
      *     permitted).
-     * @param data  the wind dataset (<code>null</code> not permitted).
+     * @param data  the wind dataset ({@code null} not permitted).
      *
-     * @throws IllegalArgumentException if <code>seriesKeys</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code seriesKeys} is
+     *     {@code null}.
      * @throws IllegalArgumentException if the number of series keys does not
      *     match the number of series in the array.
-     * @throws NullPointerException if <code>data</code> is <code>null</code>.
+     * @throws NullPointerException if {@code data} is {@code null}.
      */
     public DefaultWindDataset(List seriesKeys, Object[][][] data) {
-        if (seriesKeys == null) {
-            throw new IllegalArgumentException("Null 'seriesKeys' argument.");
-        }
+        Args.nullNotPermitted(seriesKeys, "seriesKeys");
         if (seriesKeys.size() != data.length) {
             throw new IllegalArgumentException("The number of series keys does "
                     + "not match the number of series in the data array.");
@@ -173,6 +171,7 @@ public class DefaultWindDataset extends AbstractXYDataset
      *
      * @return The series count.
      */
+    @Override
     public int getSeriesCount() {
         return this.allSeriesData.size();
     }
@@ -184,6 +183,7 @@ public class DefaultWindDataset extends AbstractXYDataset
      *
      * @return The item count.
      */
+    @Override
     public int getItemCount(int series) {
         if (series < 0 || series >= getSeriesCount()) {
             throw new IllegalArgumentException("Invalid series index: "
@@ -200,6 +200,7 @@ public class DefaultWindDataset extends AbstractXYDataset
      *
      * @return The series key.
      */
+    @Override
     public Comparable getSeriesKey(int series) {
         if (series < 0 || series >= getSeriesCount()) {
             throw new IllegalArgumentException("Invalid series index: "
@@ -218,6 +219,7 @@ public class DefaultWindDataset extends AbstractXYDataset
      *
      * @return The x-value for the item within the series.
      */
+    @Override
     public Number getX(int series, int item) {
         List oneSeriesData = (List) this.allSeriesData.get(series);
         WindDataItem windItem = (WindDataItem) oneSeriesData.get(item);
@@ -227,13 +229,14 @@ public class DefaultWindDataset extends AbstractXYDataset
     /**
      * Returns the y-value for one item within a series.  This maps to the
      * {@link #getWindForce(int, int)} method and is implemented because
-     * <code>WindDataset</code> is an extension of {@link XYDataset}.
+     * {@code WindDataset} is an extension of {@link XYDataset}.
      *
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
      * @return The y-value for the item within the series.
      */
+    @Override
     public Number getY(int series, int item) {
         return getWindForce(series, item);
     }
@@ -247,6 +250,7 @@ public class DefaultWindDataset extends AbstractXYDataset
      *
      * @return The wind direction for the item within the series.
      */
+    @Override
     public Number getWindDirection(int series, int item) {
         List oneSeriesData = (List) this.allSeriesData.get(series);
         WindDataItem windItem = (WindDataItem) oneSeriesData.get(item);
@@ -262,6 +266,7 @@ public class DefaultWindDataset extends AbstractXYDataset
      *
      * @return The wind force for the item within the series.
      */
+    @Override
     public Number getWindForce(int series, int item) {
         List oneSeriesData = (List) this.allSeriesData.get(series);
         WindDataItem windItem = (WindDataItem) oneSeriesData.get(item);
@@ -271,38 +276,36 @@ public class DefaultWindDataset extends AbstractXYDataset
     /**
      * Utility method for automatically generating series names.
      *
-     * @param data  the wind data (<code>null</code> not permitted).
+     * @param data  the wind data ({@code null} not permitted).
      *
      * @return An array of <i>Series N</i> with N = { 1 .. data.length }.
      *
-     * @throws NullPointerException if <code>data</code> is <code>null</code>.
+     * @throws NullPointerException if {@code data} is {@code null}.
      */
     public static List seriesNameListFromDataArray(Object[][] data) {
-
         int seriesCount = data.length;
         List seriesNameList = new java.util.ArrayList(seriesCount);
         for (int i = 0; i < seriesCount; i++) {
             seriesNameList.add("Series " + (i + 1));
         }
         return seriesNameList;
-
     }
 
     /**
-     * Checks this <code>WindDataset</code> for equality with an arbitrary
-     * object.  This method returns <code>true</code> if and only if:
+     * Checks this {@code WindDataset} for equality with an arbitrary
+     * object.  This method returns {@code true} if and only if:
      * <ul>
-     *   <li><code>obj</code> is not <code>null</code>;</li>
-     *   <li><code>obj</code> is an instance of
-     *       <code>DefaultWindDataset</code>;</li>
+     *   <li>{@code obj} is not {@code null};</li>
+     *   <li>{@code obj} is an instance of {@code DefaultWindDataset};</li>
      *   <li>both datasets have the same number of series containing identical
      *       values.</li>
-     * <ul>
+     * </ul>
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -383,6 +386,7 @@ class WindDataItem implements Comparable, Serializable {
      *
      * @return An int that indicates the relative comparison.
      */
+    @Override
     public int compareTo(Object object) {
         if (object instanceof WindDataItem) {
             WindDataItem item = (WindDataItem) object;
@@ -402,13 +406,14 @@ class WindDataItem implements Comparable, Serializable {
     }
 
     /**
-     * Tests this <code>WindDataItem</code> for equality with an arbitrary
+     * Tests this {@code WindDataItem} for equality with an arbitrary
      * object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return false;

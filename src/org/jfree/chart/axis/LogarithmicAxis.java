@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * LogarithmicAxis.java
  * --------------------
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  Michael Duffy / Eric Thomas;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -89,7 +89,6 @@
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
  * 02-Mar-2007 : Applied patch 1671069 to fix zooming (DG);
  * 22-Mar-2007 : Use new defaultAutoRange attribute (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -103,8 +102,8 @@ import java.util.List;
 
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.ValueAxisPlot;
-import org.jfree.chart.text.TextAnchor;
-import org.jfree.chart.util.RectangleEdge;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.Range;
 
 /**
@@ -125,8 +124,8 @@ public class LogarithmicAxis extends NumberAxis {
     protected boolean allowNegativesFlag = false;
 
     /**
-     * Flag set true make axis throw exception if any values are
-     * <= 0 and 'allowNegativesFlag' is false.
+     * Flag set true make axis throw exception if any values are &lt;= 0 and 
+     * 'allowNegativesFlag' is false.
      */
     protected boolean strictValuesFlag = true;
 
@@ -196,7 +195,7 @@ public class LogarithmicAxis extends NumberAxis {
      * values are less than or equal to zero; if false then the axis will
      * adjust for values less than or equal to zero as needed.
      *
-     * @return <code>true</code> if strict enforcement is enabled.
+     * @return {@code true} if strict enforcement is enabled.
      */
     public boolean getStrictValuesFlag() {
         return this.strictValuesFlag;
@@ -218,8 +217,8 @@ public class LogarithmicAxis extends NumberAxis {
     /**
      * Returns the 'expTickLabelsFlag' flag.
      *
-     * @return <code>true</code> for "1e#"-style tick labels,
-     *         <code>false</code> for log10 or regular numeric tick labels.
+     * @return {@code true} for "1e#"-style tick labels,
+     *         {@code false} for log10 or regular numeric tick labels.
      */
     public boolean getExpTickLabelsFlag() {
       return this.expTickLabelsFlag;
@@ -238,8 +237,8 @@ public class LogarithmicAxis extends NumberAxis {
     /**
      * Returns the 'log10TickLabelsFlag' flag.
      *
-     * @return <code>true</code> for "10^n"-style tick labels,
-     *         <code>false</code> for "1e#"-style or regular numeric tick
+     * @return {@code true} for "10^n"-style tick labels,
+     *         {@code false} for "1e#"-style or regular numeric tick
      *         labels.
      */
     public boolean getLog10TickLabelsFlag() {
@@ -252,8 +251,8 @@ public class LogarithmicAxis extends NumberAxis {
      * values when determining the upper and lower bounds.  The default
      * value is false.
      *
-     * @param flag <code>true</code> to make the 'autoAdjustRange()'
-     * method select the next "10^n" values, <code>false</code> to not.
+     * @param flag {@code true} to make the 'autoAdjustRange()'
+     * method select the next "10^n" values, {@code false} to not.
      */
     public void setAutoRangeNextLogFlag(boolean flag) {
         this.autoRangeNextLogFlag = flag;
@@ -262,8 +261,8 @@ public class LogarithmicAxis extends NumberAxis {
     /**
      * Returns the 'autoRangeNextLogFlag' flag.
      *
-     * @return <code>true</code> if the 'autoAdjustRange()' method will
-     * select the next "10^n" values, <code>false</code> if not.
+     * @return {@code true} if the 'autoAdjustRange()' method will
+     * select the next "10^n" values, {@code false} if not.
      */
     public boolean getAutoRangeNextLogFlag() {
         return this.autoRangeNextLogFlag;
@@ -275,6 +274,7 @@ public class LogarithmicAxis extends NumberAxis {
      *
      * @param range  the new range.
      */
+    @Override
     public void setRange(Range range) {
         super.setRange(range);      // call parent method
         setupSmallLogFlag();        // setup flag based on bounds values
@@ -503,6 +503,7 @@ public class LogarithmicAxis extends NumberAxis {
     /**
      * Rescales the axis to ensure that all data is visible.
      */
+    @Override
     public void autoAdjustRange() {
 
         Plot plot = getPlot();
@@ -622,6 +623,7 @@ public class LogarithmicAxis extends NumberAxis {
      *
      * @return The Java2D coordinate.
      */
+    @Override
     public double valueToJava2D(double value, Rectangle2D plotArea,
                                 RectangleEdge edge) {
 
@@ -664,6 +666,7 @@ public class LogarithmicAxis extends NumberAxis {
      *
      * @return The data value.
      */
+    @Override
     public double java2DToValue(double java2DValue, Rectangle2D plotArea,
                                 RectangleEdge edge) {
 
@@ -698,18 +701,16 @@ public class LogarithmicAxis extends NumberAxis {
      * @param lowerPercent  the new lower bound.
      * @param upperPercent  the new upper bound.
      */
+    @Override
     public void zoomRange(double lowerPercent, double upperPercent) {
         double startLog = switchedLog10(getRange().getLowerBound());
-        double lengthLog = switchedLog10(getRange().getUpperBound()) -
-                           startLog;
+        double lengthLog = switchedLog10(getRange().getUpperBound()) - startLog;
         Range adjusted;
 
         if (isInverted()) {
             adjusted = new Range(
-                    switchedPow10(
-                            startLog + (lengthLog * (1 - upperPercent))),
-                    switchedPow10(
-                            startLog + (lengthLog * (1 - lowerPercent))));
+                    switchedPow10(startLog + (lengthLog * (1 - upperPercent))),
+                    switchedPow10(startLog + (lengthLog * (1 - lowerPercent))));
         }
         else {
             adjusted = new Range(
@@ -730,9 +731,9 @@ public class LogarithmicAxis extends NumberAxis {
      *
      * @return A list of ticks.
      */
-    protected List refreshTicksHorizontal(Graphics2D g2,
-                                          Rectangle2D dataArea,
-                                          RectangleEdge edge) {
+    @Override
+    protected List refreshTicksHorizontal(Graphics2D g2, Rectangle2D dataArea,
+            RectangleEdge edge) {
 
         List ticks = new java.util.ArrayList();
         Range range = getRange();
@@ -835,8 +836,8 @@ public class LogarithmicAxis extends NumberAxis {
 
                 if (currentTickValue >= lowerBoundVal - SMALL_LOG_VALUE) {
                     //tick value not below lowest data value
-                    TextAnchor anchor = null;
-                    TextAnchor rotationAnchor = null;
+                    TextAnchor anchor;
+                    TextAnchor rotationAnchor;
                     double angle = 0.0;
                     if (isVerticalTickLabels()) {
                         anchor = TextAnchor.CENTER_RIGHT;
@@ -879,9 +880,9 @@ public class LogarithmicAxis extends NumberAxis {
      *
      * @return A list of ticks.
      */
-    protected List refreshTicksVertical(Graphics2D g2,
-                                        Rectangle2D dataArea,
-                                        RectangleEdge edge) {
+    @Override
+    protected List refreshTicksVertical(Graphics2D g2, Rectangle2D dataArea,
+            RectangleEdge edge) {
 
         List ticks = new java.util.ArrayList();
 
@@ -1025,8 +1026,8 @@ public class LogarithmicAxis extends NumberAxis {
 
                 if (tickVal >= lowerBoundVal - SMALL_LOG_VALUE) {
                     //tick value not below lowest data value
-                    TextAnchor anchor = null;
-                    TextAnchor rotationAnchor = null;
+                    TextAnchor anchor;
+                    TextAnchor rotationAnchor;
                     double angle = 0.0;
                     if (isVerticalTickLabels()) {
                         if (edge == RectangleEdge.LEFT) {

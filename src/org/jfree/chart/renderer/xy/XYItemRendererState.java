@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------
  * XYItemRendererState.java
  * ------------------------
- * (C) Copyright 2003-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2008, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Ulrich Voigt;
@@ -43,7 +43,6 @@
  *               Ulrich Voigt (DG);
  * 19-Sep-2008 : Added first and last item indices, based on patch by Greg
  *               Darke (DG);
- * 29-Jun-2009 : Added selection state (DG);
  *
  */
 
@@ -52,11 +51,9 @@ package org.jfree.chart.renderer.xy;
 import java.awt.geom.Line2D;
 
 import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.plot.XYCrosshairState;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.RendererState;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.data.xy.XYDatasetSelectionState;
 
 /**
  * The state for an {@link XYItemRenderer}.
@@ -92,20 +89,6 @@ public class XYItemRendererState extends RendererState {
     private boolean processVisibleItemsOnly;
 
     /**
-     * The crosshair state (possibly <code>null</code>).
-     * 
-     * @since 1.2.0
-     */
-    private XYCrosshairState crosshairState;
-
-    /**
-     * The selection state for the dataset, or <code>null</code>.
-     *
-     * @since 1.2.0
-     */
-    private XYDatasetSelectionState selectionState;
-
-    /**
      * Creates a new state.
      *
      * @param info  the plot rendering info.
@@ -114,13 +97,12 @@ public class XYItemRendererState extends RendererState {
         super(info);
         this.workingLine = new Line2D.Double();
         this.processVisibleItemsOnly = true;
-        this.crosshairState = null;
     }
 
     /**
      * Returns the flag that controls whether the plot passes all data
      * items in each series to the renderer, or just the visible items.  The
-     * default value is <code>true</code>.
+     * default value is {@code true}.
      *
      * @return A boolean.
      *
@@ -166,54 +148,6 @@ public class XYItemRendererState extends RendererState {
      */
     public int getLastItemIndex() {
         return this.lastItemIndex;
-    }
-
-    /**
-     * Returns the crosshair state, if any.
-     *
-     * @return The crosshair state (possibly <code>null</code>).
-     *
-     * @since 1.2.0
-     *
-     * @see #setCrosshairState(XYCrosshairState)
-     */
-    public XYCrosshairState getCrosshairState() {
-        return this.crosshairState;
-    }
-
-    /**
-     * Sets the crosshair state.
-     *
-     * @param state  the new state (<code>null</code> permitted).
-     *
-     * @since 1.2.0
-     *
-     * @see #getCrosshairState()
-     */
-    public void setCrosshairState(XYCrosshairState state) {
-        this.crosshairState = state;
-    }
-
-    /**
-     * Returns the selection state.
-     *
-     * @return The selection state (possibly <code>null</code>).
-     *
-     * @since 1.2.0
-     */
-    public XYDatasetSelectionState getSelectionState() {
-        return this.selectionState;
-    }
-
-    /**
-     * Sets the selection state.
-     *
-     * @param state  the selection state (<code>null</code> permitted).
-     *
-     * @since 1.2.0
-     */
-    public void setSelectionState(XYDatasetSelectionState state) {
-        this.selectionState = state;
     }
 
     /**

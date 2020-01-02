@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * CategoryMarker.java
  * -------------------
- * (C) Copyright 2005-2008, by Object Refinery Limited.
+ * (C) Copyright 2005-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Nicolas Brodu;
@@ -38,7 +38,7 @@
  * 19-Aug-2005 : Implemented equals(), fixed bug in constructor (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 05-Sep-2006 : Added MarkerChangeListener support (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -51,7 +51,8 @@ import java.awt.Stroke;
 import java.io.Serializable;
 
 import org.jfree.chart.event.MarkerChangeEvent;
-import org.jfree.chart.util.LengthAdjustmentType;
+import org.jfree.chart.ui.LengthAdjustmentType;
+import org.jfree.chart.util.Args;
 
 /**
  * A marker for a category.
@@ -84,8 +85,8 @@ public class CategoryMarker extends Marker implements Cloneable, Serializable {
      * Creates a new category marker.
      *
      * @param key  the key.
-     * @param paint  the paint (<code>null</code> not permitted).
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      */
     public CategoryMarker(Comparable key, Paint paint, Stroke stroke) {
         this(key, paint, stroke, paint, stroke, 1.0f);
@@ -95,10 +96,10 @@ public class CategoryMarker extends Marker implements Cloneable, Serializable {
      * Creates a new category marker.
      *
      * @param key  the key.
-     * @param paint  the paint (<code>null</code> not permitted).
-     * @param stroke  the stroke (<code>null</code> not permitted).
-     * @param outlinePaint  the outline paint (<code>null</code> permitted).
-     * @param outlineStroke  the outline stroke (<code>null</code> permitted).
+     * @param paint  the paint ({@code null} not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
+     * @param outlinePaint  the outline paint ({@code null} permitted).
+     * @param outlineStroke  the outline stroke ({@code null} permitted).
      * @param alpha  the alpha transparency.
      */
     public CategoryMarker(Comparable key, Paint paint, Stroke stroke,
@@ -122,14 +123,12 @@ public class CategoryMarker extends Marker implements Cloneable, Serializable {
      * Sets the key and sends a {@link MarkerChangeEvent} to all registered
      * listeners.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @since 1.0.3
      */
     public void setKey(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         this.key = key;
         notifyListeners(new MarkerChangeEvent(this));
     }
@@ -159,10 +158,11 @@ public class CategoryMarker extends Marker implements Cloneable, Serializable {
     /**
      * Tests the marker for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;

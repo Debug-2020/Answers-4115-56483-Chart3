@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * AxisSpace.java
  * --------------
- * (C) Copyright 2003-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -41,7 +41,7 @@
  * 07-Jan-2005 : Updated equals() method (DG);
  * 11-Jan-2005 : Removed deprecated methods in preparation for 1.0.0
  *               release (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -49,9 +49,9 @@ package org.jfree.chart.axis;
 
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
-
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
 
 /**
  * A record that contains the space required at each edge of a plot.
@@ -159,12 +159,10 @@ public class AxisSpace implements Cloneable, PublicCloneable, Serializable {
      * Adds space to the top, bottom, left or right edge of the plot area.
      *
      * @param space  the space (in Java2D units).
-     * @param edge  the edge (<code>null</code> not permitted).
+     * @param edge  the edge ({@code null} not permitted).
      */
     public void add(double space, RectangleEdge edge) {
-        if (edge == null) {
-            throw new IllegalArgumentException("Null 'edge' argument.");
-        }
+        Args.nullNotPermitted(edge, "edge");
         if (edge == RectangleEdge.TOP) {
             this.top += space;
         }
@@ -314,6 +312,7 @@ public class AxisSpace implements Cloneable, PublicCloneable, Serializable {
      * @throws CloneNotSupportedException This class won't throw this exception,
      *         but subclasses (if any) might.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -323,8 +322,9 @@ public class AxisSpace implements Cloneable, PublicCloneable, Serializable {
      *
      * @param obj  the object to compare against.
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -353,6 +353,7 @@ public class AxisSpace implements Cloneable, PublicCloneable, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 23;
         long l = Double.doubleToLongBits(this.top);
@@ -371,6 +372,7 @@ public class AxisSpace implements Cloneable, PublicCloneable, Serializable {
      *
      * @return A string.
      */
+    @Override
     public String toString() {
         return super.toString() + "[left=" + this.left + ",right=" + this.right
                     + ",top=" + this.top + ",bottom=" + this.bottom + "]";

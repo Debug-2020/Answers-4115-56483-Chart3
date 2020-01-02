@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * CategorySeriesHandler.java
@@ -87,7 +87,7 @@ public class CategorySeriesHandler extends DefaultHandler
      * @param key  the key.
      * @param value  the value.
      */
-    public void addItem(Comparable key, final Number value) {
+    public void addItem(Comparable key, Number value) {
         this.values.addValue(key, value);
     }
 
@@ -101,6 +101,7 @@ public class CategorySeriesHandler extends DefaultHandler
      *
      * @throws SAXException for errors.
      */
+    @Override
     public void startElement(String namespaceURI,
                              String localName,
                              String qName,
@@ -131,6 +132,7 @@ public class CategorySeriesHandler extends DefaultHandler
      * @param localName  the element name.
      * @param qName  the element name.
      */
+    @Override
     public void endElement(String namespaceURI,
                            String localName,
                            String qName) {

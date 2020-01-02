@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * AbstractSeriesDataset.java
@@ -44,10 +44,7 @@
 
 package org.jfree.data.general;
 
-import org.jfree.data.event.SeriesChangeListener;
-import org.jfree.data.event.SeriesChangeEvent;
 import java.io.Serializable;
-import org.jfree.chart.event.DatasetChangeInfo;
 
 /**
  * An abstract implementation of the {@link SeriesDataset} interface,
@@ -71,29 +68,32 @@ public abstract class AbstractSeriesDataset extends AbstractDataset
      *
      * @return The series count.
      */
+    @Override
     public abstract int getSeriesCount();
 
     /**
      * Returns the key for a series.
      * <p>
-     * If <code>series</code> is not within the specified range, the
+     * If {@code series} is not within the specified range, the
      * implementing method should throw an {@link IndexOutOfBoundsException}
      * (preferred) or an {@link IllegalArgumentException}.
      *
-     * @param series  the series index (in the range <code>0</code> to
-     *     <code>getSeriesCount() - 1</code>).
+     * @param series  the series index (in the range {@code 0} to
+     *     {@code getSeriesCount() - 1}).
      *
      * @return The series key.
      */
+    @Override
     public abstract Comparable getSeriesKey(int series);
 
     /**
      * Returns the index of the named series, or -1.
      *
-     * @param seriesKey  the series key (<code>null</code> permitted).
+     * @param seriesKey  the series key ({@code null} permitted).
      *
      * @return The index.
      */
+    @Override
     public int indexOf(Comparable seriesKey) {
         int seriesCount = getSeriesCount();
         for (int s = 0; s < seriesCount; s++) {
@@ -109,10 +109,9 @@ public abstract class AbstractSeriesDataset extends AbstractDataset
      *
      * @param event  information about the change.
      */
+    @Override
     public void seriesChanged(SeriesChangeEvent event) {
-        fireDatasetChanged(new DatasetChangeInfo());
-        // TODO: fill in change details - might need to override this method
-        // in each subclass to get details
+        fireDatasetChanged();
     }
 
 }

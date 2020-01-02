@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * CategoryLabelPosition.java
  * --------------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -40,17 +40,17 @@
  * 07-Jan-2005 : Fixed bug in equals() method (DG);
  * 11-Jan-2005 : Removed deprecated constructor in preparation for the 1.0.0
  *               release (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.chart.axis;
 
 import java.io.Serializable;
-
-import org.jfree.chart.text.TextAnchor;
 import org.jfree.chart.text.TextBlockAnchor;
-import org.jfree.chart.util.RectangleAnchor;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.Args;
 
 /**
  * The attributes that control the position of the labels for the categories on
@@ -94,9 +94,9 @@ public class CategoryLabelPosition implements Serializable {
     /**
      * Creates a new category label position record.
      *
-     * @param categoryAnchor  the category anchor (<code>null</code> not
+     * @param categoryAnchor  the category anchor ({@code null} not
      *                        permitted).
-     * @param labelAnchor  the label anchor (<code>null</code> not permitted).
+     * @param labelAnchor  the label anchor ({@code null} not permitted).
      */
     public CategoryLabelPosition(RectangleAnchor categoryAnchor,
                                  TextBlockAnchor labelAnchor) {
@@ -108,17 +108,16 @@ public class CategoryLabelPosition implements Serializable {
     /**
      * Creates a new category label position record.
      *
-     * @param categoryAnchor  the category anchor (<code>null</code> not
+     * @param categoryAnchor  the category anchor ({@code null} not
      *                        permitted).
-     * @param labelAnchor  the label anchor (<code>null</code> not permitted).
-     * @param widthType  the width type (<code>null</code> not permitted).
+     * @param labelAnchor  the label anchor ({@code null} not permitted).
+     * @param widthType  the width type ({@code null} not permitted).
      * @param widthRatio  the maximum label width as a percentage (of the
      *                    category space or the range space).
      */
     public CategoryLabelPosition(RectangleAnchor categoryAnchor,
-                                 TextBlockAnchor labelAnchor,
-                                 CategoryLabelWidthType widthType,
-                                 float widthRatio) {
+            TextBlockAnchor labelAnchor, CategoryLabelWidthType widthType,
+            float widthRatio) {
         // argument checking delegated...
         this(categoryAnchor, labelAnchor, TextAnchor.CENTER, 0.0, widthType,
                 widthRatio);
@@ -130,38 +129,24 @@ public class CategoryLabelPosition implements Serializable {
      * The item label is aligned by aligning the text anchor with the item
      * label anchor.
      *
-     * @param categoryAnchor  the category anchor (<code>null</code> not
+     * @param categoryAnchor  the category anchor ({@code null} not
      *                        permitted).
-     * @param labelAnchor  the label anchor (<code>null</code> not permitted).
-     * @param rotationAnchor  the rotation anchor (<code>null</code> not
+     * @param labelAnchor  the label anchor ({@code null} not permitted).
+     * @param rotationAnchor  the rotation anchor ({@code null} not
      *                        permitted).
-     * @param angle  the rotation angle (<code>null</code> not permitted).
-     * @param widthType  the width type (<code>null</code> not permitted).
+     * @param angle  the rotation angle ({@code null} not permitted).
+     * @param widthType  the width type ({@code null} not permitted).
      * @param widthRatio  the maximum label width as a percentage (of the
      *                    category space or the range space).
      */
     public CategoryLabelPosition(RectangleAnchor categoryAnchor,
-                                 TextBlockAnchor labelAnchor,
-                                 TextAnchor rotationAnchor,
-                                 double angle,
-                                 CategoryLabelWidthType widthType,
-                                 float widthRatio) {
+            TextBlockAnchor labelAnchor, TextAnchor rotationAnchor, 
+            double angle, CategoryLabelWidthType widthType, float widthRatio) {
 
-        if (categoryAnchor == null) {
-            throw new IllegalArgumentException(
-                    "Null 'categoryAnchor' argument.");
-        }
-        if (labelAnchor == null) {
-            throw new IllegalArgumentException(
-                    "Null 'labelAnchor' argument.");
-        }
-        if (rotationAnchor == null) {
-            throw new IllegalArgumentException(
-                    "Null 'rotationAnchor' argument.");
-        }
-        if (widthType == null) {
-            throw new IllegalArgumentException("Null 'widthType' argument.");
-        }
+        Args.nullNotPermitted(categoryAnchor, "categoryAnchor");
+        Args.nullNotPermitted(labelAnchor, "labelAnchor");
+        Args.nullNotPermitted(rotationAnchor, "rotationAnchor");
+        Args.nullNotPermitted(widthType, "widthType");
 
         this.categoryAnchor = categoryAnchor;
         this.labelAnchor = labelAnchor;
@@ -175,7 +160,7 @@ public class CategoryLabelPosition implements Serializable {
     /**
      * Returns the item label anchor.
      *
-     * @return The item label anchor (never <code>null</code>).
+     * @return The item label anchor (never {@code null}).
      */
     public RectangleAnchor getCategoryAnchor() {
         return this.categoryAnchor;
@@ -184,7 +169,7 @@ public class CategoryLabelPosition implements Serializable {
     /**
      * Returns the text block anchor.
      *
-     * @return The text block anchor (never <code>null</code>).
+     * @return The text block anchor (never {@code null}).
      */
     public TextBlockAnchor getLabelAnchor() {
         return this.labelAnchor;
@@ -193,7 +178,7 @@ public class CategoryLabelPosition implements Serializable {
     /**
      * Returns the rotation anchor point.
      *
-     * @return The rotation anchor point (never <code>null</code>).
+     * @return The rotation anchor point (never {@code null}).
      */
     public TextAnchor getRotationAnchor() {
         return this.rotationAnchor;
@@ -211,7 +196,7 @@ public class CategoryLabelPosition implements Serializable {
     /**
      * Returns the width calculation type.
      *
-     * @return The width calculation type (never <code>null</code>).
+     * @return The width calculation type (never {@code null}).
      */
     public CategoryLabelWidthType getWidthType() {
         return this.widthType;
@@ -229,10 +214,11 @@ public class CategoryLabelPosition implements Serializable {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -267,6 +253,7 @@ public class CategoryLabelPosition implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 19;
         result = 37 * result + this.categoryAnchor.hashCode();

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * ImageTitle.java
  * ---------------
- * (C) Copyright 2000-2008, by David Berry and Contributors;
+ * (C) Copyright 2000-2016, by David Berry and Contributors;
  *
  * Original Author:  David Berry;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -50,7 +50,6 @@
  * 20-Apr-2005 : Added new draw() method (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 20-Jun-2007 : Removed JCommon dependency (DG);
  * 11-Apr-2008 : Added arrange() method override to account for margin, border
  *               and padding (DG);
  * 21-Apr-2008 : Added equals() method override (DG);
@@ -65,12 +64,12 @@ import java.awt.geom.Rectangle2D;
 
 import org.jfree.chart.block.RectangleConstraint;
 import org.jfree.chart.event.TitleChangeEvent;
-import org.jfree.chart.util.HorizontalAlignment;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.chart.util.Size2D;
-import org.jfree.chart.util.VerticalAlignment;
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.ui.VerticalAlignment;
+import org.jfree.chart.util.ObjectUtils;
 
 /**
  * A chart title that displays an image.  This is useful, for example, if you
@@ -95,7 +94,7 @@ public class ImageTitle extends Title {
     /**
      * Creates a new image title.
      *
-     * @param image  the image (<code>null</code> not permitted).
+     * @param image  the image ({@code null} not permitted).
      */
     public ImageTitle(Image image) {
         this(image, image.getHeight(null), image.getWidth(null),
@@ -106,7 +105,7 @@ public class ImageTitle extends Title {
     /**
      * Creates a new image title.
      *
-     * @param image  the image (<code>null</code> not permitted).
+     * @param image  the image ({@code null} not permitted).
      * @param position  the title position.
      * @param horizontalAlignment  the horizontal alignment.
      * @param verticalAlignment  the vertical alignment.
@@ -124,7 +123,7 @@ public class ImageTitle extends Title {
      * Creates a new image title with the given image scaled to the given
      * width and height in the given location.
      *
-     * @param image  the image (<code>null</code> not permitted).
+     * @param image  the image ({@code null} not permitted).
      * @param height  the height used to draw the image.
      * @param width  the width used to draw the image.
      * @param position  the title position.
@@ -152,7 +151,7 @@ public class ImageTitle extends Title {
     /**
      * Returns the image for the title.
      *
-     * @return The image for the title (never <code>null</code>).
+     * @return The image for the title (never {@code null}).
      */
     public Image getImage() {
         return this.image;
@@ -162,7 +161,7 @@ public class ImageTitle extends Title {
      * Sets the image for the title and notifies registered listeners that the
      * title has been modified.
      *
-     * @param image  the new image (<code>null</code> not permitted).
+     * @param image  the new image ({@code null} not permitted).
      */
     public void setImage(Image image) {
         if (image == null) {
@@ -177,10 +176,11 @@ public class ImageTitle extends Title {
      * returns the block size.
      *
      * @param g2  the graphics device.
-     * @param constraint  the constraint (<code>null</code> not permitted).
+     * @param constraint  the constraint ({@code null} not permitted).
      *
-     * @return The block size (in Java2D units, never <code>null</code>).
+     * @return The block size (in Java2D units, never {@code null}).
      */
+    @Override
     public Size2D arrange(Graphics2D g2, RectangleConstraint constraint) {
         Size2D s = new Size2D(this.image.getWidth(null),
                 this.image.getHeight(null));
@@ -195,6 +195,7 @@ public class ImageTitle extends Title {
      * @param g2  the graphics device.
      * @param area  the area allocated for the title.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area) {
         RectangleEdge position = getPosition();
         if (position == RectangleEdge.TOP || position == RectangleEdge.BOTTOM) {
@@ -220,12 +221,11 @@ public class ImageTitle extends Title {
      * @return The size of the area used by the title.
      */
     protected Size2D drawHorizontal(Graphics2D g2, Rectangle2D chartArea) {
-
-        double startY = 0.0;
-        double topSpace = 0.0;
-        double bottomSpace = 0.0;
-        double leftSpace = 0.0;
-        double rightSpace = 0.0;
+        double startY;
+        double topSpace;
+        double bottomSpace;
+        double leftSpace;
+        double rightSpace;
 
         double w = getWidth();
         double h = getHeight();
@@ -275,7 +275,7 @@ public class ImageTitle extends Title {
      */
     protected Size2D drawVertical(Graphics2D g2, Rectangle2D chartArea) {
 
-        double startX = 0.0;
+        double startX;
         double topSpace = 0.0;
         double bottomSpace = 0.0;
         double leftSpace = 0.0;
@@ -326,29 +326,31 @@ public class ImageTitle extends Title {
      *
      * @param g2  the graphics device.
      * @param area  the area.
-     * @param params  ignored (<code>null</code> permitted).
+     * @param params  ignored ({@code null} permitted).
      *
-     * @return Always <code>null</code>.
+     * @return Always {@code null}.
      */
+    @Override
     public Object draw(Graphics2D g2, Rectangle2D area, Object params) {
         draw(g2, area);
         return null;
     }
 
     /**
-     * Tests this <code>ImageTitle</code> for equality with an arbitrary
-     * object.  Returns <code>true</code> if:
+     * Tests this {@code ImageTitle} for equality with an arbitrary
+     * object.  Returns {@code true} if:
      * <ul>
-     * <li><code>obj</code> is an instance of <code>ImageTitle</code>;
-     * <li><code>obj</code> references the same image as this
-     *     <code>ImageTitle</code>;
-     * <li><code>super.equals(obj)<code> returns <code>true</code>;
+     * <li>{@code obj} is an instance of {@code ImageTitle};
+     * <li>{@code obj} references the same image as this
+     *     {@code ImageTitle};
+     * <li>{@code super.equals(obj)} returns {@code true};
      * </ul>
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -357,7 +359,7 @@ public class ImageTitle extends Title {
             return false;
         }
         ImageTitle that = (ImageTitle) obj;
-        if (!ObjectUtilities.equal(this.image, that.image)) {
+        if (!ObjectUtils.equal(this.image, that.image)) {
             return false;
         }
         return super.equals(obj);

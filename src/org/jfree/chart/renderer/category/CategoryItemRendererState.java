@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------------
  * CategoryItemRendererState.java
@@ -48,7 +48,6 @@ package org.jfree.chart.renderer.category;
 import org.jfree.chart.plot.CategoryCrosshairState;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.renderer.RendererState;
-import org.jfree.data.category.CategoryDatasetSelectionState;
 
 /**
  * An object that retains temporary state information for a
@@ -74,17 +73,10 @@ public class CategoryItemRendererState extends RendererState {
     private CategoryCrosshairState crosshairState;
 
     /**
-     * The selection state for the dataset, or <code>null</code>.
-     *
-     * @since 1.2.0
-     */
-    private CategoryDatasetSelectionState selectionState;
-
-    /**
      * Creates a new object for recording temporary state information for a
      * renderer.
      *
-     * @param info  the plot rendering info (<code>null</code> permitted).
+     * @param info  the plot rendering info ({@code null} permitted).
      */
     public CategoryItemRendererState(PlotRenderingInfo info) {
         super(info);
@@ -141,7 +133,7 @@ public class CategoryItemRendererState extends RendererState {
     /**
      * Returns the crosshair state, if any.
      *
-     * @return The crosshair state (possibly <code>null</code>).
+     * @return The crosshair state (possibly {@code null}).
      *
      * @since 1.0.11
      *
@@ -154,7 +146,7 @@ public class CategoryItemRendererState extends RendererState {
     /**
      * Sets the crosshair state.
      *
-     * @param state  the new state (<code>null</code> permitted).
+     * @param state  the new state ({@code null} permitted).
      *
      * @since 1.0.11
      *
@@ -177,17 +169,17 @@ public class CategoryItemRendererState extends RendererState {
      * @since 1.0.13
      */
     public int getVisibleSeriesIndex(int rowIndex) {
-    	if (this.visibleSeries == null) {
-    	    return rowIndex;
-    	}
-		int index = -1;
-		for (int vRow = 0; vRow < this.visibleSeries.length ; vRow++){
-			if (this.visibleSeries[vRow] == rowIndex) {
-				index = vRow;
-				break;
-			}
-		}
-		return index;
+        if (this.visibleSeries == null) {
+            return rowIndex;
+        }
+        int index = -1;
+        for (int vRow = 0; vRow < this.visibleSeries.length; vRow++) {
+            if (this.visibleSeries[vRow] == rowIndex) {
+                index = vRow;
+                break;
+            }
+        }
+        return index;
     }
 
     /**
@@ -199,17 +191,17 @@ public class CategoryItemRendererState extends RendererState {
      * @since 1.0.13
      */
     public int getVisibleSeriesCount() {
-    	if (this.visibleSeries == null) {
-    	    return -1;
-    	}
-    	return this.visibleSeries.length;
+        if (this.visibleSeries == null) {
+            return -1;
+        }
+        return this.visibleSeries.length;
     }
 
     /**
      * Returns a copy of the visible series array.
-     *
-     * @return The visible series array (possibly <code>null</code>).
-     *
+     * 
+     * @return The visible series array (possibly {@code null}).
+     * 
      * @since 1.0.13
      */
     public int[] getVisibleSeriesArray() {
@@ -225,34 +217,12 @@ public class CategoryItemRendererState extends RendererState {
     /**
      * Sets an array with the indices of the visible rows.
      *
-     * @param visibleSeries the array (<code>null</code> permitted).
+     * @param visibleSeries the array ({@code null} permitted).
      *
      * @since 1.0.13
      */
     public void setVisibleSeriesArray(int[] visibleSeries) {
         this.visibleSeries = visibleSeries;
-    }
-
-    /**
-     * Returns the selection state.
-     *
-     * @return The selection state (possibly <code>null</code>).
-     *
-     * @since 1.2.0
-     */
-    public CategoryDatasetSelectionState getSelectionState() {
-        return this.selectionState;
-    }
-
-    /**
-     * Sets the selection state.
-     *
-     * @param state  the selection state (<code>null</code> permitted).
-     *
-     * @since 1.2.0
-     */
-    public void setSelectionState(CategoryDatasetSelectionState state) {
-        this.selectionState = state;
     }
 
 }

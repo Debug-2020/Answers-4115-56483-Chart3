@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * CategoryLineAnnotation.java
  * ---------------------------
- * (C) Copyright 2005-2009, by Object Refinery Limited.
+ * (C) Copyright 2005-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (patch 2809117);
@@ -37,10 +37,9 @@
  * 29-Jul-2005 : Version 1, based on CategoryTextAnnotation (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 06-Mar-2007 : Reimplemented hashCode() (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
- * 06-Jul-2007 : Updated for changes to CategoryAnnotation interface (DG);
  * 23-Apr-2008 : Implemented PublicCloneable (DG);
  * 24-Jun-2009 : Now extends AbstractAnnotation (see patch 2809117 by PK) (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -57,25 +56,26 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.axis.CategoryAnchor;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.event.AnnotationChangeEvent;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 import org.jfree.data.category.CategoryDataset;
 
 /**
  * A line annotation that can be placed on a {@link CategoryPlot}.
  */
-public class CategoryLineAnnotation extends AbstractAnnotation
+public class CategoryLineAnnotation extends AbstractAnnotation 
         implements CategoryAnnotation, Cloneable, PublicCloneable,
         Serializable {
 
@@ -95,7 +95,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
     private double value2;
 
     /** The line color. */
-    private transient Paint paint = Color.black;
+    private transient Paint paint = Color.BLACK;
 
     /** The line stroke. */
     private transient Stroke stroke = new BasicStroke(1.0f);
@@ -104,29 +104,21 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      * Creates a new annotation that draws a line between (category1, value1)
      * and (category2, value2).
      *
-     * @param category1  the category (<code>null</code> not permitted).
+     * @param category1  the category ({@code null} not permitted).
      * @param value1  the value.
-     * @param category2  the category (<code>null</code> not permitted).
+     * @param category2  the category ({@code null} not permitted).
      * @param value2  the value.
-     * @param paint  the line color (<code>null</code> not permitted).
-     * @param stroke  the line stroke (<code>null</code> not permitted).
+     * @param paint  the line color ({@code null} not permitted).
+     * @param stroke  the line stroke ({@code null} not permitted).
      */
     public CategoryLineAnnotation(Comparable category1, double value1,
                                   Comparable category2, double value2,
                                   Paint paint, Stroke stroke) {
         super();
-        if (category1 == null) {
-            throw new IllegalArgumentException("Null 'category1' argument.");
-        }
-        if (category2 == null) {
-            throw new IllegalArgumentException("Null 'category2' argument.");
-        }
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
+        Args.nullNotPermitted(category1, "category1");
+        Args.nullNotPermitted(category2, "category2");
+        Args.nullNotPermitted(paint, "paint");
+        Args.nullNotPermitted(stroke, "stroke");
         this.category1 = category1;
         this.value1 = value1;
         this.category2 = category2;
@@ -138,7 +130,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
     /**
      * Returns the category for the start of the line.
      *
-     * @return The category for the start of the line (never <code>null</code>).
+     * @return The category for the start of the line (never {@code null}).
      *
      * @see #setCategory1(Comparable)
      */
@@ -150,14 +142,12 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      * Sets the category for the start of the line and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param category  the category (<code>null</code> not permitted).
+     * @param category  the category ({@code null} not permitted).
      *
      * @see #getCategory1()
      */
     public void setCategory1(Comparable category) {
-        if (category == null) {
-            throw new IllegalArgumentException("Null 'category' argument.");
-        }
+        Args.nullNotPermitted(category, "category");
         this.category1 = category;
         fireAnnotationChanged();
     }
@@ -189,7 +179,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
     /**
      * Returns the category for the end of the line.
      *
-     * @return The category for the end of the line (never <code>null</code>).
+     * @return The category for the end of the line (never {@code null}).
      *
      * @see #setCategory2(Comparable)
      */
@@ -201,14 +191,12 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      * Sets the category for the end of the line and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param category  the category (<code>null</code> not permitted).
+     * @param category  the category ({@code null} not permitted).
      *
      * @see #getCategory2()
      */
     public void setCategory2(Comparable category) {
-        if (category == null) {
-            throw new IllegalArgumentException("Null 'category' argument.");
-        }
+        Args.nullNotPermitted(category, "category");
         this.category2 = category;
         fireAnnotationChanged();
     }
@@ -240,7 +228,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
     /**
      * Returns the paint used to draw the connecting line.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setPaint(Paint)
      */
@@ -252,14 +240,12 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      * Sets the paint used to draw the connecting line and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPaint()
      */
     public void setPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.paint = paint;
         fireAnnotationChanged();
     }
@@ -267,7 +253,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
     /**
      * Returns the stroke used to draw the connecting line.
      *
-     * @return The stroke (never <code>null</code>).
+     * @return The stroke (never {@code null}).
      *
      * @see #setStroke(Stroke)
      */
@@ -279,14 +265,12 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      * Sets the stroke used to draw the connecting line and sends an
      * {@link AnnotationChangeEvent} to all registered listeners.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      *
      * @see #getStroke()
      */
     public void setStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.stroke = stroke;
         fireAnnotationChanged();
     }
@@ -299,12 +283,10 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      * @param dataArea  the data area.
      * @param domainAxis  the domain axis.
      * @param rangeAxis  the range axis.
-     * @param rendererIndex  the renderer index.
-     * @param info  the plot info (<code>null</code> permitted).
      */
+    @Override
     public void draw(Graphics2D g2, CategoryPlot plot, Rectangle2D dataArea,
-            CategoryAxis domainAxis, ValueAxis rangeAxis,
-            int rendererIndex, PlotRenderingInfo info) {
+                     CategoryAxis domainAxis, ValueAxis rangeAxis) {
 
         CategoryDataset dataset = plot.getDataset();
         int catIndex1 = dataset.getColumnIndex(this.category1);
@@ -349,10 +331,11 @@ public class CategoryLineAnnotation extends AbstractAnnotation
     /**
      * Tests this object for equality with another.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -373,10 +356,10 @@ public class CategoryLineAnnotation extends AbstractAnnotation
         if (this.value2 != that.getValue2()) {
             return false;
         }
-        if (!PaintUtilities.equal(this.paint, that.paint)) {
+        if (!PaintUtils.equal(this.paint, that.paint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.stroke, that.stroke)) {
+        if (!ObjectUtils.equal(this.stroke, that.stroke)) {
             return false;
         }
         return true;
@@ -387,6 +370,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
         result = 37 * result + this.category1.hashCode();
@@ -395,7 +379,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
         result = 37 * result + this.category2.hashCode();
         temp = Double.doubleToLongBits(this.value2);
         result = 37 * result + (int) (temp ^ (temp >>> 32));
-        result = 37 * result + HashUtilities.hashCodeForPaint(this.paint);
+        result = 37 * result + HashUtils.hashCodeForPaint(this.paint);
         result = 37 * result + this.stroke.hashCode();
         return result;
     }
@@ -408,6 +392,7 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      * @throws CloneNotSupportedException  this class will not throw this
      *         exception, but subclasses (if any) might.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -421,8 +406,8 @@ public class CategoryLineAnnotation extends AbstractAnnotation
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
-        SerialUtilities.writeStroke(this.stroke, stream);
+        SerialUtils.writePaint(this.paint, stream);
+        SerialUtils.writeStroke(this.stroke, stream);
     }
 
     /**
@@ -436,8 +421,8 @@ public class CategoryLineAnnotation extends AbstractAnnotation
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
-        this.stroke = SerialUtilities.readStroke(stream);
+        this.paint = SerialUtils.readPaint(stream);
+        this.stroke = SerialUtils.readStroke(stream);
     }
 
 }

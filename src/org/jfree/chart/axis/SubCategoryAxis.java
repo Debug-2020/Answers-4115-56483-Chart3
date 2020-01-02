@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * SubCategoryAxis.java
  * --------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert;
  * Contributor(s):   Adriaan Joubert;
@@ -43,11 +43,11 @@
  *               Joubert (1277726) (DG);
  * 30-May-2007 : Added argument check and event notification to
  *               addSubCategory() (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
- * 02-Jul-2007 : Added entity support for axis labels (DG);
  * 13-Nov-2008 : Fix NullPointerException when dataset is null - see bug
  *               report 2275695 (DG);
- *
+ * 02-Jul-2013 : Use ParamChecks (DG);
+ * 01-Aug-2013 : Added attributedLabel override to support superscripts,
+ *               subscripts and more (DG);
  */
 
 package org.jfree.chart.axis;
@@ -69,10 +69,11 @@ import org.jfree.chart.event.AxisChangeEvent;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.text.TextAnchor;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 import org.jfree.data.category.CategoryDataset;
 
 /**
@@ -88,10 +89,10 @@ public class SubCategoryAxis extends CategoryAxis
     private List subCategories;
 
     /** The font for the sub-category labels. */
-    private Font subLabelFont = new Font("Tahoma", Font.PLAIN, 10);
+    private Font subLabelFont = new Font("SansSerif", Font.PLAIN, 10);
 
     /** The paint for the sub-category labels. */
-    private transient Paint subLabelPaint = Color.black;
+    private transient Paint subLabelPaint = Color.BLACK;
 
     /**
      * Creates a new axis.
@@ -107,12 +108,10 @@ public class SubCategoryAxis extends CategoryAxis
      * Adds a sub-category to the axis and sends an {@link AxisChangeEvent} to
      * all registered listeners.
      *
-     * @param subCategory  the sub-category (<code>null</code> not permitted).
+     * @param subCategory  the sub-category ({@code null} not permitted).
      */
     public void addSubCategory(Comparable subCategory) {
-        if (subCategory == null) {
-            throw new IllegalArgumentException("Null 'subcategory' axis.");
-        }
+        Args.nullNotPermitted(subCategory, "subCategory");
         this.subCategories.add(subCategory);
         notifyListeners(new AxisChangeEvent(this));
     }
@@ -120,7 +119,7 @@ public class SubCategoryAxis extends CategoryAxis
     /**
      * Returns the font used to display the sub-category labels.
      *
-     * @return The font (never <code>null</code>).
+     * @return The font (never {@code null}).
      *
      * @see #setSubLabelFont(Font)
      */
@@ -132,14 +131,12 @@ public class SubCategoryAxis extends CategoryAxis
      * Sets the font used to display the sub-category labels and sends an
      * {@link AxisChangeEvent} to all registered listeners.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getSubLabelFont()
      */
     public void setSubLabelFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.subLabelFont = font;
         notifyListeners(new AxisChangeEvent(this));
     }
@@ -147,7 +144,7 @@ public class SubCategoryAxis extends CategoryAxis
     /**
      * Returns the paint used to display the sub-category labels.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setSubLabelPaint(Paint)
      */
@@ -159,14 +156,12 @@ public class SubCategoryAxis extends CategoryAxis
      * Sets the paint used to display the sub-category labels and sends an
      * {@link AxisChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getSubLabelPaint()
      */
     public void setSubLabelPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.subLabelPaint = paint;
         notifyListeners(new AxisChangeEvent(this));
     }
@@ -182,9 +177,9 @@ public class SubCategoryAxis extends CategoryAxis
      *
      * @return The space required to draw the axis.
      */
-    public AxisSpace reserveSpace(Graphics2D g2, Plot plot,
-                                  Rectangle2D plotArea,
-                                  RectangleEdge edge, AxisSpace space) {
+    @Override
+    public AxisSpace reserveSpace(Graphics2D g2, Plot plot, 
+            Rectangle2D plotArea, RectangleEdge edge, AxisSpace space) {
 
         // create a new space object if one wasn't supplied...
         if (space == null) {
@@ -224,8 +219,8 @@ public class SubCategoryAxis extends CategoryAxis
         while (iterator.hasNext()) {
             Comparable subcategory = (Comparable) iterator.next();
             String label = subcategory.toString();
-            Rectangle2D bounds = TextUtilities.getTextBounds(label, g2, fm);
-            double dim = 0.0;
+            Rectangle2D bounds = TextUtils.getTextBounds(label, g2, fm);
+            double dim;
             if (RectangleEdge.isLeftOrRight(edge)) {
                 dim = bounds.getWidth();
             }
@@ -241,24 +236,22 @@ public class SubCategoryAxis extends CategoryAxis
      * Draws the axis on a Java 2D graphics device (such as the screen or a
      * printer).
      *
-     * @param g2  the graphics device (<code>null</code> not permitted).
+     * @param g2  the graphics device ({@code null} not permitted).
      * @param cursor  the cursor location.
      * @param plotArea  the area within which the axis should be drawn
-     *                  (<code>null</code> not permitted).
+     *                  ({@code null} not permitted).
      * @param dataArea  the area within which the plot is being drawn
-     *                  (<code>null</code> not permitted).
-     * @param edge  the location of the axis (<code>null</code> not permitted).
+     *                  ({@code null} not permitted).
+     * @param edge  the location of the axis ({@code null} not permitted).
      * @param plotState  collects information about the plot
-     *                   (<code>null</code> permitted).
+     *                   ({@code null} permitted).
      *
-     * @return The axis state (never <code>null</code>).
+     * @return The axis state (never {@code null}).
      */
-    public AxisState draw(Graphics2D g2,
-                          double cursor,
-                          Rectangle2D plotArea,
-                          Rectangle2D dataArea,
-                          RectangleEdge edge,
-                          PlotRenderingInfo plotState) {
+    @Override
+    public AxisState draw(Graphics2D g2, double cursor, Rectangle2D plotArea,
+            Rectangle2D dataArea, RectangleEdge edge, 
+            PlotRenderingInfo plotState) {
 
         // if the axis is not visible, don't draw it...
         if (!isVisible()) {
@@ -271,13 +264,16 @@ public class SubCategoryAxis extends CategoryAxis
 
         // draw the category labels and axis label
         AxisState state = new AxisState(cursor);
-        state = drawSubCategoryLabels(g2, plotArea, dataArea, edge, state,
+        state = drawSubCategoryLabels(g2, plotArea, dataArea, edge, state, 
                 plotState);
         state = drawCategoryLabels(g2, plotArea, dataArea, edge, state,
                 plotState);
-        state = drawLabel(getLabel(), g2, plotArea, dataArea, edge, state,
-                plotState);
-
+        if (getAttributedLabel() != null) {
+            state = drawAttributedLabel(getAttributedLabel(), g2, plotArea, 
+                    dataArea, edge, state);
+        } else {
+            state = drawLabel(getLabel(), g2, plotArea, dataArea, edge, state);
+        } 
         return state;
 
     }
@@ -285,27 +281,22 @@ public class SubCategoryAxis extends CategoryAxis
     /**
      * Draws the category labels and returns the updated axis state.
      *
-     * @param g2  the graphics device (<code>null</code> not permitted).
-     * @param plotArea  the plot area (<code>null</code> not permitted).
-     * @param dataArea  the area inside the axes (<code>null</code> not
+     * @param g2  the graphics device ({@code null} not permitted).
+     * @param plotArea  the plot area ({@code null} not permitted).
+     * @param dataArea  the area inside the axes ({@code null} not
      *                  permitted).
-     * @param edge  the axis location (<code>null</code> not permitted).
-     * @param state  the axis state (<code>null</code> not permitted).
-     * @param plotState  collects information about the plot (<code>null</code>
+     * @param edge  the axis location ({@code null} not permitted).
+     * @param state  the axis state ({@code null} not permitted).
+     * @param plotState  collects information about the plot ({@code null}
      *                   permitted).
      *
-     * @return The updated axis state (never <code>null</code>).
+     * @return The updated axis state (never {@code null}).
      */
     protected AxisState drawSubCategoryLabels(Graphics2D g2,
-                                              Rectangle2D plotArea,
-                                              Rectangle2D dataArea,
-                                              RectangleEdge edge,
-                                              AxisState state,
-                                              PlotRenderingInfo plotState) {
+            Rectangle2D plotArea, Rectangle2D dataArea, RectangleEdge edge,
+            AxisState state, PlotRenderingInfo plotState) {
 
-        if (state == null) {
-            throw new IllegalArgumentException("Null 'state' argument.");
-        }
+        Args.nullNotPermitted(state, "state");
 
         g2.setFont(this.subLabelFont);
         g2.setPaint(this.subLabelPaint);
@@ -361,8 +352,7 @@ public class SubCategoryAxis extends CategoryAxis
             int subCategoryCount = this.subCategories.size();
             float width = (float) ((x1 - x0) / subCategoryCount);
             float height = (float) ((y1 - y0) / subCategoryCount);
-            float xx = 0.0f;
-            float yy = 0.0f;
+            float xx, yy;
             for (int i = 0; i < subCategoryCount; i++) {
                 if (RectangleEdge.isTopOrBottom(edge)) {
                     xx = (float) (x0 + (i + 0.5) * width);
@@ -373,7 +363,7 @@ public class SubCategoryAxis extends CategoryAxis
                     yy = (float) (y0 + (i + 0.5) * height);
                 }
                 String label = this.subCategories.get(i).toString();
-                TextUtilities.drawRotatedString(label, g2, xx, yy,
+                TextUtils.drawRotatedString(label, g2, xx, yy,
                         TextAnchor.CENTER, 0.0, TextAnchor.CENTER);
             }
         }
@@ -400,10 +390,11 @@ public class SubCategoryAxis extends CategoryAxis
     /**
      * Tests the axis for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -425,6 +416,16 @@ public class SubCategoryAxis extends CategoryAxis
     }
 
     /**
+     * Returns a hashcode for this instance.
+     * 
+     * @return A hashcode for this instance. 
+     */
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    /**
      * Provides serialization support.
      *
      * @param stream  the output stream.
@@ -433,7 +434,7 @@ public class SubCategoryAxis extends CategoryAxis
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.subLabelPaint, stream);
+        SerialUtils.writePaint(this.subLabelPaint, stream);
     }
 
     /**
@@ -447,7 +448,7 @@ public class SubCategoryAxis extends CategoryAxis
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.subLabelPaint = SerialUtilities.readPaint(stream);
+        this.subLabelPaint = SerialUtils.readPaint(stream);
     }
 
 }

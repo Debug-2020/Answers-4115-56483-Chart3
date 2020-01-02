@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
- * -------------------
- * ChartSelection.java
- * -------------------
- * (C) Copyright 2009, by Object Refinery Limited.
+ * ----------------------
+ * ChartTransferable.java
+ * ----------------------
+ * (C) Copyright 2009-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -60,8 +60,8 @@ public class ChartTransferable implements Transferable {
 
     /** The data flavor. */
     final DataFlavor imageFlavor = new DataFlavor(
-            "image/x-java-image; class=java.awt.Image", "Image");
-
+            "image/x-java-image; class=java.awt.Image", "Image");    
+    
     /** The chart. */
     private JFreeChart chart;
 
@@ -88,9 +88,9 @@ public class ChartTransferable implements Transferable {
     private int minDrawHeight;
 
     /**
-     * The largest width at which the chart will be drawn (if necessary, the
-     * chart will then be scaled up to fit the requested width).
-     *
+     * The largest width at which the chart will be drawn (if necessary, the 
+     * chart will then be scaled up to fit the requested width). 
+     * 
      * @since 1.0.14
      */
     private int maxDrawWidth;
@@ -169,20 +169,22 @@ public class ChartTransferable implements Transferable {
 
     /**
      * Returns the data flavors supported.
-     *
+     * 
      * @return The data flavors supported.
      */
+    @Override
     public DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[] {this.imageFlavor};
     }
 
     /**
-     * Returns <code>true</code> if the specified flavor is supported.
+     * Returns {@code true} if the specified flavor is supported.
      *
      * @param flavor  the flavor.
      *
      * @return A boolean.
      */
+    @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
         return this.imageFlavor.equals(flavor);
     }
@@ -194,18 +196,18 @@ public class ChartTransferable implements Transferable {
      *
      * @return The content.
      *
-     * @throws UnsupportedFlavorException
-     * @throws IOException
+     * @throws java.awt.datatransfer.UnsupportedFlavorException if the flavor 
+     *         is not supported.
+     * @throws java.io.IOException if there is an IO problem.
      */
+    @Override
     public Object getTransferData(DataFlavor flavor)
             throws UnsupportedFlavorException, IOException {
-
         if (this.imageFlavor.equals(flavor)) {
             return createBufferedImage(this.chart, this.width, this.height,
                     this.minDrawWidth, this.minDrawHeight, this.maxDrawWidth,
                     this.maxDrawHeight);
-        }
-        else {
+        } else {
             throw new UnsupportedFlavorException(flavor);
         }
     }

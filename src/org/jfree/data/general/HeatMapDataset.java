@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * HeatMapDataset.java
  * -------------------
- * (C) Copyright 2009, by Object Refinery Limited.
+ * (C) Copyright 2009-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -43,7 +43,7 @@ package org.jfree.data.general;
 /**
  * A dataset that represents a rectangular grid of (x, y, z) values.  The x
  * and y values appear at regular intervals in the dataset, while the z-values
- * can take any value (including <code>null</code> for unknown values).
+ * can take any value (including {@code null} for unknown values).
  *
  * @since 1.0.13
  */
@@ -53,8 +53,8 @@ public interface HeatMapDataset {
      * Returns the number of x values across the width of the dataset.  The
      * values are evenly spaced between {@link #getMinimumXValue()} and
      * {@link #getMaximumXValue()}.
-     *
-     * @return The number of x-values (always > 0).
+     * 
+     * @return The number of x-values (always &gt; 0).
      */
     public int getXSampleCount();
 
@@ -63,7 +63,7 @@ public interface HeatMapDataset {
      * values are evenly spaced between {@link #getMinimumYValue()} and
      * {@link #getMaximumYValue()}.
      *
-     * @return The number of y-values (always > 0).
+     * @return The number of y-values (always &gt; 0).
      */
     public int getYSampleCount();
 
@@ -105,18 +105,18 @@ public interface HeatMapDataset {
 
     /**
      * A convenience method that returns the x-value for the given index.
-     *
+     * 
      * @param xIndex  the xIndex.
-     *
+     * 
      * @return The x-value.
      */
     public double getXValue(int xIndex);
 
     /**
      * A convenience method that returns the y-value for the given index.
-     *
+     * 
      * @param yIndex  the yIndex.
-     *
+     * 
      * @return The y-value.
      */
     public double getYValue(int yIndex);
@@ -134,12 +134,12 @@ public interface HeatMapDataset {
 
     /**
      * Returns the z-value at the specified sample position in the dataset.
-     * This method can return <code>null</code> to indicate a missing/unknown
+     * This method can return {@code null} to indicate a missing/unknown
      * value.
      * <br><br>
      * Bear in mind that the class implementing this interface may
      * store its data using primitives rather than objects, so calling this
-     * method may require a new <code>Number</code> object to be allocated...
+     * method may require a new {@code Number} object to be allocated...
      * for this reason, it is generally preferable to use the
      * {@link #getZValue(int, int)} method unless you *know* that the dataset
      * implementation stores the z-values using objects.
@@ -147,7 +147,7 @@ public interface HeatMapDataset {
      * @param xIndex  the position of the x sample in the dataset.
      * @param yIndex  the position of the y sample in the dataset.
      *
-     * @return The z-value (possibly <code>null</code>).
+     * @return The z-value (possibly {@code null}).
      */
     public Number getZ(int xIndex, int yIndex);
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * NormalizedMatrixSeries.java
@@ -44,7 +44,7 @@ package org.jfree.data.xy;
 /**
  * Represents a dense normalized matrix M[i,j] where each Mij item of the
  * matrix has a value (default is 0). When a matrix item is observed using
- * <code>getItem</code> method, it is normalized, that is, divided by the
+ * {@code getItem()} method, it is normalized, that is, divided by the
  * total sum of all items. It can be also be scaled by setting a scale factor.
  */
 public class NormalizedMatrixSeries extends MatrixSeries {
@@ -87,8 +87,9 @@ public class NormalizedMatrixSeries extends MatrixSeries {
      *
      * @return The value.
      *
-     * @see MatrixSeries#getItem(int)
+     * @see org.jfree.data.xy.MatrixSeries#getItem(int)
      */
+    @Override
     public Number getItem(int itemIndex) {
         int i = getItemRow(itemIndex);
         int j = getItemColumn(itemIndex);
@@ -133,6 +134,7 @@ public class NormalizedMatrixSeries extends MatrixSeries {
      *
      * @see #get(int, int)
      */
+    @Override
     public void update(int i, int j, double mij) {
         this.m_totalSum -= get(i, j);
         this.m_totalSum += mij;
@@ -141,8 +143,9 @@ public class NormalizedMatrixSeries extends MatrixSeries {
     }
 
     /**
-     * @see MatrixSeries#zeroAll()
+     * @see org.jfree.data.xy.MatrixSeries#zeroAll()
      */
+    @Override
     public void zeroAll() {
         this.m_totalSum = 0;
         super.zeroAll();

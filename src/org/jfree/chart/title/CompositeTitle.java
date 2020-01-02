@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * CompositeTitle.java
  * -------------------
- * (C) Copyright 2005-2008, by David Gilbert and Contributors.
+ * (C) Copyright 2005-2016, by David Gilbert and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Eric Penfold (patch 2006826);
@@ -39,10 +39,10 @@
  * 04-Feb-2005 : Implemented MAXIMUM_WIDTH in calculateSize (DG);
  * 20-Apr-2005 : Added new draw() method (DG);
  * 03-May-2005 : Implemented equals() method (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 02-Jul-2008 : Applied patch 2006826 by Eric Penfold, to enable chart
  *               entities to be generated (DG);
  * 09-Jul-2008 : Added backgroundPaint field (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -60,9 +60,10 @@ import org.jfree.chart.block.BlockContainer;
 import org.jfree.chart.block.BorderArrangement;
 import org.jfree.chart.block.RectangleConstraint;
 import org.jfree.chart.event.TitleChangeEvent;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.Size2D;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A title that contains multiple titles within a {@link BlockContainer}.
@@ -92,12 +93,10 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
     /**
      * Creates a new title using the specified container.
      *
-     * @param container  the container (<code>null</code> not permitted).
+     * @param container  the container ({@code null} not permitted).
      */
     public CompositeTitle(BlockContainer container) {
-        if (container == null) {
-            throw new IllegalArgumentException("Null 'container' argument.");
-        }
+        Args.nullNotPermitted(container, "container");
         this.container = container;
         this.backgroundPaint = null;
     }
@@ -105,7 +104,7 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
     /**
      * Returns the background paint.
      *
-     * @return The paint (possibly <code>null</code>).
+     * @return The paint (possibly {@code null}).
      *
      * @since 1.0.11
      */
@@ -115,10 +114,10 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
 
     /**
      * Sets the background paint and sends a {@link TitleChangeEvent} to all
-     * registered listeners.  If you set this attribute to <code>null</code>,
+     * registered listeners.  If you set this attribute to {@code null},
      * no background is painted (which makes the title background transparent).
      *
-     * @param paint  the background paint (<code>null</code> permitted).
+     * @param paint  the background paint ({@code null} permitted).
      *
      * @since 1.0.11
      */
@@ -130,7 +129,7 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
     /**
      * Returns the container holding the titles.
      *
-     * @return The title container (never <code>null</code>).
+     * @return The title container (never {@code null}).
      */
     public BlockContainer getContainer() {
         return this.container;
@@ -139,12 +138,10 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
     /**
      * Sets the title container.
      *
-     * @param container  the container (<code>null</code> not permitted).
+     * @param container  the container ({@code null} not permitted).
      */
     public void setTitleContainer(BlockContainer container) {
-        if (container == null) {
-            throw new IllegalArgumentException("Null 'container' argument.");
-        }
+        Args.nullNotPermitted(container, "container");
         this.container = container;
     }
 
@@ -153,10 +150,11 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
      * returns the block size.
      *
      * @param g2  the graphics device.
-     * @param constraint  the constraint (<code>null</code> not permitted).
+     * @param constraint  the constraint ({@code null} not permitted).
      *
-     * @return The block size (in Java2D units, never <code>null</code>).
+     * @return The block size (in Java2D units, never {@code null}).
      */
+    @Override
     public Size2D arrange(Graphics2D g2, RectangleConstraint constraint) {
         RectangleConstraint contentConstraint = toContentConstraint(constraint);
         Size2D contentSize = this.container.arrange(g2, contentConstraint);
@@ -171,6 +169,7 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
      * @param g2  the graphics device.
      * @param area  the area allocated for the title.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area) {
         draw(g2, area, null);
     }
@@ -180,10 +179,11 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
      *
      * @param g2  the graphics device.
      * @param area  the area.
-     * @param params  ignored (<code>null</code> permitted).
+     * @param params  ignored ({@code null} permitted).
      *
-     * @return Always <code>null</code>.
+     * @return Always {@code null}.
      */
+    @Override
     public Object draw(Graphics2D g2, Rectangle2D area, Object params) {
         area = trimMargin(area);
         drawBorder(g2, area);
@@ -199,10 +199,11 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
     /**
      * Tests this title for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -214,7 +215,7 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
         if (!this.container.equals(that.container)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.backgroundPaint, that.backgroundPaint)) {
+        if (!PaintUtils.equal(this.backgroundPaint, that.backgroundPaint)) {
             return false;
         }
         return super.equals(obj);
@@ -229,7 +230,7 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.backgroundPaint, stream);
+        SerialUtils.writePaint(this.backgroundPaint, stream);
     }
 
     /**
@@ -243,7 +244,7 @@ public class CompositeTitle extends Title implements Cloneable, Serializable {
     private void readObject(ObjectInputStream stream)
             throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.backgroundPaint = SerialUtilities.readPaint(stream);
+        this.backgroundPaint = SerialUtils.readPaint(stream);
     }
 
 }

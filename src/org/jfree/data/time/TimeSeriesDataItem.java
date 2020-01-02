@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * TimeSeriesDataItem.java
  * -----------------------
- * (C) Copyright 2001-2009, by Object Refinery Limited.
+ * (C) Copyright 2001-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -43,15 +43,15 @@
  *               com.jrefinery.data.time package, implemented Serializable (DG)
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 09-Jun-2009 : Tidied up equals() (DG);
- * 29-Jun-2009 : Added 'selected' attribute (DG);
- *
+ * 03-Jul-2013 : Use ParamChecks (DG);
+ * 
  */
 
 package org.jfree.data.time;
 
 import java.io.Serializable;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 
 /**
  * Represents one data item in a time series.
@@ -74,7 +74,7 @@ import org.jfree.chart.util.ObjectUtilities;
  * often be sorted within a list, and allowing the time period to be changed
  * could destroy the sort order.
  * <P>
- * Implements the <code>Comparable</code> interface so that standard Java
+ * Implements the {@code Comparable} interface so that standard Java
  * sorting can be used to keep the data items in order.
  *
  */
@@ -90,31 +90,21 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
     private Number value;
 
     /**
-     * A flag that indicates whether or not the item is "selected".
-     *
-     * @since 1.2.0
-     */
-    private boolean selected;
-
-    /**
      * Constructs a new data item that associates a value with a time period.
      *
-     * @param period  the time period (<code>null</code> not permitted).
-     * @param value  the value (<code>null</code> permitted).
+     * @param period  the time period ({@code null} not permitted).
+     * @param value  the value ({@code null} permitted).
      */
     public TimeSeriesDataItem(RegularTimePeriod period, Number value) {
-        if (period == null) {
-            throw new IllegalArgumentException("Null 'period' argument.");
-        }
+        Args.nullNotPermitted(period, "period");
         this.period = period;
         this.value = value;
-        this.selected = false;
     }
 
     /**
      * Constructs a new data item that associates a value with a time period.
      *
-     * @param period  the time period (<code>null</code> not permitted).
+     * @param period  the time period ({@code null} not permitted).
      * @param value  the value associated with the time period.
      */
     public TimeSeriesDataItem(RegularTimePeriod period, double value) {
@@ -124,7 +114,7 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
     /**
      * Returns the time period.
      *
-     * @return The time period (never <code>null</code>).
+     * @return The time period (never {@code null}).
      */
     public RegularTimePeriod getPeriod() {
         return this.period;
@@ -133,21 +123,18 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
     /**
      * Returns the value.
      *
-     * @return The value (<code>null</code> possible).
+     * @return The value ({@code null} possible).
      *
-     * @see #setValue(Number)
+     * @see #setValue(java.lang.Number)
      */
     public Number getValue() {
         return this.value;
     }
 
     /**
-     * Sets the value for this data item.  This method provides no notification
-     * of the value change - if this item belongs to a {@link TimeSeries} you
-     * should use the {@link TimeSeries#update(int, Number)} method
-     * to change the value, because this will trigger a change event.
+     * Sets the value for this data item.
      *
-     * @param value  the value (<code>null</code> permitted).
+     * @param value  the value ({@code null} permitted).
      *
      * @see #getValue()
      */
@@ -156,39 +143,13 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
     }
 
     /**
-     * Returns <code>true</code> if the data item is selected, and
-     * <code>false</code> otherwise.
-     *
-     * @return A boolean.
-     *
-     * @see #setSelected(boolean)
-     *
-     * @since 1.2.0
-     */
-    public boolean isSelected() {
-        return this.selected;
-    }
-
-    /**
-     * Sets the selection state for this item.
-     *
-     * @param selected  the new selection state.
-     *
-     * @see #isSelected()
-     *
-     * @since 1.2.0
-     */
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the other object (<code>null</code> permitted).
+     * @param obj  the other object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -197,13 +158,10 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
             return false;
         }
         TimeSeriesDataItem that = (TimeSeriesDataItem) obj;
-        if (!this.period.equals(that.period)) {
+        if (!ObjectUtils.equal(this.period, that.period)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.value, that.value)) {
-            return false;
-        }
-        if (this.selected != that.selected) {
+        if (!ObjectUtils.equal(this.value, that.value)) {
             return false;
         }
         return true;
@@ -214,11 +172,11 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result;
         result = (this.period != null ? this.period.hashCode() : 0);
         result = 29 * result + (this.value != null ? this.value.hashCode() : 0);
-        result = HashUtilities.hashCode(result, this.selected);
         return result;
     }
 
@@ -234,6 +192,7 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
      * @return An integer indicating the order of the data item object
      *         relative to another object.
      */
+    @Override
     public int compareTo(Object o1) {
 
         int result;
@@ -258,10 +217,11 @@ public class TimeSeriesDataItem implements Cloneable, Comparable, Serializable {
 
     /**
      * Clones the data item.  Note: there is no need to clone the period or
-     * value since they are immutable instances.
+     * value since they are immutable classes.
      *
      * @return A clone of the data item.
      */
+    @Override
     public Object clone() {
         Object clone = null;
         try {

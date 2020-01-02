@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * PiePlot3D.java
  * --------------
- * (C) Copyright 2000-2008, by Object Refinery and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery and Contributors.
  *
  * Original Author:  Tomer Peretz;
  * Contributor(s):   Richard Atkinson;
@@ -36,6 +36,8 @@
  *                   Christian W. Zuckschwerdt;
  *                   Arnaud Lelievre;
  *                   Dave Crane;
+ *                   Martin Hoeller;
+ *                   DaveLaw (dave ATT davelaw DOTT de);
  *
  * Changes
  * -------
@@ -71,7 +73,6 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 27-Sep-2006 : Updated draw() method for new lookup methods (DG);
  * 22-Mar-2007 : Added equals() override (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 18-Jun-2007 : Added handling for simple label option (DG);
  * 04-Oct-2007 : Added option to darken sides of plot - thanks to Alex Moots
  *               (see patch 1805262) (DG);
@@ -79,6 +80,11 @@
  *               debug code - see debug flags in PiePlot class (DG);
  * 20-Mar-2008 : Fixed bug 1920854 - multiple redraws of the section
  *               labels (DG);
+ * 19-May-2009 : Fixed FindBugs warnings, patch by Michal Wozniak (DG);
+ * 10-Jul-2009 : Added drop shaow support (DG);
+ * 10-Oct-2011 : Localization fix: bug #3353913 (MH);
+ * 18-Oct-2011 : Fix tooltip offset with shadow generator (DG);
+ * 11-Jun-2012 : Utilise new PaintAlpha class (patch 3204823 from DaveLaw) (DG);
  *
  */
 
@@ -99,6 +105,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -108,9 +115,10 @@ import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.entity.PieSectionEntity;
 import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.labels.PieToolTipGenerator;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.data.general.DatasetUtilities;
-import org.jfree.data.pie.PieDataset;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.PaintAlpha;
+import org.jfree.data.general.DatasetUtils;
+import org.jfree.data.general.PieDataset;
 
 /**
  * A plot that displays data in the form of a 3D pie chart, using data from
@@ -147,7 +155,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
      * Creates a pie chart with a three dimensional effect using the specified
      * dataset.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public PiePlot3D(PieDataset dataset) {
         super(dataset);
@@ -180,8 +188,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
 
     /**
      * Returns a flag that controls whether or not the sides of the pie chart
-     * are rendered using a darker colour.  This is only applied if the
-     * section colour is an instance of {@link Color}.
+     * are rendered using a darker colour.
      *
      * @return A boolean.
      *
@@ -196,8 +203,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
     /**
      * Sets a flag that controls whether or not the sides of the pie chart
      * are rendered using a darker colour, and sends a {@link PlotChangeEvent}
-     * to all registered listeners.  This is only applied if the
-     * section colour is an instance of {@link Color}.
+     * to all registered listeners.
      *
      * @param darker true to darken the sides, false to use the default
      *         behaviour.
@@ -222,11 +228,11 @@ public class PiePlot3D extends PiePlot implements Serializable {
      * @param anchor  the anchor point.
      * @param parentState  the state from the parent plot, if there is one.
      * @param info  collects info about the drawing
-     *              (<code>null</code> permitted).
+     *              ({@code null} permitted).
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D plotArea, Point2D anchor,
-                     PlotState parentState,
-                     PlotRenderingInfo info) {
+                     PlotState parentState, PlotRenderingInfo info) {
 
         // adjust for insets...
         RectangleInsets insets = getInsets();
@@ -243,6 +249,16 @@ public class PiePlot3D extends PiePlot implements Serializable {
         Shape savedClip = g2.getClip();
         g2.clip(plotArea);
 
+        Graphics2D savedG2 = g2;
+        BufferedImage dataImage = null;
+        if (getShadowGenerator() != null) {
+            dataImage = new BufferedImage((int) plotArea.getWidth(),
+                (int) plotArea.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            g2 = dataImage.createGraphics();
+            g2.translate(-plotArea.getX(), -plotArea.getY());
+            g2.setRenderingHints(savedG2.getRenderingHints());
+            originalPlotArea = (Rectangle2D) plotArea.clone();
+        }
         // adjust the plot area by the interior spacing value
         double gapPercent = getInteriorGap();
         double labelPercent = 0.0;
@@ -288,9 +304,9 @@ public class PiePlot3D extends PiePlot implements Serializable {
         state.setLinkArea(linkAreaXX);
 
         if (DEBUG_DRAW_LINK_AREA) {
-            g2.setPaint(Color.blue);
+            g2.setPaint(Color.BLUE);
             g2.draw(linkAreaXX);
-            g2.setPaint(Color.yellow);
+            g2.setPaint(Color.YELLOW);
             g2.draw(new Ellipse2D.Double(linkAreaXX.getX(), linkAreaXX.getY(),
                     linkAreaXX.getWidth(), linkAreaXX.getHeight()));
         }
@@ -332,7 +348,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
 
         // get the data source - return if null;
         PieDataset dataset = getDataset();
-        if (DatasetUtilities.isEmptyOrNull(getDataset())) {
+        if (DatasetUtils.isEmptyOrNull(getDataset())) {
             drawNoDataMessage(g2, plotArea);
             g2.setClip(savedClip);
             drawOutline(g2, plotArea);
@@ -341,8 +357,8 @@ public class PiePlot3D extends PiePlot implements Serializable {
 
         // if too any elements
         if (dataset.getKeys().size() > plotArea.getWidth()) {
-            String text = "Too many elements";
-            Font sfont = new Font("Tahoma", Font.BOLD, 10);
+            String text = localizationResources.getString("Too_many_elements");
+            Font sfont = new Font("dialog", Font.BOLD, 10);
             g2.setFont(sfont);
             FontMetrics fm = g2.getFontMetrics(sfont);
             int stringWidth = fm.stringWidth(text);
@@ -364,7 +380,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
         // get a list of keys...
         List sectionKeys = dataset.getKeys();
 
-        if (sectionKeys.size() == 0) {
+        if (sectionKeys.isEmpty()) {
             return;
         }
 
@@ -377,7 +393,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
                 getForegroundAlpha()));
 
-        double totalValue = DatasetUtilities.calculatePieDatasetTotal(dataset);
+        double totalValue = DatasetUtils.calculatePieDatasetTotal(dataset);
         double runningTotal = 0;
         if (depth < 0) {
             return;  // if depth is negative don't draw anything
@@ -451,8 +467,6 @@ public class PiePlot3D extends PiePlot implements Serializable {
         // draw the bottom circle
         int[] xs;
         int[] ys;
-        arc = new Arc2D.Double(arcX, arcY + depth, pieArea.getWidth(),
-                pieArea.getHeight() - depth, 0, 360, Arc2D.PIE);
 
         int categoryCount = arcList.size();
         for (int categoryIndex = 0; categoryIndex < categoryCount;
@@ -462,9 +476,9 @@ public class PiePlot3D extends PiePlot implements Serializable {
                 continue;
             }
             Comparable key = getSectionKey(categoryIndex);
-            paint = lookupSectionPaint(key, false);
-            outlinePaint = lookupSectionOutlinePaint(key, false);
-            outlineStroke = lookupSectionOutlineStroke(key, false);
+            paint = lookupSectionPaint(key);
+            outlinePaint = lookupSectionOutlinePaint(key);
+            outlineStroke = lookupSectionOutlineStroke(key);
             g2.setPaint(paint);
             g2.fill(arc);
             g2.setPaint(outlinePaint);
@@ -480,7 +494,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
             ys = new int[] {(int) arc.getCenterY(), (int) arc.getCenterY()
                     - depth, (int) p1.getY() - depth, (int) p1.getY()};
             Polygon polygon = new Polygon(xs, ys, 4);
-            g2.setPaint(Color.lightGray);
+            g2.setPaint(java.awt.Color.lightGray);
             g2.fill(polygon);
             g2.setPaint(outlinePaint);
             g2.setStroke(outlineStroke);
@@ -500,9 +514,9 @@ public class PiePlot3D extends PiePlot implements Serializable {
             Arc2D segment = (Arc2D) iterator.next();
             if (segment != null) {
                 Comparable key = getSectionKey(cat);
-                paint = lookupSectionPaint(key, false);
-                outlinePaint = lookupSectionOutlinePaint(key, false);
-                outlineStroke = lookupSectionOutlineStroke(key, false);
+                paint = lookupSectionPaint(key);
+                outlinePaint = lookupSectionOutlinePaint(key);
+                outlineStroke = lookupSectionOutlineStroke(key);
                 drawSide(g2, pieArea, segment, front, back, paint,
                         outlinePaint, outlineStroke, false, true);
             }
@@ -516,9 +530,9 @@ public class PiePlot3D extends PiePlot implements Serializable {
             Arc2D segment = (Arc2D) iterator.next();
             if (segment != null) {
                 Comparable key = getSectionKey(cat);
-                paint = lookupSectionPaint(key, false);
-                outlinePaint = lookupSectionOutlinePaint(key, false);
-                outlineStroke = lookupSectionOutlineStroke(key, false);
+                paint = lookupSectionPaint(key);
+                outlinePaint = lookupSectionOutlinePaint(key);
+                outlineStroke = lookupSectionOutlineStroke(key);
                 drawSide(g2, pieArea, segment, front, back, paint,
                         outlinePaint, outlineStroke, true, false);
             }
@@ -541,8 +555,8 @@ public class PiePlot3D extends PiePlot implements Serializable {
 
             Comparable currentKey = (Comparable) sectionKeys.get(sectionIndex);
             paint = lookupSectionPaint(currentKey, true);
-            outlinePaint = lookupSectionOutlinePaint(currentKey, false);
-            outlineStroke = lookupSectionOutlineStroke(currentKey, false);
+            outlinePaint = lookupSectionOutlinePaint(currentKey);
+            outlineStroke = lookupSectionOutlineStroke(currentKey);
             g2.setPaint(paint);
             g2.fill(upperArc);
             g2.setStroke(outlineStroke);
@@ -587,6 +601,18 @@ public class PiePlot3D extends PiePlot implements Serializable {
                     state);
         }
 
+        if (getShadowGenerator() != null) {
+            BufferedImage shadowImage
+                    = getShadowGenerator().createDropShadow(dataImage);
+            g2 = savedG2;
+            g2.drawImage(shadowImage, (int) plotArea.getX()
+                    + getShadowGenerator().calculateOffsetX(),
+                    (int) plotArea.getY()
+                    + getShadowGenerator().calculateOffsetY(), null);
+            g2.drawImage(dataImage, (int) plotArea.getX(),
+                    (int) plotArea.getY(), null);
+        }
+
         g2.setClip(savedClip);
         g2.setComposite(originalComposite);
         drawOutline(g2, originalPlotArea);
@@ -619,11 +645,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
                             boolean drawBack) {
 
         if (getDarkerSides()) {
-            if (paint instanceof Color) {
-                Color c = (Color) paint;
-                c = c.darker();
-                paint = c;
-            }
+             paint = PaintAlpha.darker(paint);
         }
 
         double start = arc.getAngleStart();
@@ -974,6 +996,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
      *
      * @return <i>Pie 3D Plot</i>.
      */
+    @Override
     public String getPlotType() {
         return localizationResources.getString("Pie_3D_Plot");
     }
@@ -998,7 +1021,7 @@ public class PiePlot3D extends PiePlot implements Serializable {
      *
      * @param angle  the angle.
      *
-     * @return <code>true</code> if the angle is at the back of the pie.
+     * @return {@code true} if the angle is at the back of the pie.
      */
     private boolean isAngleAtBack(double angle) {
         return (Math.sin(Math.toRadians(angle)) > 0.0);
@@ -1007,10 +1030,11 @@ public class PiePlot3D extends PiePlot implements Serializable {
     /**
      * Tests this plot for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

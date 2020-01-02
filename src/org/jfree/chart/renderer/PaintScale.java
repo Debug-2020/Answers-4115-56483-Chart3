@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * PaintScale.java
@@ -46,11 +46,11 @@ import java.awt.Paint;
 import org.jfree.chart.renderer.xy.XYBlockRenderer;
 
 /**
- * A source for <code>Paint</code> instances, used by the
+ * A source for {@code Paint} instances, used by the
  * {@link XYBlockRenderer}.
  * <br><br>
  * NOTE: Classes that implement this interface should also implement
- * <code>PublicCloneable</code> and <code>Serializable</code>, so
+ * {@code PublicCloneable} and {@code Serializable}, so
  * that any renderer (or other object instance) that references an instance of
  * this interface can still be cloned or serialized.
  *
@@ -77,11 +77,11 @@ public interface PaintScale {
     public double getUpperBound();
 
     /**
-     * Returns a <code>Paint</code> instance for the specified value.
+     * Returns a {@code Paint} instance for the specified value.
      *
      * @param value  the value.
      *
-     * @return A <code>Paint</code> instance (never <code>null</code>).
+     * @return A {@code Paint} instance (never {@code null}).
      */
     public Paint getPaint(double value);
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * DialLayer.java
@@ -81,7 +81,7 @@ public interface DialLayer {
     public void removeChangeListener(DialLayerChangeListener listener);
 
     /**
-     * Returns <code>true</code> if the specified listener is currently
+     * Returns {@code true} if the specified listener is currently
      * registered with the this layer.
      *
      * @param listener  the listener.
@@ -91,9 +91,9 @@ public interface DialLayer {
     public boolean hasListener(EventListener listener);
 
     /**
-     * Returns <code>true</code> if the drawing should be clipped to the
+     * Returns {@code true} if the drawing should be clipped to the
      * dial window (which is defined by the {@link DialFrame}), and
-     * <code>false</code> otherwise.
+     * {@code false} otherwise.
      *
      * @return A boolean.
      */
@@ -102,17 +102,17 @@ public interface DialLayer {
     /**
      * Draws the content of this layer.
      *
-     * @param g2  the graphics target (<code>null</code> not permitted).
-     * @param plot  the plot (typically this should not be <code>null</code>,
+     * @param g2  the graphics target ({@code null} not permitted).
+     * @param plot  the plot (typically this should not be {@code null},
      *     but for a layer that doesn't need to reference the plot, it may
      *     be permitted).
      * @param frame  the reference frame for the dial's geometry
-     *     (<code>null</code> not permitted).  This is typically larger than
+     *     ({@code null} not permitted).  This is typically larger than
      *     the visible area of the dial (see the next parameter).
-     * @param view  the visible area for the dial (<code>null</code> not
+     * @param view  the visible area for the dial ({@code null} not
      *     permitted).
      */
     public void draw(Graphics2D g2, DialPlot plot, Rectangle2D frame,
-                     Rectangle2D view);
+            Rectangle2D view);
 
 }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------------
  * AnnotationChangeEvent.java
@@ -41,6 +41,7 @@
 package org.jfree.chart.event;
 
 import org.jfree.chart.annotations.Annotation;
+import org.jfree.chart.util.Args;
 
 /**
  * An event that can be forwarded to any {@link AnnotationChangeListener} to
@@ -50,26 +51,28 @@ import org.jfree.chart.annotations.Annotation;
  */
 public class AnnotationChangeEvent extends ChartChangeEvent {
 
-    /** The plot that generated the event. */
+    /** The annotation that generated the event. */
     private Annotation annotation;
 
     /**
-     * Creates a new <code>AnnotationChangeEvent</code> instance.
+     * Creates a new {@code AnnotationChangeEvent} instance.
      *
+     * @param source  the event source.
      * @param annotation  the annotation that triggered the event
-     *     (<code>null</code> not permitted).
+     *     ({@code null} not permitted).
      *
      * @since 1.0.14
      */
     public AnnotationChangeEvent(Object source, Annotation annotation) {
         super(source);
+        Args.nullNotPermitted(annotation, "annotation");
         this.annotation = annotation;
     }
 
     /**
      * Returns the annotation that triggered the event.
      *
-     * @return The annotation that triggered the event (never <code>null</code>).
+     * @return The annotation that triggered the event (never {@code null}).
      *
      * @since 1.0.14
      */

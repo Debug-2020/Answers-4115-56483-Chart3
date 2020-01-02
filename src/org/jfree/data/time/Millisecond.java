@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * Millisecond.java
  * ----------------
- * (C) Copyright 2001-2008, by Object Refinery Limited.
+ * (C) Copyright 2001-2012, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -53,6 +53,8 @@
  *               method:
  *               see http://www.jfree.org/phpBB2/viewtopic.php?t=24805 (DG);
  * 16-Sep-2008 : Deprecated DEFAULT_TIME_ZONE (DG);
+ * 02-Mar-2009 : Added new constructor with Locale (DG);
+ * 05-Jul-2012 : Replaced getTime().getTime() with getTimeInMillis() (DG);
  *
  */
 
@@ -61,6 +63,7 @@ package org.jfree.data.time;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -143,27 +146,29 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @param time  the time.
      *
-     * @see #Millisecond(Date, TimeZone)
+     * @see #Millisecond(Date, TimeZone, Locale)
      */
     public Millisecond(Date time) {
-        this(time, TimeZone.getDefault());
+        this(time, TimeZone.getDefault(), Locale.getDefault());
     }
 
     /**
      * Creates a millisecond.
      *
-     * @param time  the instant in time.
-     * @param zone  the time zone.
+     * @param time  the date-time ({@code null} not permitted).
+     * @param zone  the time zone ({@code null} not permitted).
+     * @param locale  the locale ({@code null} not permitted).
+     *
+     * @since 1.0.13
      */
-    public Millisecond(Date time, TimeZone zone) {
-        // FIXME:  need a locale as well as a timezone
-        Calendar calendar = Calendar.getInstance(zone);
+    public Millisecond(Date time, TimeZone zone, Locale locale) {
+        Calendar calendar = Calendar.getInstance(zone, locale);
         calendar.setTime(time);
         this.millisecond = calendar.get(Calendar.MILLISECOND);
         this.second = (byte) calendar.get(Calendar.SECOND);
         this.minute = (byte) calendar.get(Calendar.MINUTE);
         this.hour = (byte) calendar.get(Calendar.HOUR_OF_DAY);
-        this.day = new Day(time, zone);
+        this.day = new Day(time, zone, locale);
         peg(calendar);
     }
 
@@ -197,6 +202,7 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @see #getLastMillisecond()
      */
+    @Override
     public long getFirstMillisecond() {
         return this.firstMillisecond;
     }
@@ -211,6 +217,7 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @see #getFirstMillisecond()
      */
+    @Override
     public long getLastMillisecond() {
         return this.firstMillisecond;
     }
@@ -219,10 +226,11 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      * Recalculates the start date/time and end date/time for this time period
      * relative to the supplied calendar (which incorporates a time zone).
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @since 1.0.3
      */
+    @Override
     public void peg(Calendar calendar) {
         this.firstMillisecond = getFirstMillisecond(calendar);
     }
@@ -232,10 +240,9 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @return The millisecond preceding this one.
      */
+    @Override
     public RegularTimePeriod previous() {
-
         RegularTimePeriod result = null;
-
         if (this.millisecond != FIRST_MILLISECOND_IN_SECOND) {
             result = new Millisecond(this.millisecond - 1, getSecond());
         }
@@ -246,7 +253,6 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
             }
         }
         return result;
-
     }
 
     /**
@@ -254,8 +260,8 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @return The millisecond following this one.
      */
+    @Override
     public RegularTimePeriod next() {
-
         RegularTimePeriod result = null;
         if (this.millisecond != LAST_MILLISECOND_IN_SECOND) {
             result = new Millisecond(this.millisecond + 1, getSecond());
@@ -267,7 +273,6 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
             }
         }
         return result;
-
     }
 
     /**
@@ -275,6 +280,7 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @return The serial index number.
      */
+    @Override
     public long getSerialIndex() {
         long hourIndex = this.day.getSerialIndex() * 24L + this.hour;
         long minuteIndex = hourIndex * 60L + this.minute;
@@ -290,9 +296,10 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @param obj  the object to compare
      *
-     * @return <code>true</code> if milliseconds and seconds of this and object
+     * @return {@code true} if milliseconds and seconds of this and object
      *      are the same.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -323,11 +330,12 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      * Returns a hash code for this object instance.  The approach described by
      * Joshua Bloch in "Effective Java" has been used here:
      * <p>
-     * <code>http://developer.java.sun.com/developer/Books/effectivejava
-     * /Chapter3.pdf</code>
+     * {@code http://developer.java.sun.com/developer/Books/effectivejava
+     * /Chapter3.pdf}
      *
      * @return A hashcode.
      */
+    @Override
     public int hashCode() {
         int result = 17;
         result = 37 * result + this.millisecond;
@@ -345,8 +353,8 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
      *
      * @return negative == before, zero == same, positive == after.
      */
+    @Override
     public int compareTo(Object obj) {
-
         int result;
         long difference;
 
@@ -386,40 +394,40 @@ public class Millisecond extends RegularTimePeriod implements Serializable {
         }
 
         return result;
-
     }
 
     /**
      * Returns the first millisecond of the time period.
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The first millisecond of the time period.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getFirstMillisecond(Calendar calendar) {
         int year = this.day.getYear();
         int month = this.day.getMonth() - 1;
-        int day = this.day.getDayOfMonth();
+        int d = this.day.getDayOfMonth();
         calendar.clear();
-        calendar.set(year, month, day, this.hour, this.minute, this.second);
+        calendar.set(year, month, d, this.hour, this.minute, this.second);
         calendar.set(Calendar.MILLISECOND, this.millisecond);
-        //return calendar.getTimeInMillis();  // this won't work for JDK 1.3
-        return calendar.getTime().getTime();
+        return calendar.getTimeInMillis();
     }
 
     /**
      * Returns the last millisecond of the time period.
      *
-     * @param calendar  the calendar (<code>null</code> not permitted).
+     * @param calendar  the calendar ({@code null} not permitted).
      *
      * @return The last millisecond of the time period.
      *
-     * @throws NullPointerException if <code>calendar</code> is
-     *     <code>null</code>.
+     * @throws NullPointerException if {@code calendar} is
+     *     {@code null}.
      */
+    @Override
     public long getLastMillisecond(Calendar calendar) {
         return getFirstMillisecond(calendar);
     }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------
  * PieLabelDistributor.java
@@ -69,6 +69,7 @@ public class PieLabelDistributor extends AbstractPieLabelDistributor {
      * @param minY  the minimum y-coordinate in Java2D-space.
      * @param height  the available height (in Java2D units).
      */
+    @Override
     public void distributeLabels(double minY, double height) {
         sort();  // sorts the label records into ascending order by baseY
 //        if (isOverlap()) {
@@ -89,8 +90,8 @@ public class PieLabelDistributor extends AbstractPieLabelDistributor {
     }
 
     /**
-     * Returns <code>true</code> if there are overlapping labels in the list,
-     * and <code>false</code> otherwise.
+     * Returns {@code true} if there are overlapping labels in the list,
+     * and {@code false} otherwise.
      *
      * @return A boolean.
      */
@@ -211,8 +212,9 @@ public class PieLabelDistributor extends AbstractPieLabelDistributor {
      *
      * @return A string.
      */
+    @Override
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < this.labels.size(); i++) {
             result.append(getPieLabelRecord(i).toString()).append("\n");
         }

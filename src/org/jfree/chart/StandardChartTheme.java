@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * StandardChartTheme.java
  * -----------------------
- * (C) Copyright 2008, 2009, by Object Refinery Limited.
+ * (C) Copyright 2008-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,6 +36,9 @@
  * -------
  * 14-Aug-2008 : Version 1 (DG);
  * 10-Apr-2009 : Added getter/setter for smallFont (DG);
+ * 10-Jul-2009 : Added shadowGenerator field (DG);
+ * 29-Oct-2011 : Fixed Eclipse warnings (DG);
+ * 02-Jul-2013 : Use ParamChecks class (DG);
  *
  */
 
@@ -84,10 +87,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.AbstractRenderer;
 import org.jfree.chart.renderer.category.BarPainter;
 import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.chart.renderer.category.BarRenderer3D;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.renderer.category.GradientBarPainter;
-import org.jfree.chart.renderer.category.LineRenderer3D;
 import org.jfree.chart.renderer.category.MinMaxCategoryRenderer;
 import org.jfree.chart.renderer.category.StatisticalBarRenderer;
 import org.jfree.chart.renderer.xy.GradientXYBarPainter;
@@ -99,10 +100,13 @@ import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.title.PaintScaleLegend;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.title.Title;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.DefaultShadowGenerator;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
+import org.jfree.chart.util.ShadowGenerator;
 
 /**
  * A default implementation of the {@link ChartTheme} interface.  This
@@ -214,12 +218,6 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /** The thermometer paint. */
     private transient Paint thermometerPaint;
 
-    /**
-     * The paint used to fill the interior of the 'walls' in the background
-     * of a plot with a 3D effect.  Applied to BarRenderer3D.
-     */
-    private transient Paint wallPaint;
-
     /** The error indicator paint for the {@link StatisticalBarRenderer}. */
     private transient Paint errorIndicatorPaint;
 
@@ -229,6 +227,13 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /** The grid band alternate paint for a {@link SymbolAxis}. */
     private transient Paint gridBandAlternatePaint
             = SymbolAxis.DEFAULT_GRID_BAND_ALTERNATE_PAINT;
+
+    /**
+     * The shadow generator (can be null).
+     * 
+     * @since 1.0.14
+     */
+    private ShadowGenerator shadowGenerator;
 
     /**
      * Creates and returns the default 'JFree' chart theme.
@@ -247,20 +252,20 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
      */
     public static ChartTheme createDarknessTheme() {
         StandardChartTheme theme = new StandardChartTheme("Darkness");
-        theme.titlePaint = Color.white;
-        theme.subtitlePaint = Color.white;
-        theme.legendBackgroundPaint = Color.black;
-        theme.legendItemPaint = Color.white;
-        theme.chartBackgroundPaint = Color.black;
-        theme.plotBackgroundPaint = Color.black;
-        theme.plotOutlinePaint = Color.yellow;
-        theme.baselinePaint = Color.white;
-        theme.crosshairPaint = Color.red;
-        theme.labelLinkPaint = Color.lightGray;
-        theme.tickLabelPaint = Color.white;
-        theme.axisLabelPaint = Color.white;
-        theme.shadowPaint = Color.darkGray;
-        theme.itemLabelPaint = Color.white;
+        theme.titlePaint = Color.WHITE;
+        theme.subtitlePaint = Color.WHITE;
+        theme.legendBackgroundPaint = Color.BLACK;
+        theme.legendItemPaint = Color.WHITE;
+        theme.chartBackgroundPaint = Color.BLACK;
+        theme.plotBackgroundPaint = Color.BLACK;
+        theme.plotOutlinePaint = Color.YELLOW;
+        theme.baselinePaint = Color.WHITE;
+        theme.crosshairPaint = Color.RED;
+        theme.labelLinkPaint = Color.LIGHT_GRAY;
+        theme.tickLabelPaint = Color.WHITE;
+        theme.axisLabelPaint = Color.WHITE;
+        theme.shadowPaint = Color.DARK_GRAY;
+        theme.itemLabelPaint = Color.WHITE;
         theme.drawingSupplier = new DefaultDrawingSupplier(
                 new Paint[] {Color.decode("0xFFFF00"),
                         Color.decode("0x0036CC"), Color.decode("0xFF0000"),
@@ -273,12 +278,13 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
                 new Stroke[] {new BasicStroke(2.0f)},
                 new Stroke[] {new BasicStroke(0.5f)},
                 DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE);
-        theme.wallPaint = Color.darkGray;
-        theme.errorIndicatorPaint = Color.lightGray;
+        theme.errorIndicatorPaint = Color.LIGHT_GRAY;
         theme.gridBandPaint = new Color(255, 255, 255, 20);
         theme.gridBandAlternatePaint = new Color(255, 255, 255, 40);
+        theme.shadowGenerator = null;
         return theme;
     }
+
     /**
      * Creates and returns a {@link ChartTheme} that doesn't apply any changes
      * to the JFreeChart defaults.  This produces the "legacy" look for
@@ -288,6 +294,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
      */
     public static ChartTheme createLegacyTheme() {
         StandardChartTheme theme = new StandardChartTheme("Legacy") {
+            @Override
             public void apply(JFreeChart chart) {
                 // do nothing at all
             }
@@ -298,42 +305,53 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Creates a new default instance.
      *
-     * @param name  the name of the theme (<code>null</code> not permitted).
+     * @param name  the name of the theme ({@code null} not permitted).
      */
     public StandardChartTheme(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Null 'name' argument.");
-        }
+        this(name, false);
+    }
+
+    /**
+     * Creates a new default instance.
+     *
+     * @param name  the name of the theme ({@code null} not permitted).
+     * @param shadow  a flag that controls whether a shadow generator is 
+     *                included.
+     *
+     * @since 1.0.14
+     */
+    public StandardChartTheme(String name, boolean shadow) {
+        Args.nullNotPermitted(name, "name");
         this.name = name;
         this.extraLargeFont = new Font("Tahoma", Font.BOLD, 20);
         this.largeFont = new Font("Tahoma", Font.BOLD, 14);
         this.regularFont = new Font("Tahoma", Font.PLAIN, 12);
         this.smallFont = new Font("Tahoma", Font.PLAIN, 10);
-        this.titlePaint = Color.black;
-        this.subtitlePaint = Color.black;
-        this.legendBackgroundPaint = Color.white;
-        this.legendItemPaint = Color.darkGray;
-        this.chartBackgroundPaint = Color.white;
+        this.titlePaint = Color.BLACK;
+        this.subtitlePaint = Color.BLACK;
+        this.legendBackgroundPaint = Color.WHITE;
+        this.legendItemPaint = Color.DARK_GRAY;
+        this.chartBackgroundPaint = Color.WHITE;
         this.drawingSupplier = new DefaultDrawingSupplier();
-        this.plotBackgroundPaint = Color.lightGray;
-        this.plotOutlinePaint = Color.black;
-        this.labelLinkPaint = Color.black;
+        this.plotBackgroundPaint = Color.LIGHT_GRAY;
+        this.plotOutlinePaint = Color.BLACK;
+        this.labelLinkPaint = Color.BLACK;
         this.labelLinkStyle = PieLabelLinkStyle.CUBIC_CURVE;
         this.axisOffset = new RectangleInsets(4, 4, 4, 4);
-        this.domainGridlinePaint = Color.white;
-        this.rangeGridlinePaint = Color.white;
-        this.baselinePaint = Color.black;
-        this.crosshairPaint = Color.blue;
-        this.axisLabelPaint = Color.darkGray;
-        this.tickLabelPaint = Color.darkGray;
+        this.domainGridlinePaint = Color.WHITE;
+        this.rangeGridlinePaint = Color.WHITE;
+        this.baselinePaint = Color.BLACK;
+        this.crosshairPaint = Color.BLUE;
+        this.axisLabelPaint = Color.DARK_GRAY;
+        this.tickLabelPaint = Color.DARK_GRAY;
         this.barPainter = new GradientBarPainter();
         this.xyBarPainter = new GradientXYBarPainter();
-        this.shadowVisible = true;
-        this.shadowPaint = Color.gray;
-        this.itemLabelPaint = Color.black;
-        this.thermometerPaint = Color.white;
-        this.wallPaint = BarRenderer3D.DEFAULT_WALL_PAINT;
-        this.errorIndicatorPaint = Color.black;
+        this.shadowVisible = false;
+        this.shadowPaint = Color.GRAY;
+        this.itemLabelPaint = Color.BLACK;
+        this.thermometerPaint = Color.WHITE;
+        this.errorIndicatorPaint = Color.BLACK;
+        this.shadowGenerator = shadow ? new DefaultShadowGenerator() : null;
     }
 
     /**
@@ -350,21 +368,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the largest font for this theme.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getExtraLargeFont()
      */
     public void setExtraLargeFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.extraLargeFont = font;
     }
 
     /**
      * Returns the large font for this theme.
      *
-     * @return The large font (never <code>null</code>).
+     * @return The large font (never {@code null}).
      *
      * @see #setLargeFont(Font)
      */
@@ -375,21 +391,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the large font for this theme.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getLargeFont()
      */
     public void setLargeFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.largeFont = font;
     }
 
     /**
      * Returns the regular font.
      *
-     * @return The regular font (never <code>null</code>).
+     * @return The regular font (never {@code null}).
      *
      * @see #setRegularFont(Font)
      */
@@ -400,21 +414,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the regular font for this theme.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getRegularFont()
      */
     public void setRegularFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.regularFont = font;
     }
 
     /**
      * Returns the small font.
      *
-     * @return The small font (never <code>null</code>).
+     * @return The small font (never {@code null}).
      *
      * @see #setSmallFont(Font)
      *
@@ -427,23 +439,21 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the small font for this theme.
      *
-     * @param font  the font (<code>null</code> not permitted).
+     * @param font  the font ({@code null} not permitted).
      *
      * @see #getSmallFont()
      *
      * @since 1.0.13
      */
     public void setSmallFont(Font font) {
-        if (font == null) {
-            throw new IllegalArgumentException("Null 'font' argument.");
-        }
+        Args.nullNotPermitted(font, "font");
         this.smallFont = font;
     }
 
     /**
      * Returns the title paint.
      *
-     * @return The title paint (never <code>null</code>).
+     * @return The title paint (never {@code null}).
      *
      * @see #setTitlePaint(Paint)
      */
@@ -454,21 +464,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the title paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getTitlePaint()
      */
     public void setTitlePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.titlePaint = paint;
     }
 
     /**
      * Returns the subtitle paint.
      *
-     * @return The subtitle paint (never <code>null</code>).
+     * @return The subtitle paint (never {@code null}).
      *
      * @see #setSubtitlePaint(Paint)
      */
@@ -479,21 +487,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the subtitle paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getSubtitlePaint()
      */
     public void setSubtitlePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.subtitlePaint = paint;
     }
 
     /**
      * Returns the chart background paint.
      *
-     * @return The chart background paint (never <code>null</code>).
+     * @return The chart background paint (never {@code null}).
      *
      * @see #setChartBackgroundPaint(Paint)
      */
@@ -504,21 +510,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the chart background paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getChartBackgroundPaint()
      */
     public void setChartBackgroundPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.chartBackgroundPaint = paint;
     }
 
     /**
      * Returns the legend background paint.
      *
-     * @return The legend background paint (never <code>null</code>).
+     * @return The legend background paint (never {@code null}).
      *
      * @see #setLegendBackgroundPaint(Paint)
      */
@@ -529,21 +533,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the legend background paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getLegendBackgroundPaint()
      */
     public void setLegendBackgroundPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.legendBackgroundPaint = paint;
     }
 
     /**
      * Returns the legend item paint.
      *
-     * @return The legend item paint (never <code>null</code>).
+     * @return The legend item paint (never {@code null}).
      *
      * @see #setLegendItemPaint(Paint)
      */
@@ -554,21 +556,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the legend item paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getLegendItemPaint()
      */
     public void setLegendItemPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.legendItemPaint = paint;
     }
 
     /**
      * Returns the plot background paint.
      *
-     * @return The plot background paint (never <code>null</code>).
+     * @return The plot background paint (never {@code null}).
      *
      * @see #setPlotBackgroundPaint(Paint)
      */
@@ -579,21 +579,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the plot background paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPlotBackgroundPaint()
      */
     public void setPlotBackgroundPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.plotBackgroundPaint = paint;
     }
 
     /**
      * Returns the plot outline paint.
      *
-     * @return The plot outline paint (never <code>null</code>).
+     * @return The plot outline paint (never {@code null}).
      *
      * @see #setPlotOutlinePaint(Paint)
      */
@@ -604,21 +602,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the plot outline paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPlotOutlinePaint()
      */
     public void setPlotOutlinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.plotOutlinePaint = paint;
     }
 
     /**
      * Returns the label link style for pie charts.
      *
-     * @return The label link style (never <code>null</code>).
+     * @return The label link style (never {@code null}).
      *
      * @see #setLabelLinkStyle(PieLabelLinkStyle)
      */
@@ -629,21 +625,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the label link style for pie charts.
      *
-     * @param style  the style (<code>null</code> not permitted).
+     * @param style  the style ({@code null} not permitted).
      *
      * @see #getLabelLinkStyle()
      */
     public void setLabelLinkStyle(PieLabelLinkStyle style) {
-        if (style == null) {
-            throw new IllegalArgumentException("Null 'style' argument.");
-        }
+        Args.nullNotPermitted(style, "style");
         this.labelLinkStyle = style;
     }
 
     /**
      * Returns the label link paint for pie charts.
      *
-     * @return The label link paint (never <code>null</code>).
+     * @return The label link paint (never {@code null}).
      *
      * @see #setLabelLinkPaint(Paint)
      */
@@ -654,21 +648,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the label link paint for pie charts.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getLabelLinkPaint()
      */
     public void setLabelLinkPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.labelLinkPaint = paint;
     }
 
     /**
      * Returns the domain grid line paint.
      *
-     * @return The domain grid line paint (never <code>null<code>).
+     * @return The domain grid line paint (never {@code null}).
      *
      * @see #setDomainGridlinePaint(Paint)
      */
@@ -679,21 +671,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the domain grid line paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getDomainGridlinePaint()
      */
     public void setDomainGridlinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.domainGridlinePaint = paint;
     }
 
     /**
      * Returns the range grid line paint.
      *
-     * @return The range grid line paint (never <code>null</code>).
+     * @return The range grid line paint (never {@code null}).
      *
      * @see #setRangeGridlinePaint(Paint)
      */
@@ -704,14 +694,12 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the range grid line paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getRangeGridlinePaint()
      */
     public void setRangeGridlinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.rangeGridlinePaint = paint;
     }
 
@@ -729,14 +717,12 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the baseline paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @since 1.0.13
      */
     public void setBaselinePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.baselinePaint = paint;
     }
 
@@ -752,19 +738,17 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the crosshair paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      */
     public void setCrosshairPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.crosshairPaint = paint;
     }
 
     /**
      * Returns the axis offsets.
      *
-     * @return The axis offsets (never <code>null</code>).
+     * @return The axis offsets (never {@code null}).
      *
      * @see #setAxisOffset(RectangleInsets)
      */
@@ -775,21 +759,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the axis offset.
      *
-     * @param offset  the offset (<code>null</code> not permitted).
+     * @param offset  the offset ({@code null} not permitted).
      *
      * @see #getAxisOffset()
      */
     public void setAxisOffset(RectangleInsets offset) {
-        if (offset == null) {
-            throw new IllegalArgumentException("Null 'offset' argument.");
-        }
+        Args.nullNotPermitted(offset, "offset");
         this.axisOffset = offset;
     }
 
     /**
      * Returns the axis label paint.
      *
-     * @return The axis label paint (never <code>null</code>).
+     * @return The axis label paint (never {@code null}).
      *
      * @see #setAxisLabelPaint(Paint)
      */
@@ -800,21 +782,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the axis label paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getAxisLabelPaint()
      */
     public void setAxisLabelPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.axisLabelPaint = paint;
     }
 
     /**
      * Returns the tick label paint.
      *
-     * @return The tick label paint (never <code>null</code>).
+     * @return The tick label paint (never {@code null}).
      *
      * @see #setTickLabelPaint(Paint)
      */
@@ -825,21 +805,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the tick label paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getTickLabelPaint()
      */
     public void setTickLabelPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.tickLabelPaint = paint;
     }
 
     /**
      * Returns the item label paint.
      *
-     * @return The item label paint (never <code>null</code>).
+     * @return The item label paint (never {@code null}).
      *
      * @see #setItemLabelPaint(Paint)
      */
@@ -850,14 +828,12 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the item label paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getItemLabelPaint()
      */
     public void setItemLabelPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.itemLabelPaint = paint;
     }
 
@@ -886,7 +862,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Returns the shadow paint.
      *
-     * @return The shadow paint (never <code>null</code>).
+     * @return The shadow paint (never {@code null}).
      *
      * @see #setShadowPaint(Paint)
      */
@@ -897,21 +873,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the shadow paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getShadowPaint()
      */
     public void setShadowPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.shadowPaint = paint;
     }
 
     /**
      * Returns the bar painter.
      *
-     * @return The bar painter (never <code>null</code>).
+     * @return The bar painter (never {@code null}).
      *
      * @see #setBarPainter(BarPainter)
      */
@@ -922,21 +896,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the bar painter.
      *
-     * @param painter  the painter (<code>null</code> not permitted).
+     * @param painter  the painter ({@code null} not permitted).
      *
      * @see #getBarPainter()
      */
     public void setBarPainter(BarPainter painter) {
-        if (painter == null) {
-            throw new IllegalArgumentException("Null 'painter' argument.");
-        }
+        Args.nullNotPermitted(painter, "painter");
         this.barPainter = painter;
     }
 
     /**
      * Returns the XY bar painter.
      *
-     * @return The XY bar painter (never <code>null</code>).
+     * @return The XY bar painter (never {@code null}).
      *
      * @see #setXYBarPainter(XYBarPainter)
      */
@@ -947,21 +919,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the XY bar painter.
      *
-     * @param painter  the painter (<code>null</code> not permitted).
+     * @param painter  the painter ({@code null} not permitted).
      *
      * @see #getXYBarPainter()
      */
     public void setXYBarPainter(XYBarPainter painter) {
-        if (painter == null) {
-            throw new IllegalArgumentException("Null 'painter' argument.");
-        }
+        Args.nullNotPermitted(painter, "painter");
         this.xyBarPainter = painter;
     }
 
     /**
      * Returns the thermometer paint.
      *
-     * @return The thermometer paint (never <code>null</code>).
+     * @return The thermometer paint (never {@code null}).
      *
      * @see #setThermometerPaint(Paint)
      */
@@ -972,46 +942,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the thermometer paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getThermometerPaint()
      */
     public void setThermometerPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.thermometerPaint = paint;
-    }
-
-    /**
-     * Returns the wall paint for charts with a 3D effect.
-     *
-     * @return The wall paint (never <code>null</code>).
-     *
-     * @see #setWallPaint(Paint)
-     */
-    public Paint getWallPaint() {
-        return this.wallPaint;
-    }
-
-    /**
-     * Sets the wall paint for charts with a 3D effect.
-     *
-     * @param paint  the paint (<code>null</code> not permitted).
-     *
-     * @see #getWallPaint()
-     */
-    public void setWallPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
-        this.wallPaint = paint;
     }
 
     /**
      * Returns the error indicator paint.
      *
-     * @return The error indicator paint (never <code>null</code>).
+     * @return The error indicator paint (never {@code null}).
      *
      * @see #setErrorIndicatorPaint(Paint)
      */
@@ -1022,21 +965,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the error indicator paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getErrorIndicatorPaint()
      */
     public void setErrorIndicatorPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.errorIndicatorPaint = paint;
     }
 
     /**
      * Returns the grid band paint.
      *
-     * @return The grid band paint (never <code>null</code>).
+     * @return The grid band paint (never {@code null}).
      *
      * @see #setGridBandPaint(Paint)
      */
@@ -1047,21 +988,19 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the grid band paint.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getGridBandPaint()
      */
     public void setGridBandPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.gridBandPaint = paint;
     }
 
     /**
      * Returns the grid band alternate paint (used for a {@link SymbolAxis}).
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setGridBandAlternatePaint(Paint)
      */
@@ -1072,14 +1011,12 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the grid band alternate paint (used for a {@link SymbolAxis}).
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getGridBandAlternatePaint()
      */
     public void setGridBandAlternatePaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.gridBandAlternatePaint = paint;
     }
 
@@ -1105,7 +1042,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
                 result = (DrawingSupplier) pc.clone();
             }
             catch (CloneNotSupportedException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         return result;
@@ -1114,26 +1051,23 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Sets the drawing supplier for this theme.
      *
-     * @param supplier  the supplier (<code>null</code> not permitted).
+     * @param supplier  the supplier ({@code null} not permitted).
      *
      * @see #getDrawingSupplier()
      */
     public void setDrawingSupplier(DrawingSupplier supplier) {
-        if (supplier == null) {
-            throw new IllegalArgumentException("Null 'supplier' argument.");
-        }
+        Args.nullNotPermitted(supplier, "supplier");
         this.drawingSupplier = supplier;
     }
 
     /**
      * Applies this theme to the supplied chart.
      *
-     * @param chart  the chart (<code>null</code> not permitted).
+     * @param chart  the chart ({@code null} not permitted).
      */
+    @Override
     public void apply(JFreeChart chart) {
-        if (chart == null) {
-            throw new IllegalArgumentException("Null 'chart' argument.");
-        }
+        Args.nullNotPermitted(chart, "chart");
         TextTitle title = chart.getTitle();
         if (title != null) {
             title.setFont(this.extraLargeFont);
@@ -1201,7 +1135,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes of this theme to the specified container.
      *
-     * @param bc  a block container (<code>null</code> not permitted).
+     * @param bc  a block container ({@code null} not permitted).
      */
     protected void applyToBlockContainer(BlockContainer bc) {
         Iterator iterator = bc.getBlocks().iterator();
@@ -1230,12 +1164,10 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes of this theme to a plot.
      *
-     * @param plot  the plot (<code>null</code>).
+     * @param plot  the plot ({@code null}).
      */
     protected void applyToPlot(Plot plot) {
-        if (plot == null) {
-            throw new IllegalArgumentException("Null 'plot' argument.");
-        }
+        Args.nullNotPermitted(plot, "plot");
         if (plot.getDrawingSupplier() != null) {
             plot.setDrawingSupplier(getDrawingSupplier());
         }
@@ -1282,12 +1214,13 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
      * This method also clears any set values for the section paint, outline
      * etc, so that the theme's {@link DrawingSupplier} will be used.
      *
-     * @param plot  the plot (<code>null</code> not permitted).
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToPiePlot(PiePlot plot) {
         plot.setLabelLinkPaint(this.labelLinkPaint);
         plot.setLabelLinkStyle(this.labelLinkStyle);
         plot.setLabelFont(this.regularFont);
+        plot.setShadowGenerator(this.shadowGenerator);
 
         // clear the section attributes so that the theme's DrawingSupplier
         // will be used
@@ -1305,7 +1238,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes of this theme to a {@link MultiplePiePlot}.
      *
-     * @param plot  the plot (<code>null</code> not permitted).
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToMultiplePiePlot(MultiplePiePlot plot) {
         apply(plot.getPieChart());
@@ -1314,13 +1247,14 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes of this theme to a {@link CategoryPlot}.
      *
-     * @param plot  the plot (<code>null</code> not permitted).
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToCategoryPlot(CategoryPlot plot) {
         plot.setAxisOffset(this.axisOffset);
         plot.setDomainGridlinePaint(this.domainGridlinePaint);
         plot.setRangeGridlinePaint(this.rangeGridlinePaint);
         plot.setRangeZeroBaselinePaint(this.baselinePaint);
+        plot.setShadowGenerator(this.shadowGenerator);
 
         // process all domain axes
         int domainAxisCount = plot.getDomainAxisCount();
@@ -1334,7 +1268,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
         // process all range axes
         int rangeAxisCount = plot.getRangeAxisCount();
         for (int i = 0; i < rangeAxisCount; i++) {
-            ValueAxis axis = (ValueAxis) plot.getRangeAxis(i);
+            ValueAxis axis = plot.getRangeAxis(i);
             if (axis != null) {
                 applyToValueAxis(axis);
             }
@@ -1374,7 +1308,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes of this theme to a {@link XYPlot}.
      *
-     * @param plot  the plot (<code>null</code> not permitted).
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToXYPlot(XYPlot plot) {
         plot.setAxisOffset(this.axisOffset);
@@ -1384,6 +1318,8 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
         plot.setRangeGridlinePaint(this.rangeGridlinePaint);
         plot.setDomainCrosshairPaint(this.crosshairPaint);
         plot.setRangeCrosshairPaint(this.crosshairPaint);
+        plot.setShadowGenerator(this.shadowGenerator);
+
         // process all domain axes
         int domainAxisCount = plot.getDomainAxisCount();
         for (int i = 0; i < domainAxisCount; i++) {
@@ -1396,7 +1332,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
         // process all range axes
         int rangeAxisCount = plot.getRangeAxisCount();
         for (int i = 0; i < rangeAxisCount; i++) {
-            ValueAxis axis = (ValueAxis) plot.getRangeAxis(i);
+            ValueAxis axis = plot.getRangeAxis(i);
             if (axis != null) {
                 applyToValueAxis(axis);
             }
@@ -1442,7 +1378,8 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
 
     /**
      * Applies the attributes of this theme to a {@link FastScatterPlot}.
-     * @param plot
+     * 
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToFastScatterPlot(FastScatterPlot plot) {
         plot.setDomainGridlinePaint(this.domainGridlinePaint);
@@ -1462,7 +1399,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
      * Applies the attributes of this theme to a {@link PolarPlot}.  This
      * method is called from the {@link #applyToPlot(Plot)} method.
      *
-     * @param plot  the plot (<code>null</code> not permitted).
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToPolarPlot(PolarPlot plot) {
         plot.setAngleLabelFont(this.regularFont);
@@ -1478,7 +1415,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes of this theme to a {@link SpiderWebPlot}.
      *
-     * @param plot  the plot (<code>null</code> not permitted).
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToSpiderWebPlot(SpiderWebPlot plot) {
         plot.setLabelFont(this.regularFont);
@@ -1489,7 +1426,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes of this theme to a {@link MeterPlot}.
      *
-     * @param plot  the plot (<code>null</code> not permitted).
+     * @param plot  the plot ({@code null} not permitted).
      */
     protected void applyToMeterPlot(MeterPlot plot) {
         plot.setDialBackgroundPaint(this.plotBackgroundPaint);
@@ -1519,7 +1456,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes for this theme to a {@link CategoryAxis}.
      *
-     * @param axis  the axis (<code>null</code> not permitted).
+     * @param axis  the axis ({@code null} not permitted).
      */
     protected void applyToCategoryAxis(CategoryAxis axis) {
         axis.setLabelFont(this.largeFont);
@@ -1536,7 +1473,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes for this theme to a {@link ValueAxis}.
      *
-     * @param axis  the axis (<code>null</code> not permitted).
+     * @param axis  the axis ({@code null} not permitted).
      */
     protected void applyToValueAxis(ValueAxis axis) {
         axis.setLabelFont(this.largeFont);
@@ -1554,7 +1491,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes for this theme to a {@link SymbolAxis}.
      *
-     * @param axis  the axis (<code>null</code> not permitted).
+     * @param axis  the axis ({@code null} not permitted).
      */
     protected void applyToSymbolAxis(SymbolAxis axis) {
         axis.setGridBandPaint(this.gridBandPaint);
@@ -1564,7 +1501,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes for this theme to a {@link PeriodAxis}.
      *
-     * @param axis  the axis (<code>null</code> not permitted).
+     * @param axis  the axis ({@code null} not permitted).
      */
     protected void applyToPeriodAxis(PeriodAxis axis) {
         PeriodAxisLabelInfo[] info = axis.getLabelInfo();
@@ -1582,7 +1519,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the attributes for this theme to an {@link AbstractRenderer}.
      *
-     * @param renderer  the renderer (<code>null</code> not permitted).
+     * @param renderer  the renderer ({@code null} not permitted).
      */
     protected void applyToAbstractRenderer(AbstractRenderer renderer) {
         if (renderer.getAutoPopulateSeriesPaint()) {
@@ -1596,19 +1533,17 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the settings of this theme to the specified renderer.
      *
-     * @param renderer  the renderer (<code>null</code> not permitted).
+     * @param renderer  the renderer ({@code null} not permitted).
      */
     protected void applyToCategoryItemRenderer(CategoryItemRenderer renderer) {
-        if (renderer == null) {
-            throw new IllegalArgumentException("Null 'renderer' argument.");
-        }
+        Args.nullNotPermitted(renderer, "renderer");
 
         if (renderer instanceof AbstractRenderer) {
             applyToAbstractRenderer((AbstractRenderer) renderer);
         }
 
-        renderer.setBaseItemLabelFont(this.regularFont);
-        renderer.setBaseItemLabelPaint(this.itemLabelPaint);
+        renderer.setDefaultItemLabelFont(this.regularFont);
+        renderer.setDefaultItemLabelPaint(this.itemLabelPaint);
 
         // now we handle some special cases - yes, UGLY code alert!
 
@@ -1620,17 +1555,6 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
             br.setShadowPaint(this.shadowPaint);
         }
 
-        // BarRenderer3D
-        if (renderer instanceof BarRenderer3D) {
-            BarRenderer3D br3d = (BarRenderer3D) renderer;
-            br3d.setWallPaint(this.wallPaint);
-        }
-
-        // LineRenderer3D
-        if (renderer instanceof LineRenderer3D) {
-            LineRenderer3D lr3d = (LineRenderer3D) renderer;
-            lr3d.setWallPaint(this.wallPaint);
-        }
 
         //  StatisticalBarRenderer
         if (renderer instanceof StatisticalBarRenderer) {
@@ -1648,17 +1572,15 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Applies the settings of this theme to the specified renderer.
      *
-     * @param renderer  the renderer (<code>null</code> not permitted).
+     * @param renderer  the renderer ({@code null} not permitted).
      */
     protected void applyToXYItemRenderer(XYItemRenderer renderer) {
-        if (renderer == null) {
-            throw new IllegalArgumentException("Null 'renderer' argument.");
-        }
+        Args.nullNotPermitted(renderer, "renderer");
         if (renderer instanceof AbstractRenderer) {
             applyToAbstractRenderer((AbstractRenderer) renderer);
         }
-        renderer.setBaseItemLabelFont(this.regularFont);
-        renderer.setBaseItemLabelPaint(this.itemLabelPaint);
+        renderer.setDefaultItemLabelFont(this.regularFont);
+        renderer.setDefaultItemLabelPaint(this.itemLabelPaint);
         if (renderer instanceof XYBarRenderer) {
             XYBarRenderer br = (XYBarRenderer) renderer;
             br.setBarPainter(this.xyBarPainter);
@@ -1672,9 +1594,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
      * @param annotation  the annotation.
      */
     protected void applyToXYAnnotation(XYAnnotation annotation) {
-        if (annotation == null) {
-            throw new IllegalArgumentException("Null 'annotation' argument.");
-        }
+        Args.nullNotPermitted(annotation, "annotation");
         if (annotation instanceof XYTextAnnotation) {
             XYTextAnnotation xyta = (XYTextAnnotation) annotation;
             xyta.setFont(this.smallFont);
@@ -1685,10 +1605,11 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Tests this theme for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -1712,67 +1633,67 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
         if (!this.smallFont.equals(that.smallFont)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.titlePaint, that.titlePaint)) {
+        if (!PaintUtils.equal(this.titlePaint, that.titlePaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.subtitlePaint, that.subtitlePaint)) {
+        if (!PaintUtils.equal(this.subtitlePaint, that.subtitlePaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.chartBackgroundPaint,
+        if (!PaintUtils.equal(this.chartBackgroundPaint,
                 that.chartBackgroundPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.legendBackgroundPaint,
+        if (!PaintUtils.equal(this.legendBackgroundPaint,
                 that.legendBackgroundPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.legendItemPaint, that.legendItemPaint)) {
+        if (!PaintUtils.equal(this.legendItemPaint, that.legendItemPaint)) {
             return false;
         }
         if (!this.drawingSupplier.equals(that.drawingSupplier)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.plotBackgroundPaint,
+        if (!PaintUtils.equal(this.plotBackgroundPaint,
                 that.plotBackgroundPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.plotOutlinePaint,
+        if (!PaintUtils.equal(this.plotOutlinePaint,
                 that.plotOutlinePaint)) {
             return false;
         }
         if (!this.labelLinkStyle.equals(that.labelLinkStyle)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.labelLinkPaint, that.labelLinkPaint)) {
+        if (!PaintUtils.equal(this.labelLinkPaint, that.labelLinkPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.domainGridlinePaint,
+        if (!PaintUtils.equal(this.domainGridlinePaint,
                 that.domainGridlinePaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.rangeGridlinePaint,
+        if (!PaintUtils.equal(this.rangeGridlinePaint,
                 that.rangeGridlinePaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.crosshairPaint, that.crosshairPaint)) {
+        if (!PaintUtils.equal(this.crosshairPaint, that.crosshairPaint)) {
             return false;
         }
         if (!this.axisOffset.equals(that.axisOffset)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.axisLabelPaint, that.axisLabelPaint)) {
+        if (!PaintUtils.equal(this.axisLabelPaint, that.axisLabelPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.tickLabelPaint, that.tickLabelPaint)) {
+        if (!PaintUtils.equal(this.tickLabelPaint, that.tickLabelPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.itemLabelPaint, that.itemLabelPaint)) {
+        if (!PaintUtils.equal(this.itemLabelPaint, that.itemLabelPaint)) {
             return false;
         }
         if (this.shadowVisible != that.shadowVisible) {
             return false;
         }
-        if (!PaintUtilities.equal(this.shadowPaint, that.shadowPaint)) {
+        if (!PaintUtils.equal(this.shadowPaint, that.shadowPaint)) {
             return false;
         }
         if (!this.barPainter.equals(that.barPainter)) {
@@ -1781,21 +1702,18 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
         if (!this.xyBarPainter.equals(that.xyBarPainter)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.thermometerPaint,
+        if (!PaintUtils.equal(this.thermometerPaint,
                 that.thermometerPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.wallPaint, that.wallPaint)) {
-            return false;
-        }
-        if (!PaintUtilities.equal(this.errorIndicatorPaint,
+        if (!PaintUtils.equal(this.errorIndicatorPaint,
                 that.errorIndicatorPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.gridBandPaint, that.gridBandPaint)) {
+        if (!PaintUtils.equal(this.gridBandPaint, that.gridBandPaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.gridBandAlternatePaint,
+        if (!PaintUtils.equal(this.gridBandAlternatePaint,
                 that.gridBandAlternatePaint)) {
             return false;
         }
@@ -1809,6 +1727,7 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
      *
      * @throws CloneNotSupportedException if the theme cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -1816,39 +1735,38 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     /**
      * Provides serialization support.
      *
-     * @param stream  the output stream (<code>null</code> not permitted).
+     * @param stream  the output stream ({@code null} not permitted).
      *
      * @throws IOException  if there is an I/O error.
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.titlePaint, stream);
-        SerialUtilities.writePaint(this.subtitlePaint, stream);
-        SerialUtilities.writePaint(this.chartBackgroundPaint, stream);
-        SerialUtilities.writePaint(this.legendBackgroundPaint, stream);
-        SerialUtilities.writePaint(this.legendItemPaint, stream);
-        SerialUtilities.writePaint(this.plotBackgroundPaint, stream);
-        SerialUtilities.writePaint(this.plotOutlinePaint, stream);
-        SerialUtilities.writePaint(this.labelLinkPaint, stream);
-        SerialUtilities.writePaint(this.baselinePaint, stream);
-        SerialUtilities.writePaint(this.domainGridlinePaint, stream);
-        SerialUtilities.writePaint(this.rangeGridlinePaint, stream);
-        SerialUtilities.writePaint(this.crosshairPaint, stream);
-        SerialUtilities.writePaint(this.axisLabelPaint, stream);
-        SerialUtilities.writePaint(this.tickLabelPaint, stream);
-        SerialUtilities.writePaint(this.itemLabelPaint, stream);
-        SerialUtilities.writePaint(this.shadowPaint, stream);
-        SerialUtilities.writePaint(this.thermometerPaint, stream);
-        SerialUtilities.writePaint(this.wallPaint, stream);
-        SerialUtilities.writePaint(this.errorIndicatorPaint, stream);
-        SerialUtilities.writePaint(this.gridBandPaint, stream);
-        SerialUtilities.writePaint(this.gridBandAlternatePaint, stream);
+        SerialUtils.writePaint(this.titlePaint, stream);
+        SerialUtils.writePaint(this.subtitlePaint, stream);
+        SerialUtils.writePaint(this.chartBackgroundPaint, stream);
+        SerialUtils.writePaint(this.legendBackgroundPaint, stream);
+        SerialUtils.writePaint(this.legendItemPaint, stream);
+        SerialUtils.writePaint(this.plotBackgroundPaint, stream);
+        SerialUtils.writePaint(this.plotOutlinePaint, stream);
+        SerialUtils.writePaint(this.labelLinkPaint, stream);
+        SerialUtils.writePaint(this.baselinePaint, stream);
+        SerialUtils.writePaint(this.domainGridlinePaint, stream);
+        SerialUtils.writePaint(this.rangeGridlinePaint, stream);
+        SerialUtils.writePaint(this.crosshairPaint, stream);
+        SerialUtils.writePaint(this.axisLabelPaint, stream);
+        SerialUtils.writePaint(this.tickLabelPaint, stream);
+        SerialUtils.writePaint(this.itemLabelPaint, stream);
+        SerialUtils.writePaint(this.shadowPaint, stream);
+        SerialUtils.writePaint(this.thermometerPaint, stream);
+        SerialUtils.writePaint(this.errorIndicatorPaint, stream);
+        SerialUtils.writePaint(this.gridBandPaint, stream);
+        SerialUtils.writePaint(this.gridBandAlternatePaint, stream);
     }
 
     /**
      * Provides serialization support.
      *
-     * @param stream  the input stream (<code>null</code> not permitted).
+     * @param stream  the input stream ({@code null} not permitted).
      *
      * @throws IOException  if there is an I/O error.
      * @throws ClassNotFoundException  if there is a classpath problem.
@@ -1856,27 +1774,26 @@ public class StandardChartTheme implements ChartTheme, Cloneable,
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.titlePaint = SerialUtilities.readPaint(stream);
-        this.subtitlePaint = SerialUtilities.readPaint(stream);
-        this.chartBackgroundPaint = SerialUtilities.readPaint(stream);
-        this.legendBackgroundPaint = SerialUtilities.readPaint(stream);
-        this.legendItemPaint = SerialUtilities.readPaint(stream);
-        this.plotBackgroundPaint = SerialUtilities.readPaint(stream);
-        this.plotOutlinePaint = SerialUtilities.readPaint(stream);
-        this.labelLinkPaint = SerialUtilities.readPaint(stream);
-        this.baselinePaint = SerialUtilities.readPaint(stream);
-        this.domainGridlinePaint = SerialUtilities.readPaint(stream);
-        this.rangeGridlinePaint = SerialUtilities.readPaint(stream);
-        this.crosshairPaint = SerialUtilities.readPaint(stream);
-        this.axisLabelPaint = SerialUtilities.readPaint(stream);
-        this.tickLabelPaint = SerialUtilities.readPaint(stream);
-        this.itemLabelPaint = SerialUtilities.readPaint(stream);
-        this.shadowPaint = SerialUtilities.readPaint(stream);
-        this.thermometerPaint = SerialUtilities.readPaint(stream);
-        this.wallPaint = SerialUtilities.readPaint(stream);
-        this.errorIndicatorPaint = SerialUtilities.readPaint(stream);
-        this.gridBandPaint = SerialUtilities.readPaint(stream);
-        this.gridBandAlternatePaint = SerialUtilities.readPaint(stream);
+        this.titlePaint = SerialUtils.readPaint(stream);
+        this.subtitlePaint = SerialUtils.readPaint(stream);
+        this.chartBackgroundPaint = SerialUtils.readPaint(stream);
+        this.legendBackgroundPaint = SerialUtils.readPaint(stream);
+        this.legendItemPaint = SerialUtils.readPaint(stream);
+        this.plotBackgroundPaint = SerialUtils.readPaint(stream);
+        this.plotOutlinePaint = SerialUtils.readPaint(stream);
+        this.labelLinkPaint = SerialUtils.readPaint(stream);
+        this.baselinePaint = SerialUtils.readPaint(stream);
+        this.domainGridlinePaint = SerialUtils.readPaint(stream);
+        this.rangeGridlinePaint = SerialUtils.readPaint(stream);
+        this.crosshairPaint = SerialUtils.readPaint(stream);
+        this.axisLabelPaint = SerialUtils.readPaint(stream);
+        this.tickLabelPaint = SerialUtils.readPaint(stream);
+        this.itemLabelPaint = SerialUtils.readPaint(stream);
+        this.shadowPaint = SerialUtils.readPaint(stream);
+        this.thermometerPaint = SerialUtils.readPaint(stream);
+        this.errorIndicatorPaint = SerialUtils.readPaint(stream);
+        this.gridBandPaint = SerialUtils.readPaint(stream);
+        this.gridBandAlternatePaint = SerialUtils.readPaint(stream);
     }
 
 }

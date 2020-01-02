@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * BlockBorder.java
  * ----------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -40,7 +40,7 @@
  * 06-May-2005 : Added new convenience constructors (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 16-Mar-2007 : Implemented BlockFrame (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -54,10 +54,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A border for a block.  This class is immutable.
@@ -69,7 +69,7 @@ public class BlockBorder implements BlockFrame, Serializable {
 
     /** An empty border. */
     public static final BlockBorder NONE = new BlockBorder(
-            RectangleInsets.ZERO_INSETS, Color.white);
+            RectangleInsets.ZERO_INSETS, Color.WHITE);
 
     /** The space reserved for the border. */
     private RectangleInsets insets;
@@ -81,13 +81,13 @@ public class BlockBorder implements BlockFrame, Serializable {
      * Creates a default border.
      */
     public BlockBorder() {
-        this(Color.black);
+        this(Color.BLACK);
     }
 
     /**
      * Creates a new border with the specified color.
      *
-     * @param paint  the color (<code>null</code> not permitted).
+     * @param paint  the color ({@code null} not permitted).
      */
     public BlockBorder(Paint paint) {
         this(new RectangleInsets(1, 1, 1, 1), paint);
@@ -102,7 +102,7 @@ public class BlockBorder implements BlockFrame, Serializable {
      * @param right  the width of the right border.
      */
     public BlockBorder(double top, double left, double bottom, double right) {
-        this(new RectangleInsets(top, left, bottom, right), Color.black);
+        this(new RectangleInsets(top, left, bottom, right), Color.BLACK);
     }
 
     /**
@@ -112,7 +112,7 @@ public class BlockBorder implements BlockFrame, Serializable {
      * @param left  the width of the left border.
      * @param bottom  the width of the bottom border.
      * @param right  the width of the right border.
-     * @param paint  the border paint (<code>null</code> not permitted).
+     * @param paint  the border paint ({@code null} not permitted).
      */
     public BlockBorder(double top, double left, double bottom, double right,
                        Paint paint) {
@@ -122,16 +122,12 @@ public class BlockBorder implements BlockFrame, Serializable {
     /**
      * Creates a new border.
      *
-     * @param insets  the border insets (<code>null</code> not permitted).
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param insets  the border insets ({@code null} not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      */
     public BlockBorder(RectangleInsets insets, Paint paint) {
-        if (insets == null) {
-            throw new IllegalArgumentException("Null 'insets' argument.");
-        }
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(insets, "insets");
+        Args.nullNotPermitted(paint, "paint");
         this.insets = insets;
         this.paint = paint;
     }
@@ -139,8 +135,9 @@ public class BlockBorder implements BlockFrame, Serializable {
     /**
      * Returns the space reserved for the border.
      *
-     * @return The space (never <code>null</code>).
+     * @return The space (never {@code null}).
      */
+    @Override
     public RectangleInsets getInsets() {
         return this.insets;
     }
@@ -148,7 +145,7 @@ public class BlockBorder implements BlockFrame, Serializable {
     /**
      * Returns the paint used to draw the border.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      */
     public Paint getPaint() {
         return this.paint;
@@ -160,6 +157,7 @@ public class BlockBorder implements BlockFrame, Serializable {
      * @param g2  the graphics device.
      * @param area  the area.
      */
+    @Override
     public void draw(Graphics2D g2, Rectangle2D area) {
         // this default implementation will just fill the available
         // border space with a single color
@@ -194,10 +192,11 @@ public class BlockBorder implements BlockFrame, Serializable {
     /**
      * Tests this border for equality with an arbitrary instance.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -209,7 +208,7 @@ public class BlockBorder implements BlockFrame, Serializable {
         if (!this.insets.equals(that.insets)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.paint, that.paint)) {
+        if (!PaintUtils.equal(this.paint, that.paint)) {
             return false;
         }
         return true;
@@ -224,7 +223,7 @@ public class BlockBorder implements BlockFrame, Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
+        SerialUtils.writePaint(this.paint, stream);
     }
 
     /**
@@ -238,7 +237,7 @@ public class BlockBorder implements BlockFrame, Serializable {
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
+        this.paint = SerialUtils.readPaint(stream);
     }
 
 }

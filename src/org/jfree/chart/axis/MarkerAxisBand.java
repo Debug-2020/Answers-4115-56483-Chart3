@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,19 +21,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * MarkerAxisBand.java
  * -------------------
- * (C) Copyright 2000-2008, by Object Refinery Limited.
+ * (C) Copyright 2000-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
  *
- * Changes (from 03-Sep-2002)
- * --------------------------
+ * Changes
+ * -------
  * 03-Sep-2002 : Updated Javadoc comments (DG);
  * 01-Oct-2002 : Fixed errors reported by Checkstyle (DG);
  * 08-Nov-2002 : Moved to new package com.jrefinery.chart.axis (DG);
@@ -42,7 +42,6 @@
  * 29-Oct-2003 : Added workaround for font alignment in PDF output (DG);
  * 21-Jan-2004 : Update for renamed method in ValueAxis (DG);
  * 07-Apr-2004 : Changed text bounds calculation (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -61,9 +60,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jfree.chart.plot.IntervalMarker;
-import org.jfree.chart.text.TextUtilities;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.RectangleEdge;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
 
 /**
  * A band that can be added to a number axis to display regions.
@@ -160,7 +159,7 @@ public class MarkerAxisBand implements Serializable {
 
         g2.setFont(font);
         FontMetrics fm = g2.getFontMetrics(font);
-        Rectangle2D r = TextUtilities.getTextBounds(text, g2, fm);
+        Rectangle2D r = TextUtils.getTextBounds(text, g2, fm);
         double x = bounds.getX();
         if (r.getWidth() < bounds.getWidth()) {
             x = x + (bounds.getWidth() - r.getWidth()) / 2;
@@ -217,7 +216,7 @@ public class MarkerAxisBand implements Serializable {
             g2.draw(r);
             g2.setComposite(originalComposite);
 
-            g2.setPaint(Color.black);
+            g2.setPaint(Color.BLACK);
             drawStringInRect(g2, r, this.font, marker.getLabel());
         }
 
@@ -227,10 +226,11 @@ public class MarkerAxisBand implements Serializable {
      * Tests this axis for equality with another object.  Note that the axis
      * that the band belongs to is ignored in the test.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -251,10 +251,10 @@ public class MarkerAxisBand implements Serializable {
         if (this.bottomOuterGap != that.bottomOuterGap) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.font, that.font)) {
+        if (!ObjectUtils.equal(this.font, that.font)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.markers, that.markers)) {
+        if (!ObjectUtils.equal(this.markers, that.markers)) {
             return false;
         }
         return true;
@@ -265,6 +265,7 @@ public class MarkerAxisBand implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 37;
         result = 19 * result + this.font.hashCode();

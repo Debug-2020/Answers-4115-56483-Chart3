@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,21 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * ---------------
- * StrokeList.java
- * ---------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes
- * -------
- * 19-Aug-2003 : Version 1 (DG);
- * 21-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
@@ -70,8 +57,7 @@ public class StrokeList extends AbstractObjectList {
     }
 
     /**
-     * Sets the {@link Stroke} for an item in the list.  The list is expanded
-     * if necessary.
+     * Sets the {@link Stroke} for an item in the list.  The list is expanded if necessary.
      *
      * @param index  the index (zero-based).
      * @param stroke  the {@link Stroke}.
@@ -82,40 +68,41 @@ public class StrokeList extends AbstractObjectList {
 
     /**
      * Returns an independent copy of the list.
-     *
+     * 
      * @return A clone.
-     *
+     * 
      * @throws CloneNotSupportedException if an item in the list cannot be cloned.
      */
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
-
+    
     /**
      * Tests the list for equality with another object (typically also a list).
      *
-     * @param obj  the other object.
+     * @param o  the other object.
      *
      * @return A boolean.
      */
-    public boolean equals(Object obj) {
+    @Override
+    public boolean equals(Object o) {
 
-        if (obj == null) {
+        if (o == null) {
             return false;
         }
-
-        if (obj == this) {
+        
+        if (o == this) {
             return true;
         }
-
-        if (obj instanceof StrokeList) {
-            return super.equals(obj);
+        
+        if (o instanceof StrokeList) {
+            return super.equals(o);
         }
 
         return false;
 
     }
-
+    
     /**
      * Returns a hash code value for the object.
      *
@@ -135,13 +122,13 @@ public class StrokeList extends AbstractObjectList {
     private void writeObject(ObjectOutputStream stream) throws IOException {
 
         stream.defaultWriteObject();
-        int count = size();
+        final int count = size();
         stream.writeInt(count);
         for (int i = 0; i < count; i++) {
-            Stroke stroke = getStroke(i);
+            final Stroke stroke = getStroke(i);
             if (stroke != null) {
                 stream.writeInt(i);
-                SerialUtilities.writeStroke(stroke, stream);
+                SerialUtils.writeStroke(stroke, stream);
             }
             else {
                 stream.writeInt(-1);
@@ -149,7 +136,7 @@ public class StrokeList extends AbstractObjectList {
         }
 
     }
-
+    
     /**
      * Provides serialization support.
      *
@@ -158,19 +145,19 @@ public class StrokeList extends AbstractObjectList {
      * @throws IOException  if there is an I/O error.
      * @throws ClassNotFoundException  if there is a classpath problem.
      */
-    private void readObject(ObjectInputStream stream) throws IOException,
-            ClassNotFoundException {
+    private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 
         stream.defaultReadObject();
         int count = stream.readInt();
         for (int i = 0; i < count; i++) {
             int index = stream.readInt();
             if (index != -1) {
-                setStroke(index, SerialUtilities.readStroke(stream));
+                setStroke(index, SerialUtils.readStroke(stream));
             }
         }
-
+        
     }
 
 }
+
 

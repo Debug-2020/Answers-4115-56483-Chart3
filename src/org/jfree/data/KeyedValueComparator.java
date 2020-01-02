@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * KeyedValueComparator.java
  * -------------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2012, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -37,21 +37,22 @@
  * 05-Mar-2003 : Version 1 (DG);
  * 27-Aug-2003 : Moved SortOrder from org.jfree.data --> org.jfree.util (DG);
  * 12-Jan-2005 : Added accessor methods (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 23-Sep-2012 : Make this class serializable (DG);
  *
  */
 
 package org.jfree.data;
 
+import java.io.Serializable;
 import java.util.Comparator;
-
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.SortOrder;
 
 /**
  * A utility class that can compare and order two {@link KeyedValue} instances
  * and sort them into ascending or descending order by key or by value.
  */
-public class KeyedValueComparator implements Comparator {
+public class KeyedValueComparator implements Comparator, Serializable {
 
     /** The comparator type. */
     private KeyedValueComparatorType type;
@@ -62,15 +63,14 @@ public class KeyedValueComparator implements Comparator {
     /**
      * Creates a new comparator.
      *
-     * @param type  the type (<code>BY_KEY</code> or <code>BY_VALUE</code>,
-     *              <code>null</code> not permitted).
-     * @param order  the order (<code>null</code> not permitted).
+     * @param type  the type ({@code BY_KEY} or {@code BY_VALUE},
+     *              {@code null} not permitted).
+     * @param order  the order ({@code null} not permitted).
      */
     public KeyedValueComparator(KeyedValueComparatorType type,
                                 SortOrder order) {
-        if (order == null) {
-            throw new IllegalArgumentException("Null 'order' argument.");
-        }
+        Args.nullNotPermitted(type, "type");
+        Args.nullNotPermitted(order, "order");
         this.type = type;
         this.order = order;
     }
@@ -78,7 +78,7 @@ public class KeyedValueComparator implements Comparator {
     /**
      * Returns the type.
      *
-     * @return The type (never <code>null</code>).
+     * @return The type (never {@code null}).
      */
     public KeyedValueComparatorType getType() {
         return this.type;
@@ -87,7 +87,7 @@ public class KeyedValueComparator implements Comparator {
     /**
      * Returns the sort order.
      *
-     * @return The sort order (never <code>null</code>).
+     * @return The sort order (never {@code null}).
      */
     public SortOrder getOrder() {
         return this.order;
@@ -95,13 +95,14 @@ public class KeyedValueComparator implements Comparator {
 
     /**
      * Compares two {@link KeyedValue} instances and returns an
-     * <code>int</code> that indicates the relative order of the two objects.
+     * {@code int} that indicates the relative order of the two objects.
      *
      * @param o1  object 1.
      * @param o2  object 2.
      *
      * @return An int indicating the relative order of the objects.
      */
+    @Override
     public int compare(Object o1, Object o2) {
 
         if (o2 == null) {

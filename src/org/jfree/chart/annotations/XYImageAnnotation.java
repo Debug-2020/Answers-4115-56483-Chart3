@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * XYImageAnnotation.java
  * ----------------------
- * (C) Copyright 2003-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Mike Harris;
@@ -43,7 +43,7 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 01-Dec-2006 : Added anchor attribute (see patch 1584860 from
  *               Mike Harris) (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -64,10 +64,11 @@ import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleAnchor;
-import org.jfree.chart.util.RectangleEdge;
 
 /**
  * An annotation that allows an image to be placed at some location on
@@ -103,7 +104,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
      *
      * @param x  the x-coordinate (in data space).
      * @param y  the y-coordinate (in data space).
-     * @param image  the image (<code>null</code> not permitted).
+     * @param image  the image ({@code null} not permitted).
      */
     public XYImageAnnotation(double x, double y, Image image) {
         this(x, y, image, RectangleAnchor.CENTER);
@@ -115,20 +116,16 @@ public class XYImageAnnotation extends AbstractXYAnnotation
      *
      * @param x  the x-coordinate (in data space).
      * @param y  the y-coordinate (in data space).
-     * @param image  the image (<code>null</code> not permitted).
-     * @param anchor  the image anchor (<code>null</code> not permitted).
+     * @param image  the image ({@code null} not permitted).
+     * @param anchor  the image anchor ({@code null} not permitted).
      *
      * @since 1.0.4
      */
     public XYImageAnnotation(double x, double y, Image image,
             RectangleAnchor anchor) {
         super();
-        if (image == null) {
-            throw new IllegalArgumentException("Null 'image' argument.");
-        }
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(image, "image");
+        Args.nullNotPermitted(anchor, "anchor");
         this.x = x;
         this.y = y;
         this.image = image;
@@ -193,6 +190,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
      * @param info  if supplied, this info object will be populated with
      *              entity information.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                      ValueAxis domainAxis, ValueAxis rangeAxis,
                      int rendererIndex,
@@ -223,8 +221,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
         int h = this.image.getHeight(null);
 
         Rectangle2D imageRect = new Rectangle2D.Double(0, 0, w, h);
-        Point2D anchorPoint = RectangleAnchor.coordinates(imageRect,
-                this.anchor);
+        Point2D anchorPoint = this.anchor.getAnchorPoint(imageRect);
         xx = xx - (float) anchorPoint.getX();
         yy = yy - (float) anchorPoint.getY();
         g2.drawImage(this.image, (int) xx, (int) yy, null);
@@ -240,10 +237,11 @@ public class XYImageAnnotation extends AbstractXYAnnotation
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -262,7 +260,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
         if (this.y != that.y) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.image, that.image)) {
+        if (!ObjectUtils.equal(this.image, that.image)) {
             return false;
         }
         if (!this.anchor.equals(that.anchor)) {
@@ -277,6 +275,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         return this.image.hashCode();
     }
@@ -288,6 +287,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
      *
      * @throws CloneNotSupportedException  if the annotation can't be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -301,7 +301,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        //SerialUtilities.writeImage(this.image, stream);
+        //SerialUtils.writeImage(this.image, stream);
     }
 
     /**
@@ -315,7 +315,7 @@ public class XYImageAnnotation extends AbstractXYAnnotation
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        //this.image = SerialUtilities.readImage(stream);
+        //this.image = SerialUtils.readImage(stream);
     }
 
 

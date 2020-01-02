@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,90 +21,74 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * ---------------
- * ObjectList.java
- * ---------------
- * (C)opyright 2003-2008, by Object Refinery Limited and Contributors.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes
- * -------
- * 17-Jul-2003 : Version 1 (DG);
- * 13-Aug-2003 : Refactored to extend AbstractObjectList (DG);
- * 21-Oct-2004 : removed duplicate interface declarations and empty methods.
- * 22-Oct-2004 : Restored removed methods - see note in code (DG);
- * 21-Jun-2007 : Copied from JCommon (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
 package org.jfree.chart.util;
 
-
 /**
  * A list of objects that can grow as required.
  * <p>
- * When cloning, the objects in the list are NOT cloned, only the references.
+ * When cloning, the objects in the list are NOT cloned, only the references. 
  */
 public class ObjectList extends AbstractObjectList {
-
+    
     /**
      * Default constructor.
      */
     public ObjectList() {
     }
-
+    
     /**
      * Creates a new list.
-     *
+     * 
      * @param initialCapacity  the initial capacity.
      */
     public ObjectList(int initialCapacity) {
         super(initialCapacity);
     }
-
-    // NOTE:  the methods below look redundant, but their purpose is to provide
-    // public access to the the get(), set() and indexOf() methods defined in
-    // the AbstractObjectList class, for this class only.  For other classes
-    // (e.g. PaintList, ShapeList etc) we don't want the Object versions of
-    // these methods to be visible in the public API.
-
-    /**
-     * Returns the object at the specified index, if there is one, or
-     * <code>null</code>.
-     *
-     * @param index  the object index.
-     *
-     * @return The object or <code>null</code>.
-     */
-    public Object get(int index) {
-        return super.get(index);
-    }
-
-    /**
-     * Sets an object reference (overwriting any existing object).
-     *
-     * @param index  the object index.
-     * @param object  the object (<code>null</code> permitted).
-     */
-    public void set(int index, Object object) {
-        super.set(index, object);
-    }
-
-    /**
-     * Returns the index of the specified object, or -1 if the object is not
-     * in the list.
-     *
-     * @param object  the object.
-     *
-     * @return The index or -1.
-     */
-    public int indexOf(Object object) {
-        return super.indexOf(object);
-    }
-
+    
+    // NOTE:  the methods below look redundant, but their purpose is to provide public
+    // access to the the get(), set() and indexOf() methods defined in the 
+    // AbstractObjectList class, for this class only.  For other classes 
+    // (e.g. PaintList, ShapeList etc) we don't want the Object versions of these 
+    // methods to be visible in the public API.
+    
+    /**          
+     * Returns the object at the specified index, if there is one, or {@code null}.         
+     *   
+     * @param index  the object index.   
+     *   
+     * @return The object or {@code null}.          
+     */          
+    @Override
+    public Object get(int index) {         
+        return super.get(index);         
+    }    
+         
+    /**          
+     * Sets an object reference (overwriting any existing object).       
+     *   
+     * @param index  the object index.   
+     * @param object  the object ({@code null} permitted).          
+     */          
+    @Override
+    public void set(int index, Object object) {      
+        super.set(index, object);        
+    }    
+         
+    /**          
+     * Returns the index of the specified object, or -1 if the object is not in the list.        
+     *   
+     * @param object  the object.        
+     *   
+     * @return The index or -1.          
+     */          
+    @Override
+    public int indexOf(Object object) {    
+        return super.indexOf(object);    
+    }    
+         
 }

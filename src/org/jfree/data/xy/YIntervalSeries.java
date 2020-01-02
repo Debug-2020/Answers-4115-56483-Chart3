@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * YIntervalSeries.java
  * --------------------
- * (C) Copyright 2006-2008, by Object Refinery Limited.
+ * (C) Copyright 2006-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,6 +36,7 @@
  * -------
  * 20-Oct-2006 : Version 1 (DG);
  * 20-Feb-2007 : Added getYHighValue() and getYLowValue() methods (DG);
+ * 09-Jan-2014 : Added add(YIntervalDataItem, boolean) method (DG);
  *
  */
 
@@ -43,6 +44,7 @@ package org.jfree.data.xy;
 
 import org.jfree.data.ComparableObjectItem;
 import org.jfree.data.ComparableObjectSeries;
+import org.jfree.data.general.SeriesChangeEvent;
 
 /**
  * A list of (x, y, y-low, y-high) data items.
@@ -58,7 +60,7 @@ public class YIntervalSeries extends ComparableObjectSeries {
      * be sorted into ascending order by x-value, and duplicate x-values will
      * be allowed (these defaults can be modified with another constructor.
      *
-     * @param key  the series key (<code>null</code> not permitted).
+     * @param key  the series key ({@code null} not permitted).
      */
     public YIntervalSeries(Comparable key) {
         this(key, true, true);
@@ -68,7 +70,7 @@ public class YIntervalSeries extends ComparableObjectSeries {
      * Constructs a new xy-series that contains no data.  You can specify
      * whether or not duplicate x-values are allowed for the series.
      *
-     * @param key  the series key (<code>null</code> not permitted).
+     * @param key  the series key ({@code null} not permitted).
      * @param autoSort  a flag that controls whether or not the items in the
      *                  series are sorted.
      * @param allowDuplicateXValues  a flag that controls whether duplicate
@@ -80,7 +82,8 @@ public class YIntervalSeries extends ComparableObjectSeries {
     }
 
     /**
-     * Adds a data item to the series.
+     * Adds a data item to the series and sends a {@link SeriesChangeEvent} to 
+     * all registered listeners.
      *
      * @param x  the x-value.
      * @param y  the y-value.
@@ -88,7 +91,20 @@ public class YIntervalSeries extends ComparableObjectSeries {
      * @param yHigh  the upper bound of the y-interval.
      */
     public void add(double x, double y, double yLow, double yHigh) {
-        super.add(new YIntervalDataItem(x, y, yLow, yHigh), true);
+        add(new YIntervalDataItem(x, y, yLow, yHigh), true);
+    }
+    
+    /**
+     * Adds a data item to the series and, if requested, sends a 
+     * {@link SeriesChangeEvent} to all registered listeners.
+     * 
+     * @param item  the data item ({@code null} not permitted).
+     * @param notify  notify listeners?
+     * 
+     * @since 1.0.18
+     */
+    public void add(YIntervalDataItem item, boolean notify) {
+        super.add(item, notify);
     }
 
     /**
@@ -96,7 +112,7 @@ public class YIntervalSeries extends ComparableObjectSeries {
      *
      * @param index  the item index.
      *
-     * @return The x-value (never <code>null</code>).
+     * @return The x-value (never {@code null}).
      */
     public Number getX(int index) {
         YIntervalDataItem item = (YIntervalDataItem) getDataItem(index);
@@ -152,6 +168,7 @@ public class YIntervalSeries extends ComparableObjectSeries {
      *
      * @return The data item.
      */
+    @Override
     public ComparableObjectItem getDataItem(int index) {
         return super.getDataItem(index);
     }

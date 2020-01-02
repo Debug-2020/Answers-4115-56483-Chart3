@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------
  * ChartRenderingInfo.java
  * -----------------------
- * (C) Copyright 2002-2009, by Object Refinery Limited.
+ * (C) Copyright 2002-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -44,8 +44,6 @@
  * 30-Nov-2005 : Removed get/setPlotArea() (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 01-Dec-2006 : Fixed equals() and clone() (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
- * 18-Jun-2009 : Added RenderingSource (DG);
  *
  */
 
@@ -60,22 +58,22 @@ import java.io.Serializable;
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.entity.StandardEntityCollection;
 import org.jfree.chart.plot.PlotRenderingInfo;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A structure for storing rendering information from one call to the
  * JFreeChart.draw() method.
  * <P>
  * An instance of the {@link JFreeChart} class can draw itself within an
- * arbitrary rectangle on any <code>Graphics2D</code>.  It is assumed that
+ * arbitrary rectangle on any {@code Graphics2D}.  It is assumed that
  * client code will sometimes render the same chart in more than one view, so
  * the {@link JFreeChart} instance does not retain any information about its
  * rendered dimensions.  This information can be useful sometimes, so you have
  * the option to collect the information at each call to
- * <code>JFreeChart.draw()</code>, by passing an instance of this
- * <code>ChartRenderingInfo</code> class.
+ * {@code JFreeChart.draw()}, by passing an instance of this
+ * {@code ChartRenderingInfo} class.
  */
 public class ChartRenderingInfo implements Cloneable, Serializable {
 
@@ -91,22 +89,10 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
     /**
      * Storage for the chart entities.  Since retaining entity information for
      * charts with a large number of data points consumes a lot of memory, it
-     * is intended that you can set this to <code>null</code> to prevent the
+     * is intended that you can set this to {@code null} to prevent the
      * information being collected.
      */
     private EntityCollection entities;
-
-    /**
-     * The rendering source.  This is the object that calls the draw(...)
-     * method in the {@link JFreeChart} class, or <code>null</code> if the
-     * rendering source chooses to remain anonymous.  Our initial use for
-     * this is to identify the {@link ChartPanel} that is drawing a chart, so
-     * that selection state info can be retrieved from the panel in some
-     * cases.
-     *
-     * @since 1.2.0
-     */
-    private RenderingSource renderingSource;
 
     /**
      * Constructs a new ChartRenderingInfo structure that can be used to
@@ -119,10 +105,10 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
     /**
      * Constructs a new instance. If an entity collection is supplied, it will
      * be populated with information about the entities in a chart.  If it is
-     * <code>null</code>, no entity information (including tool tips) will
+     * {@code null}, no entity information (including tool tips) will
      * be collected.
      *
-     * @param entities  an entity collection (<code>null</code> permitted).
+     * @param entities  an entity collection ({@code null} permitted).
      */
     public ChartRenderingInfo(EntityCollection entities) {
         this.chartArea = new Rectangle2D.Double();
@@ -155,7 +141,7 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
     /**
      * Returns the collection of entities maintained by this instance.
      *
-     * @return The entity collection (possibly <code>null</code>).
+     * @return The entity collection (possibly {@code null}).
      *
      * @see #setEntityCollection(EntityCollection)
      */
@@ -166,7 +152,7 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
     /**
      * Sets the entity collection.
      *
-     * @param entities  the entity collection (<code>null</code> permitted).
+     * @param entities  the entity collection ({@code null} permitted).
      *
      * @see #getEntityCollection()
      */
@@ -175,34 +161,7 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the rendering source, or <code>null</code>.
-     *
-     * @return The rendering source (possibly <code>null</code>).
-     *
-     * @see #setRenderingSource(RenderingSource)
-     *
-     * @since 1.2.0
-     */
-    public RenderingSource getRenderingSource() {
-        return this.renderingSource;
-    }
-
-    /**
-     * Sets the rendering source.
-     *
-     * @param source  the source (<code>null</code> permitted).
-     *
-     * @see #getRenderingSource()
-     *
-     * @since 1.2.0
-     */
-    public void setRenderingSource(RenderingSource source) {
-        this.renderingSource = source;
-    }
-
-    /**
-     * Clears the information recorded by this object, but not the
-     * rendering source.
+     * Clears the information recorded by this object.
      */
     public void clear() {
         this.chartArea.setRect(0.0, 0.0, 0.0, 0.0);
@@ -224,10 +183,11 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -236,13 +196,13 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
             return false;
         }
         ChartRenderingInfo that = (ChartRenderingInfo) obj;
-        if (!ObjectUtilities.equal(this.chartArea, that.chartArea)) {
+        if (!ObjectUtils.equal(this.chartArea, that.chartArea)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.plotInfo, that.plotInfo)) {
+        if (!ObjectUtils.equal(this.plotInfo, that.plotInfo)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.entities, that.entities)) {
+        if (!ObjectUtils.equal(this.entities, that.entities)) {
             return false;
         }
         return true;
@@ -255,6 +215,7 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
      *
      * @throws CloneNotSupportedException if the object cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         ChartRenderingInfo clone = (ChartRenderingInfo) super.clone();
         if (this.chartArea != null) {
@@ -276,7 +237,7 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeShape(this.chartArea, stream);
+        SerialUtils.writeShape(this.chartArea, stream);
     }
 
     /**
@@ -290,7 +251,7 @@ public class ChartRenderingInfo implements Cloneable, Serializable {
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.chartArea = (Rectangle2D) SerialUtilities.readShape(stream);
+        this.chartArea = (Rectangle2D) SerialUtils.readShape(stream);
     }
 
 }

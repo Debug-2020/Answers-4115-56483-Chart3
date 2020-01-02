@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------------
  * StandardEntityCollection.java
  * -----------------------------
- * (C) Copyright 2001-2008, by Object Refinery Limited.
+ * (C) Copyright 2001-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -44,7 +44,7 @@
  * 20-May-2005 : Fixed bug 1113521 - inefficiency in getEntity() method (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 01-Dec-2006 : Implemented PublicCloneable and fixed clone() method (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -55,8 +55,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -83,6 +83,7 @@ public class StandardEntityCollection implements EntityCollection,
      *
      * @return The entity count.
      */
+    @Override
     public int getEntityCount() {
         return this.entities.size();
     }
@@ -96,6 +97,7 @@ public class StandardEntityCollection implements EntityCollection,
      *
      * @see #add(ChartEntity)
      */
+    @Override
     public ChartEntity getEntity(int index) {
         return (ChartEntity) this.entities.get(index);
     }
@@ -103,6 +105,7 @@ public class StandardEntityCollection implements EntityCollection,
     /**
      * Clears all the entities from the collection.
      */
+    @Override
     public void clear() {
         this.entities.clear();
     }
@@ -110,34 +113,35 @@ public class StandardEntityCollection implements EntityCollection,
     /**
      * Adds an entity to the collection.
      *
-     * @param entity  the entity (<code>null</code> not permitted).
+     * @param entity  the entity ({@code null} not permitted).
      */
+    @Override
     public void add(ChartEntity entity) {
-        if (entity == null) {
-            throw new IllegalArgumentException("Null 'entity' argument.");
-        }
+        Args.nullNotPermitted(entity, "entity");
         this.entities.add(entity);
     }
 
     /**
      * Adds all the entities from the specified collection.
      *
-     * @param collection  the collection of entities (<code>null</code> not
+     * @param collection  the collection of entities ({@code null} not
      *     permitted).
      */
+    @Override
     public void addAll(EntityCollection collection) {
         this.entities.addAll(collection.getEntities());
     }
 
     /**
      * Returns the last entity in the list with an area that encloses the
-     * specified coordinates, or <code>null</code> if there is no such entity.
+     * specified coordinates, or {@code null} if there is no such entity.
      *
      * @param x  the x coordinate.
      * @param y  the y coordinate.
      *
-     * @return The entity (possibly <code>null</code>).
+     * @return The entity (possibly {@code null}).
      */
+    @Override
     public ChartEntity getEntity(double x, double y) {
         int entityCount = this.entities.size();
         for (int i = entityCount - 1; i >= 0; i--) {
@@ -154,6 +158,7 @@ public class StandardEntityCollection implements EntityCollection,
      *
      * @return The entities.
      */
+    @Override
     public Collection getEntities() {
         return Collections.unmodifiableCollection(this.entities);
     }
@@ -163,6 +168,7 @@ public class StandardEntityCollection implements EntityCollection,
      *
      * @return An iterator.
      */
+    @Override
     public Iterator iterator() {
         return this.entities.iterator();
     }
@@ -170,17 +176,18 @@ public class StandardEntityCollection implements EntityCollection,
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
         }
         if (obj instanceof StandardEntityCollection) {
             StandardEntityCollection that = (StandardEntityCollection) obj;
-            return ObjectUtilities.equal(this.entities, that.entities);
+            return ObjectUtils.equal(this.entities, that.entities);
         }
         return false;
     }
@@ -192,6 +199,7 @@ public class StandardEntityCollection implements EntityCollection,
      *
      * @throws CloneNotSupportedException if the object cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         StandardEntityCollection clone
                 = (StandardEntityCollection) super.clone();

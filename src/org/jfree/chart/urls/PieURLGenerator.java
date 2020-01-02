@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * PieURLGenerator.java
@@ -47,7 +47,7 @@
 
 package org.jfree.chart.urls;
 
-import org.jfree.data.pie.PieDataset;
+import org.jfree.data.general.PieDataset;
 
 /**
  * Interface for a URL generator for plots that use data from a
@@ -57,7 +57,7 @@ import org.jfree.data.pie.PieDataset;
  *     dataset, as this may be user-specified and could pose a security
  *     risk;</li>
  * <li>should be either (a) immutable, or (b) cloneable via the
- *     <code>PublicCloneable</code> interface (defined in the JCommon class
+ *     {@code PublicCloneable} interface (defined in the JCommon class
  *     library).  This provides a mechanism for the referring plot to clone
  *     the generator if necessary.</li>
  * </ul>
@@ -68,8 +68,8 @@ public interface PieURLGenerator {
      * Generates a URL for one item in a {@link PieDataset}. As a guideline,
      * the URL should be valid within the context of an XHTML 1.0 document.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
-     * @param key  the item key (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
+     * @param key  the item key ({@code null} not permitted).
      * @param pieIndex  the pie index (differentiates between pies in a
      *                  'multi' pie chart).
      *

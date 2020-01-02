@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------
  * RingPlot.java
  * -------------
- * (C) Copyright 2004-2009, by Object Refinery Limited.
+ * (C) Copyright 2004-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limtied);
  * Contributor(s):   Christoph Beck (bug 2121818);
@@ -43,8 +43,11 @@
  * 27-Sep-2006 : Updated drawItem() method for new lookup methods (DG);
  * 12-Oct-2006 : Added configurable section depth (DG);
  * 14-Feb-2007 : Added notification in setSectionDepth() method (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 23-Sep-2008 : Fix for bug 2121818 by Christoph Beck (DG);
+ * 13-Jul-2009 : Added support for shadow generator (DG);
+ * 11-Oct-2011 : Check sectionOutlineVisible - bug 3237879 (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
+ * 28-Feb-2014 : Add center text feature (DG);
  *
  */
 
@@ -52,6 +55,7 @@ package org.jfree.chart.plot;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
@@ -64,20 +68,25 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.text.Format;
 
 import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.entity.PieSectionEntity;
-import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.labels.PieToolTipGenerator;
+import org.jfree.chart.text.TextUtils;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.ui.TextAnchor;
 import org.jfree.chart.urls.PieURLGenerator;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.RectangleInsets;
+import org.jfree.chart.util.LineUtils;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.Rotation;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.ShapeUtilities;
+import org.jfree.chart.util.SerialUtils;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.chart.util.UnitType;
-import org.jfree.data.pie.PieDataset;
+import org.jfree.data.general.PieDataset;
 
 /**
  * A customised pie plot that leaves a hole in the middle.
@@ -87,6 +96,27 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     /** For serialization. */
     private static final long serialVersionUID = 1556064784129676620L;
 
+    /** The center text mode. */
+    private CenterTextMode centerTextMode = CenterTextMode.NONE;
+    
+    /** 
+     * Text to display in the middle of the chart (used for 
+     * CenterTextMode.FIXED). 
+     */
+    private String centerText;
+    
+    /**
+     * The formatter used when displaying the first data value from the
+     * dataset (CenterTextMode.VALUE).
+     */
+    private Format centerTextFormatter = new DecimalFormat("0.00");
+    
+    /** The font used to display the center text. */
+    private Font centerTextFont;
+    
+    /** The color used to display the center text. */
+    private Color centerTextColor;
+    
     /**
      * A flag that controls whether or not separators are drawn between the
      * sections of the chart.
@@ -117,7 +147,7 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     private double sectionDepth;
 
     /**
-     * Creates a new plot with a <code>null</code> dataset.
+     * Creates a new plot with a {@code null} dataset.
      */
     public RingPlot() {
         this(null);
@@ -126,18 +156,158 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     /**
      * Creates a new plot for the specified dataset.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public RingPlot(PieDataset dataset) {
         super(dataset);
+        this.centerTextMode = CenterTextMode.NONE;
+        this.centerText = null;
+        this.centerTextFormatter = new DecimalFormat("0.00");
+        this.centerTextFont = DEFAULT_LABEL_FONT;
+        this.centerTextColor = Color.BLACK;
         this.separatorsVisible = true;
         this.separatorStroke = new BasicStroke(0.5f);
         this.separatorPaint = Color.gray;
-        this.innerSeparatorExtension = 0.20;  // twenty percent
-        this.outerSeparatorExtension = 0.20;  // twenty percent
+        this.innerSeparatorExtension = 0.20;  // 20%
+        this.outerSeparatorExtension = 0.20;  // 20%
         this.sectionDepth = 0.20; // 20%
     }
 
+    /**
+     * Returns the mode for displaying text in the center of the plot.  The
+     * default value is {@link CenterTextMode#NONE} therefore no text
+     * will be displayed by default.
+     * 
+     * @return The mode (never {@code null}).
+     * 
+     * @since 1.0.18
+     */
+    public CenterTextMode getCenterTextMode() {
+        return this.centerTextMode;
+    }
+    
+    /**
+     * Sets the mode for displaying text in the center of the plot and sends 
+     * a change event to all registered listeners.  For
+     * {@link CenterTextMode#FIXED}, the display text will come from the 
+     * {@code centerText} attribute (see {@link #getCenterText()}).
+     * For {@link CenterTextMode#VALUE}, the center text will be the value from
+     * the first section in the dataset.
+     * 
+     * @param mode  the mode ({@code null} not permitted).
+     * 
+     * @since 1.0.18
+     */
+    public void setCenterTextMode(CenterTextMode mode) {
+        Args.nullNotPermitted(mode, "mode");
+        this.centerTextMode = mode;
+        fireChangeEvent();
+    }
+    
+    /**
+     * Returns the text to display in the center of the plot when the mode
+     * is {@link CenterTextMode#FIXED}.
+     * 
+     * @return The text (possibly {@code null}).
+     * 
+     * @since 1.0.18.
+     */
+    public String getCenterText() {
+        return this.centerText;
+    }
+    
+    /**
+     * Sets the text to display in the center of the plot and sends a
+     * change event to all registered listeners.  If the text is set to 
+     * {@code null}, no text will be displayed.
+     * 
+     * @param text  the text ({@code null} permitted).
+     * 
+     * @since 1.0.18
+     */
+    public void setCenterText(String text) {
+        this.centerText = text;
+        fireChangeEvent();
+    }
+    
+    /**
+     * Returns the formatter used to format the center text value for the mode
+     * {@link CenterTextMode#VALUE}.  The default value is 
+     * {@code DecimalFormat("0.00")}.
+     * 
+     * @return The formatter (never {@code null}).
+     * 
+     * @since 1.0.18
+     */
+    public Format getCenterTextFormatter() {
+        return this.centerTextFormatter;
+    }
+    
+    /**
+     * Sets the formatter used to format the center text value and sends a
+     * change event to all registered listeners.
+     * 
+     * @param formatter  the formatter ({@code null} not permitted).
+     * 
+     * @since 1.0.18
+     */
+    public void setCenterTextFormatter(Format formatter) {
+        Args.nullNotPermitted(formatter, "formatter");
+        this.centerTextFormatter = formatter;
+    }
+    
+    /**
+     * Returns the font used to display the center text.  The default value
+     * is {@link PiePlot#DEFAULT_LABEL_FONT}.
+     * 
+     * @return The font (never {@code null}).
+     * 
+     * @since 1.0.18
+     */
+    public Font getCenterTextFont() {
+        return this.centerTextFont;
+    }
+    
+    /**
+     * Sets the font used to display the center text and sends a change event
+     * to all registered listeners.
+     * 
+     * @param font  the font ({@code null} not permitted).
+     * 
+     * @since 1.0.18
+     */
+    public void setCenterTextFont(Font font) {
+        Args.nullNotPermitted(font, "font");
+        this.centerTextFont = font;
+        fireChangeEvent();
+    }
+    
+    /**
+     * Returns the color for the center text.  The default value is
+     * {@code Color.BLACK}.
+     * 
+     * @return The color (never {@code null}). 
+     * 
+     * @since 1.0.18
+     */
+    public Color getCenterTextColor() {
+        return this.centerTextColor;
+    }
+    
+    /**
+     * Sets the color for the center text and sends a change event to all 
+     * registered listeners.
+     * 
+     * @param color  the color ({@code null} not permitted).
+     * 
+     * @since 1.0.18
+     */
+    public void setCenterTextColor(Color color) {
+        Args.nullNotPermitted(color, "color");
+        this.centerTextColor = color;
+        fireChangeEvent();
+    }
+    
     /**
      * Returns a flag that indicates whether or not separators are drawn between
      * the sections in the chart.
@@ -152,8 +322,8 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
 
     /**
      * Sets the flag that controls whether or not separators are drawn between
-     * the sections in the chart, and sends a {@link PlotChangeEvent} to all
-     * registered listeners.
+     * the sections in the chart, and sends a change event to all registered 
+     * listeners.
      *
      * @param visible  the flag.
      *
@@ -167,7 +337,7 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     /**
      * Returns the separator stroke.
      *
-     * @return The stroke (never <code>null</code>).
+     * @return The stroke (never {@code null}).
      *
      * @see #setSeparatorStroke(Stroke)
      */
@@ -177,16 +347,14 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
 
     /**
      * Sets the stroke used to draw the separator between sections and sends
-     * a {@link PlotChangeEvent} to all registered listeners.
+     * a change event to all registered listeners.
      *
-     * @param stroke  the stroke (<code>null</code> not permitted).
+     * @param stroke  the stroke ({@code null} not permitted).
      *
      * @see #getSeparatorStroke()
      */
     public void setSeparatorStroke(Stroke stroke) {
-        if (stroke == null) {
-            throw new IllegalArgumentException("Null 'stroke' argument.");
-        }
+        Args.nullNotPermitted(stroke, "stroke");
         this.separatorStroke = stroke;
         fireChangeEvent();
     }
@@ -194,7 +362,7 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     /**
      * Returns the separator paint.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setSeparatorPaint(Paint)
      */
@@ -204,16 +372,14 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
 
     /**
      * Sets the paint used to draw the separator between sections and sends a
-     * {@link PlotChangeEvent} to all registered listeners.
+     * change event to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getSeparatorPaint()
      */
     public void setSeparatorPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.separatorPaint = paint;
         fireChangeEvent();
     }
@@ -234,8 +400,7 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     /**
      * Sets the length of the inner extension of the separator line that is
      * drawn between sections, as a percentage of the depth of the
-     * sections, and sends a {@link PlotChangeEvent} to all registered
-     * listeners.
+     * sections, and sends a change event to all registered listeners.
      *
      * @param percent  the percentage.
      *
@@ -263,8 +428,7 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     /**
      * Sets the length of the outer extension of the separator line that is
      * drawn between sections, as a percentage of the depth of the
-     * sections, and sends a {@link PlotChangeEvent} to all registered
-     * listeners.
+     * sections, and sends a change event to all registered listeners.
      *
      * @param percent  the percentage.
      *
@@ -308,38 +472,35 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
      * beginning of each drawing.
      *
      * @param g2  the graphics device.
-     * @param plotArea  the plot area (<code>null</code> not permitted).
+     * @param plotArea  the plot area ({@code null} not permitted).
      * @param plot  the plot.
-     * @param index  the secondary index (<code>null</code> for primary
+     * @param index  the secondary index ({@code null} for primary
      *               renderer).
      * @param info  collects chart rendering information for return to caller.
      *
      * @return A state object (maintains state information relevant to one
      *         chart drawing).
      */
+    @Override
     public PiePlotState initialise(Graphics2D g2, Rectangle2D plotArea,
             PiePlot plot, Integer index, PlotRenderingInfo info) {
-
         PiePlotState state = super.initialise(g2, plotArea, plot, index, info);
         state.setPassesRequired(3);
         return state;
-
     }
 
     /**
      * Draws a single data item.
      *
-     * @param g2  the graphics device (<code>null</code> not permitted).
+     * @param g2  the graphics device ({@code null} not permitted).
      * @param section  the section index.
      * @param dataArea  the data plot area.
      * @param state  state information for one chart.
      * @param currentPass  the current pass index.
      */
-    protected void drawItem(Graphics2D g2,
-                            int section,
-                            Rectangle2D dataArea,
-                            PiePlotState state,
-                            int currentPass) {
+    @Override
+    protected void drawItem(Graphics2D g2, int section, Rectangle2D dataArea,
+            PiePlotState state, int currentPass) {
 
         PieDataset dataset = getDataset();
         Number n = dataset.getValue(section);
@@ -401,23 +562,41 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
                 Paint shadowPaint = getShadowPaint();
                 double shadowXOffset = getShadowXOffset();
                 double shadowYOffset = getShadowYOffset();
-                if (shadowPaint != null) {
-                    Shape shadowArc = ShapeUtilities.createTranslatedShape(
+                if (shadowPaint != null && getShadowGenerator() == null) {
+                    Shape shadowArc = ShapeUtils.createTranslatedShape(
                             path, (float) shadowXOffset, (float) shadowYOffset);
                     g2.setPaint(shadowPaint);
                     g2.fill(shadowArc);
                 }
             }
             else if (currentPass == 1) {
-                Paint paint = lookupSectionPaint(key, false);
+                Paint paint = lookupSectionPaint(key);
                 g2.setPaint(paint);
                 g2.fill(path);
-                Paint outlinePaint = lookupSectionOutlinePaint(key, false);
-                Stroke outlineStroke = lookupSectionOutlineStroke(key, false);
-                if (outlinePaint != null && outlineStroke != null) {
+                Paint outlinePaint = lookupSectionOutlinePaint(key);
+                Stroke outlineStroke = lookupSectionOutlineStroke(key);
+                if (getSectionOutlinesVisible() && outlinePaint != null 
+                        && outlineStroke != null) {
                     g2.setPaint(outlinePaint);
                     g2.setStroke(outlineStroke);
                     g2.draw(path);
+                }
+                
+                if (section == 0) {
+                    String nstr = null;
+                    if (this.centerTextMode.equals(CenterTextMode.VALUE)) {
+                        nstr = this.centerTextFormatter.format(n);
+                    } else if (this.centerTextMode.equals(CenterTextMode.FIXED)) {
+                        nstr = this.centerText;
+                    }
+                    if (nstr != null) {
+                        g2.setFont(this.centerTextFont);
+                        g2.setPaint(this.centerTextColor);
+                        TextUtils.drawAlignedString(nstr, g2, 
+                            (float) dataArea.getCenterX(), 
+                            (float) dataArea.getCenterY(),  
+                            TextAnchor.CENTER);                        
+                    }
                 }
 
                 // add an entity for the pie section
@@ -446,9 +625,9 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
             }
             else if (currentPass == 2) {
                 if (this.separatorsVisible) {
-                    Line2D extendedSeparator = extendLine(separator,
-                        this.innerSeparatorExtension,
-                        this.outerSeparatorExtension);
+                    Line2D extendedSeparator = LineUtils.extendLine(
+                            separator, this.innerSeparatorExtension,
+                            this.outerSeparatorExtension);
                     g2.setStroke(this.separatorStroke);
                     g2.setPaint(this.separatorPaint);
                     g2.draw(extendedSeparator);
@@ -464,6 +643,7 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
      *
      * @return The label link depth, as a percentage of the plot's radius.
      */
+    @Override
     protected double getLabelLinkDepth() {
         return Math.min(super.getLabelLinkDepth(), getSectionDepth() / 2);
     }
@@ -471,10 +651,11 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     /**
      * Tests this plot for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -483,14 +664,29 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
             return false;
         }
         RingPlot that = (RingPlot) obj;
+        if (!this.centerTextMode.equals(that.centerTextMode)) {
+            return false;
+        }
+        if (!ObjectUtils.equal(this.centerText, that.centerText)) {
+            return false;
+        }
+        if (!this.centerTextFormatter.equals(that.centerTextFormatter)) {
+            return false;
+        }
+        if (!this.centerTextFont.equals(that.centerTextFont)) {
+            return false;
+        }
+        if (!this.centerTextColor.equals(that.centerTextColor)) {
+            return false;
+        }
         if (this.separatorsVisible != that.separatorsVisible) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.separatorStroke,
+        if (!ObjectUtils.equal(this.separatorStroke,
                 that.separatorStroke)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.separatorPaint, that.separatorPaint)) {
+        if (!PaintUtils.equal(this.separatorPaint, that.separatorPaint)) {
             return false;
         }
         if (this.innerSeparatorExtension != that.innerSeparatorExtension) {
@@ -506,34 +702,6 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     }
 
     /**
-     * Creates a new line by extending an existing line.
-     *
-     * @param line  the line (<code>null</code> not permitted).
-     * @param startPercent  the amount to extend the line at the start point
-     *                      end.
-     * @param endPercent  the amount to extend the line at the end point end.
-     *
-     * @return A new line.
-     */
-    private Line2D extendLine(Line2D line, double startPercent,
-                              double endPercent) {
-        if (line == null) {
-            throw new IllegalArgumentException("Null 'line' argument.");
-        }
-        double x1 = line.getX1();
-        double x2 = line.getX2();
-        double deltaX = x2 - x1;
-        double y1 = line.getY1();
-        double y2 = line.getY2();
-        double deltaY = y2 - y1;
-        x1 = x1 - (startPercent * deltaX);
-        y1 = y1 - (startPercent * deltaY);
-        x2 = x2 + (endPercent * deltaX);
-        y2 = y2 + (endPercent * deltaY);
-        return new Line2D.Double(x1, y1, x2, y2);
-    }
-
-    /**
      * Provides serialization support.
      *
      * @param stream  the output stream.
@@ -542,8 +710,8 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeStroke(this.separatorStroke, stream);
-        SerialUtilities.writePaint(this.separatorPaint, stream);
+        SerialUtils.writeStroke(this.separatorStroke, stream);
+        SerialUtils.writePaint(this.separatorPaint, stream);
     }
 
     /**
@@ -557,8 +725,8 @@ public class RingPlot extends PiePlot implements Cloneable, Serializable {
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.separatorStroke = SerialUtilities.readStroke(stream);
-        this.separatorPaint = SerialUtilities.readPaint(stream);
+        this.separatorStroke = SerialUtils.readStroke(stream);
+        this.separatorPaint = SerialUtils.readPaint(stream);
     }
 
 }

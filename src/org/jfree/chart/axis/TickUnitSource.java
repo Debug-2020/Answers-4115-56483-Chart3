@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * TickUnitSource.java
  * -------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -47,9 +47,10 @@ package org.jfree.chart.axis;
 public interface TickUnitSource {
 
     /**
-     * Returns a tick unit that is larger than the supplied unit.
+     * Returns the smallest tick unit available in the source that is larger
+     * than {@code unit} or, if there is no larger unit, returns {@code unit}.
      *
-     * @param unit   the unit.
+     * @param unit  the unit ({@code null} not permitted).
      *
      * @return A tick unit that is larger than the supplied unit.
      */
@@ -66,12 +67,13 @@ public interface TickUnitSource {
     public TickUnit getCeilingTickUnit(TickUnit unit);
 
     /**
-     * Returns the tick unit in the collection that is greater than or equal
-     * to the specified size.
+     * Returns the smallest tick unit available in the source that is greater 
+     * than or equal to the specified size.  If there is no such tick unit,
+     * the method should return the largest available tick in the source.
      *
      * @param size  the size.
      *
-     * @return A unit from the collection.
+     * @return A unit from the collection (never {@code null}).
      */
     public TickUnit getCeilingTickUnit(double size);
 

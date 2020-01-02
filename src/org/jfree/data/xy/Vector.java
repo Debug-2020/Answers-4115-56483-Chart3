@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------
  * Vector.java
@@ -59,7 +59,7 @@ public class Vector implements Serializable {
     private double y;
 
     /**
-     * Creates a new instance of <code>Vector</code>.
+     * Creates a new instance of {@code Vector}.
      *
      * @param x  the x-component.
      * @param y  the y-component.
@@ -108,10 +108,11 @@ public class Vector implements Serializable {
     /**
      * Tests this vector for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> not permitted).
+     * @param obj  the object ({@code null} not permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -134,6 +135,7 @@ public class Vector implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
         long temp = Double.doubleToLongBits(this.x);

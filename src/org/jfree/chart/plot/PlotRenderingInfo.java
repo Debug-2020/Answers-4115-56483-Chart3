@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * PlotRenderingInfo.java
@@ -41,7 +41,6 @@
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 01-Dec-2006 : Implemented clone() method properly (DG);
  * 17-Apr-2007 : Fixed bug 1698965 (NPE in CombinedDomainXYPlot) (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -56,8 +55,9 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * Stores information about the dimensions of a plot and its subplots.
@@ -84,7 +84,7 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     /**
      * Creates a new instance.
      *
-     * @param owner  the owner (<code>null</code> permitted).
+     * @param owner  the owner ({@code null} permitted).
      */
     public PlotRenderingInfo(ChartRenderingInfo owner) {
         this.owner = owner;
@@ -95,7 +95,7 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     /**
      * Returns the owner (as specified in the constructor).
      *
-     * @return The owner (possibly <code>null</code>).
+     * @return The owner (possibly {@code null}).
      */
     public ChartRenderingInfo getOwner() {
         return this.owner;
@@ -104,7 +104,7 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     /**
      * Returns the plot area (in Java2D space).
      *
-     * @return The plot area (possibly <code>null</code>).
+     * @return The plot area (possibly {@code null}).
      *
      * @see #setPlotArea(Rectangle2D)
      */
@@ -115,7 +115,7 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     /**
      * Sets the plot area.
      *
-     * @param area  the plot area (in Java2D space, <code>null</code>
+     * @param area  the plot area (in Java2D space, {@code null}
      *     permitted but discouraged)
      *
      * @see #getPlotArea()
@@ -127,7 +127,7 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     /**
      * Returns the plot's data area (in Java2D space).
      *
-     * @return The data area (possibly <code>null</code>).
+     * @return The data area (possibly {@code null}).
      *
      * @see #setDataArea(Rectangle2D)
      */
@@ -138,7 +138,7 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     /**
      * Sets the data area.
      *
-     * @param area  the data area (in Java2D space, <code>null</code> permitted
+     * @param area  the data area (in Java2D space, {@code null} permitted
      *     but discouraged).
      *
      * @see #getDataArea()
@@ -187,16 +187,13 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
      * and this method is then used to determine the subplot that
      * contains the source point.
      *
-     * @param source  the source point (in Java2D space, <code>null</code> not
+     * @param source  the source point (in Java2D space, {@code null} not
      * permitted).
      *
-     * @return The subplot index (or -1 if no subplot contains
-     *         <code>source</code>).
+     * @return The subplot index (or -1 if no subplot contains {@code source}).
      */
     public int getSubplotIndex(Point2D source) {
-        if (source == null) {
-            throw new IllegalArgumentException("Null 'source' argument.");
-        }
+        Args.nullNotPermitted(source, "source");
         int subplotCount = getSubplotCount();
         for (int i = 0; i < subplotCount; i++) {
             PlotRenderingInfo info = getSubplotInfo(i);
@@ -211,10 +208,11 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     /**
      * Tests this instance for equality against an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -223,13 +221,13 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
             return false;
         }
         PlotRenderingInfo that = (PlotRenderingInfo) obj;
-        if (!ObjectUtilities.equal(this.dataArea, that.dataArea)) {
+        if (!ObjectUtils.equal(this.dataArea, that.dataArea)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.plotArea, that.plotArea)) {
+        if (!ObjectUtils.equal(this.plotArea, that.plotArea)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.subplotInfo, that.subplotInfo)) {
+        if (!ObjectUtils.equal(this.subplotInfo, that.subplotInfo)) {
             return false;
         }
         return true;
@@ -242,6 +240,7 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
      *
      * @throws CloneNotSupportedException if there is a problem cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         PlotRenderingInfo clone = (PlotRenderingInfo) super.clone();
         if (this.plotArea != null) {
@@ -268,8 +267,8 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeShape(this.dataArea, stream);
-        SerialUtilities.writeShape(this.plotArea, stream);
+        SerialUtils.writeShape(this.dataArea, stream);
+        SerialUtils.writeShape(this.plotArea, stream);
     }
 
     /**
@@ -283,8 +282,8 @@ public class PlotRenderingInfo implements Cloneable, Serializable {
     private void readObject(ObjectInputStream stream)
             throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.dataArea = (Rectangle2D) SerialUtilities.readShape(stream);
-        this.plotArea = (Rectangle2D) SerialUtilities.readShape(stream);
+        this.dataArea = (Rectangle2D) SerialUtils.readShape(stream);
+        this.plotArea = (Rectangle2D) SerialUtils.readShape(stream);
     }
 
 }

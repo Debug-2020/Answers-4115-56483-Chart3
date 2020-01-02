@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * ColumnArrangement.java
@@ -36,7 +36,6 @@
  * --------
  * 22-Oct-2004 : Version 1 (DG);
  * 04-Feb-2005 : Added equals() and implemented Serializable (DG);
- * 20-Jun-2007 : Removed JCommon dependency (DG);
  *
  */
 
@@ -47,10 +46,9 @@ import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jfree.chart.util.HorizontalAlignment;
-import org.jfree.chart.util.Size2D;
-import org.jfree.chart.util.VerticalAlignment;
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.ui.VerticalAlignment;
 
 /**
  * Arranges blocks in a column layout.  This class is immutable.
@@ -103,6 +101,7 @@ public class ColumnArrangement implements Arrangement, Serializable {
      * @param block  the block.
      * @param key  a key that controls the position of the block.
      */
+    @Override
     public void add(Block block, Object key) {
         // since the flow layout is relatively straightforward, no information
         // needs to be recorded here
@@ -110,7 +109,7 @@ public class ColumnArrangement implements Arrangement, Serializable {
 
     /**
      * Calculates and sets the bounds of all the items in the specified
-     * container, subject to the given constraint.  The <code>Graphics2D</code>
+     * container, subject to the given constraint.  The {@code Graphics2D}
      * can be used by some items (particularly items containing text) to
      * calculate sizing parameters.
      *
@@ -120,6 +119,7 @@ public class ColumnArrangement implements Arrangement, Serializable {
      *
      * @return The size of the container after arrangement of the contents.
      */
+    @Override
     public Size2D arrange(BlockContainer container, Graphics2D g2,
                           RectangleConstraint constraint) {
 
@@ -164,7 +164,7 @@ public class ColumnArrangement implements Arrangement, Serializable {
 
     /**
      * Calculates and sets the bounds of all the items in the specified
-     * container, subject to the given constraint.  The <code>Graphics2D</code>
+     * container, subject to the given constraint.  The {@code Graphics2D}
      * can be used by some items (particularly items containing text) to
      * calculate sizing parameters.
      *
@@ -182,7 +182,7 @@ public class ColumnArrangement implements Arrangement, Serializable {
 
     /**
      * Calculates and sets the bounds of all the items in the specified
-     * container, subject to the given constraint.  The <code>Graphics2D</code>
+     * container, subject to the given constraint.  The {@code Graphics2D}
      * can be used by some items (particularly items containing text) to
      * calculate sizing parameters.
      *
@@ -351,6 +351,7 @@ public class ColumnArrangement implements Arrangement, Serializable {
     /**
      * Clears any cached information.
      */
+    @Override
     public void clear() {
         // no action required.
     }
@@ -358,10 +359,11 @@ public class ColumnArrangement implements Arrangement, Serializable {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

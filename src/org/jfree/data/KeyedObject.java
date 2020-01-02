@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * KeyedObject.java
@@ -37,15 +37,13 @@
  * 05-Feb-2003 : Version 1 (DG);
  * 27-Jan-2003 : Implemented Cloneable and Serializable, and added an equals()
  *               method (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
 package org.jfree.data;
 
 import java.io.Serializable;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -66,7 +64,7 @@ public class KeyedObject implements Cloneable, PublicCloneable, Serializable {
      * Creates a new (key, object) pair.
      *
      * @param key  the key.
-     * @param object  the object (<code>null</code> permitted).
+     * @param object  the object ({@code null} permitted).
      */
     public KeyedObject(Comparable key, Object object) {
         this.key = key;
@@ -85,7 +83,7 @@ public class KeyedObject implements Cloneable, PublicCloneable, Serializable {
     /**
      * Returns the object.
      *
-     * @return The object (possibly <code>null</code>).
+     * @return The object (possibly {@code null}).
      */
     public Object getObject() {
         return this.object;
@@ -94,7 +92,7 @@ public class KeyedObject implements Cloneable, PublicCloneable, Serializable {
     /**
      * Sets the object.
      *
-     * @param object  the object (<code>null</code> permitted).
+     * @param object  the object ({@code null} permitted).
      */
     public void setObject(Object object) {
         this.object = object;
@@ -110,6 +108,7 @@ public class KeyedObject implements Cloneable, PublicCloneable, Serializable {
      *
      * @throws CloneNotSupportedException if there is a problem cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         KeyedObject clone = (KeyedObject) super.clone();
         if (this.object instanceof PublicCloneable) {
@@ -126,6 +125,7 @@ public class KeyedObject implements Cloneable, PublicCloneable, Serializable {
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj == this) {
@@ -136,11 +136,11 @@ public class KeyedObject implements Cloneable, PublicCloneable, Serializable {
             return false;
         }
         KeyedObject that = (KeyedObject) obj;
-        if (!ObjectUtilities.equal(this.key, that.key)) {
+        if (!ObjectUtils.equal(this.key, that.key)) {
             return false;
         }
 
-        if (!ObjectUtilities.equal(this.object, that.object)) {
+        if (!ObjectUtils.equal(this.object, that.object)) {
             return false;
         }
 

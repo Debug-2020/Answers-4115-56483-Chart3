@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------
  * AxisEntity.java
  * ----------------
- * (C) Copyright 2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2009-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  Peter Kolb;
  * Contributor(s):   ;
@@ -35,6 +35,7 @@
  * Changes:
  * --------
  * 15-Feb-2009 : Version 1 (PK);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -45,13 +46,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.axis.Axis;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 
 /**
- * A class that captures information about an Axis of a chart.
+ * A class that captures information about an {@link Axis} belonging to a 
+ * chart.
  *
  * @since 1.0.13
  */
@@ -67,8 +70,8 @@ public class AxisEntity extends ChartEntity {
     /**
      * Creates a new axis entity.
      *
-     * @param area  the area (<code>null</code> not permitted).
-     * @param axis  the axis (<code>null</code> not permitted).
+     * @param area  the area ({@code null} not permitted).
+     * @param axis  the axis ({@code null} not permitted).
      */
     public AxisEntity(Shape area, Axis axis) {
         // defer argument checks...
@@ -78,9 +81,9 @@ public class AxisEntity extends ChartEntity {
     /**
      * Creates a new axis entity.
      *
-     * @param area  the area (<code>null</code> not permitted).
-     * @param axis  the axis (<code>null</code> not permitted).
-     * @param toolTipText  the tool tip text (<code>null</code> permitted).
+     * @param area  the area ({@code null} not permitted).
+     * @param axis  the axis ({@code null} not permitted).
+     * @param toolTipText  the tool tip text ({@code null} permitted).
      */
     public AxisEntity(Shape area, Axis axis, String toolTipText) {
         // defer argument checks...
@@ -90,26 +93,23 @@ public class AxisEntity extends ChartEntity {
     /**
      * Creates a new axis entity.
      *
-     * @param area  the area (<code>null</code> not permitted).
-     * @param axis  the axis (<code>null</code> not permitted).
-     * @param toolTipText  the tool tip text (<code>null</code> permitted).
-     * @param urlText  the URL text for HTML image maps (<code>null</code>
+     * @param area  the area ({@code null} not permitted).
+     * @param axis  the axis ({@code null} not permitted).
+     * @param toolTipText  the tool tip text ({@code null} permitted).
+     * @param urlText  the URL text for HTML image maps ({@code null}
      *                 permitted).
      */
     public AxisEntity(Shape area, Axis axis, String toolTipText,
             String urlText) {
         super(area, toolTipText, urlText);
-        if (axis == null) {
-            throw new IllegalArgumentException("Null 'axis' argument.");
-        }
-
+        Args.nullNotPermitted(axis, "axis");
         this.axis = axis;
     }
 
     /**
      * Returns the axis that occupies the entity area.
      *
-     * @return The axis (never <code>null</code>).
+     * @return The axis (never {@code null}).
      */
     public Axis getAxis() {
         return this.axis;
@@ -121,20 +121,22 @@ public class AxisEntity extends ChartEntity {
      *
      * @return A string.
      */
+    @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer("AxisEntity: ");
-        buf.append("tooltip = ");
-        buf.append(getToolTipText());
-        return buf.toString();
+        StringBuilder sb = new StringBuilder("AxisEntity: ");
+        sb.append("tooltip = ");
+        sb.append(getToolTipText());
+        return sb.toString();
     }
 
     /**
      * Tests the entity for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -146,10 +148,10 @@ public class AxisEntity extends ChartEntity {
         if (!getArea().equals(that.getArea())) {
             return false;
         }
-        if (!ObjectUtilities.equal(getToolTipText(), that.getToolTipText())) {
+        if (!ObjectUtils.equal(getToolTipText(), that.getToolTipText())) {
             return false;
         }
-        if (!ObjectUtilities.equal(getURLText(), that.getURLText())) {
+        if (!ObjectUtils.equal(getURLText(), that.getURLText())) {
             return false;
         }
         if (!(this.axis.equals(that.axis))) {
@@ -163,10 +165,11 @@ public class AxisEntity extends ChartEntity {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 39;
-        result = HashUtilities.hashCode(result, getToolTipText());
-        result = HashUtilities.hashCode(result, getURLText());
+        result = HashUtils.hashCode(result, getToolTipText());
+        result = HashUtils.hashCode(result, getURLText());
         return result;
     }
 
@@ -178,6 +181,7 @@ public class AxisEntity extends ChartEntity {
      * @throws CloneNotSupportedException if there is a problem cloning the
      *         entity.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -191,7 +195,7 @@ public class AxisEntity extends ChartEntity {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeShape(getArea(), stream);
+        SerialUtils.writeShape(getArea(), stream);
     }
 
     /**
@@ -205,7 +209,7 @@ public class AxisEntity extends ChartEntity {
     private void readObject(ObjectInputStream stream)
             throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        setArea(SerialUtilities.readShape(stream));
+        setArea(SerialUtils.readShape(stream));
     }
 
 }

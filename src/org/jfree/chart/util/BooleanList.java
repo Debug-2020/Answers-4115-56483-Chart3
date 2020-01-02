@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,39 +21,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
- *
- * ----------------
- * BooleanList.java
- * ----------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
- *
- * Original Author:  David Gilbert (for Object Refinery Limited);
- * Contributor(s):   -;
- *
- * Changes
- * -------
- * 11-Jun-2003 : Version 1 (DG);
- * 23-Jul-2003 : Renamed BooleanTable --> BooleanList and now extends
- *               ObjectList (DG);
- * 13-Aug-2003 : Now extends new class AbstractObjectList (DG);
- * 21-Oct-2004 : Removed duplicate implementation of Cloneable and Serializable,
- *               AbstractObjectList already implements that.
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  */
 
 package org.jfree.chart.util;
 
 /**
- * A list of <code>Boolean</code> objects.
+ * A list of {@code Boolean} objects.
  */
 public class BooleanList extends AbstractObjectList {
 
     /** For serialization. */
     private static final long serialVersionUID = -8543170333219422042L;
-
+    
     /**
      * Creates a new list.
      */
@@ -72,7 +54,7 @@ public class BooleanList extends AbstractObjectList {
     }
 
     /**
-     * Sets the value for an item in the list.  The list is expanded if
+     * Sets the value for an item in the list.  The list is expanded if 
      * necessary.
      *
      * @param index  the index (zero-based).
@@ -85,13 +67,14 @@ public class BooleanList extends AbstractObjectList {
     /**
      * Tests the list for equality with another object (typically also a list).
      *
-     * @param obj  the other object.
+     * @param o  the other object.
      *
      * @return A boolean.
      */
-    public boolean equals(Object obj) {
-        if (obj instanceof BooleanList) {
-            return super.equals(obj);
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof BooleanList) {
+            return super.equals(o);
         }
         return false;
     }
@@ -99,9 +82,11 @@ public class BooleanList extends AbstractObjectList {
     /**
      * Returns a hash code value for the object.
      *
-     * @return The hashcode.
+     * @return the hashcode
      */
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
 }
+

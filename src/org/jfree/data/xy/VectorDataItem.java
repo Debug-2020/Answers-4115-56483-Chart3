@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2013, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * VectorDataItem.java
@@ -54,7 +54,7 @@ import org.jfree.data.ComparableObjectItem;
 public class VectorDataItem extends ComparableObjectItem {
 
     /**
-     * Creates a new instance of <code>VectorDataItem</code>.
+     * Creates a new {@code VectorDataItem} instance.
      *
      * @param x  the x-value.
      * @param y  the y-value.
@@ -68,7 +68,7 @@ public class VectorDataItem extends ComparableObjectItem {
     /**
      * Returns the x-value.
      *
-     * @return The x-value (never <code>null</code>).
+     * @return The x-value (never {@code null}).
      */
     public double getXValue() {
         XYCoordinate xy = (XYCoordinate) getComparable();
@@ -88,7 +88,7 @@ public class VectorDataItem extends ComparableObjectItem {
     /**
      * Returns the vector.
      *
-     * @return The vector (possibly <code>null</code>).
+     * @return The vector (possibly {@code null}).
      */
     public Vector getVector() {
         return (Vector) getObject();

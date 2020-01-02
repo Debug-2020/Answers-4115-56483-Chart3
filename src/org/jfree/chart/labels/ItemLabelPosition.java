@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * ItemLabelPosition.java
  * ----------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2003-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -38,16 +38,15 @@
  * 19-Feb-2004 : Moved to org.jfree.chart.labels, updated Javadocs and argument
  *               checking (DG);
  * 26-Feb-2004 : Added new constructor (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.chart.labels;
 
 import java.io.Serializable;
-
-import org.jfree.chart.text.TextAnchor;
-
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.Args;
 
 /**
  * The attributes that control the position of the label for each data item on
@@ -81,9 +80,9 @@ public class ItemLabelPosition implements Serializable {
     /**
      * Creates a new position record (with zero rotation).
      *
-     * @param itemLabelAnchor  the item label anchor (<code>null</code> not
+     * @param itemLabelAnchor  the item label anchor ({@code null} not
      *                         permitted).
-     * @param textAnchor  the text anchor (<code>null</code> not permitted).
+     * @param textAnchor  the text anchor ({@code null} not permitted).
      */
     public ItemLabelPosition(ItemLabelAnchor itemLabelAnchor,
                              TextAnchor textAnchor) {
@@ -96,41 +95,29 @@ public class ItemLabelPosition implements Serializable {
      * The item label is aligned by aligning the text anchor with the
      * item label anchor.
      *
-     * @param itemLabelAnchor  the item label anchor (<code>null</code> not
+     * @param itemLabelAnchor  the item label anchor ({@code null} not
      *                         permitted).
-     * @param textAnchor  the text anchor (<code>null</code> not permitted).
-     * @param rotationAnchor  the rotation anchor (<code>null</code> not
+     * @param textAnchor  the text anchor ({@code null} not permitted).
+     * @param rotationAnchor  the rotation anchor ({@code null} not
      *                        permitted).
      * @param angle  the rotation angle (in radians).
      */
-    public ItemLabelPosition(ItemLabelAnchor itemLabelAnchor,
-                             TextAnchor textAnchor,
-                             TextAnchor rotationAnchor,
-                             double angle) {
+    public ItemLabelPosition(ItemLabelAnchor itemLabelAnchor, 
+            TextAnchor textAnchor, TextAnchor rotationAnchor, double angle) {
 
-        if (itemLabelAnchor == null) {
-            throw new IllegalArgumentException(
-                    "Null 'itemLabelAnchor' argument.");
-        }
-        if (textAnchor == null) {
-            throw new IllegalArgumentException("Null 'textAnchor' argument.");
-        }
-        if (rotationAnchor == null) {
-            throw new IllegalArgumentException(
-                    "Null 'rotationAnchor' argument.");
-        }
-
+        Args.nullNotPermitted(itemLabelAnchor, "itemLabelAnchor");
+        Args.nullNotPermitted(textAnchor, "textAnchor");
+        Args.nullNotPermitted(rotationAnchor, "rotationAnchor");
         this.itemLabelAnchor = itemLabelAnchor;
         this.textAnchor = textAnchor;
         this.rotationAnchor = rotationAnchor;
         this.angle = angle;
-
     }
 
     /**
      * Returns the item label anchor.
      *
-     * @return The item label anchor (never <code>null</code>).
+     * @return The item label anchor (never {@code null}).
      */
     public ItemLabelAnchor getItemLabelAnchor() {
         return this.itemLabelAnchor;
@@ -139,7 +126,7 @@ public class ItemLabelPosition implements Serializable {
     /**
      * Returns the text anchor.
      *
-     * @return The text anchor (never <code>null</code>).
+     * @return The text anchor (never {@code null}).
      */
     public TextAnchor getTextAnchor() {
         return this.textAnchor;
@@ -148,7 +135,7 @@ public class ItemLabelPosition implements Serializable {
     /**
      * Returns the rotation anchor point.
      *
-     * @return The rotation anchor point (never <code>null</code>).
+     * @return The rotation anchor point (never {@code null}).
      */
     public TextAnchor getRotationAnchor() {
         return this.rotationAnchor;
@@ -166,10 +153,11 @@ public class ItemLabelPosition implements Serializable {
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;

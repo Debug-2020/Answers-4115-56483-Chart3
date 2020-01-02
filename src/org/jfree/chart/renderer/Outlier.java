@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------
  * Outlier.java
@@ -142,6 +142,7 @@ public class Outlier implements Comparable {
      *      is less than, equal to, or greater than the specified object.
      *
      */
+    @Override
     public int compareTo(Object o) {
         Outlier outlier = (Outlier) o;
         Point2D p1 = getPoint();
@@ -164,7 +165,7 @@ public class Outlier implements Comparable {
      *
      * @param other  the other outlier.
      *
-     * @return A <code>boolean</code> indicating whether or not an overlap has
+     * @return A {@code boolean} indicating whether or not an overlap has
      *         occurred.
      */
     public boolean overlaps(Outlier other) {
@@ -177,10 +178,11 @@ public class Outlier implements Comparable {
     /**
      * Tests this outlier for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -201,8 +203,9 @@ public class Outlier implements Comparable {
     /**
      * Returns a textual representation of the outlier.
      *
-     * @return A <code>String</code> representing the outlier.
+     * @return A {@code String} representing the outlier.
      */
+    @Override
     public String toString() {
         return "{" + getX() + "," + getY() + "}";
     }

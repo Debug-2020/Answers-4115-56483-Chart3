@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------------
  * MultiplePiePlot.java
  * --------------------
- * (C) Copyright 2004-2009, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Brian Cabana (patch 1943021);
@@ -47,12 +47,12 @@
  *               underlying PiePlot (DG);
  * 17-May-2007 : Added argument check to setPieChart() (DG);
  * 18-May-2007 : Set dataset for LegendItem (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 18-Apr-2008 : In the constructor, register the plot as a dataset listener -
  *               see patch 1943021 from Brian Cabana (DG);
  * 30-Dec-2008 : Added legendItemShape field, and fixed cloning bug (DG);
  * 09-Jan-2009 : See ignoreNullValues to true for sub-chart (DG);
  * 01-Jun-2009 : Set series key in getLegendItems() (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -80,21 +80,21 @@ import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.LegendItem;
 import org.jfree.chart.LegendItemCollection;
-import org.jfree.chart.event.DatasetChangeInfo;
 import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.title.TextTitle;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.ShapeUtilities;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
+import org.jfree.chart.util.ShapeUtils;
 import org.jfree.chart.util.TableOrder;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.CategoryToPieDataset;
-import org.jfree.data.event.DatasetChangeEvent;
-import org.jfree.data.general.DatasetUtilities;
-import org.jfree.data.pie.PieDataset; 
+import org.jfree.data.general.DatasetChangeEvent;
+import org.jfree.data.general.DatasetUtils;
+import org.jfree.data.general.PieDataset;
 
 /**
  * A plot that displays multiple pie plots using data from a
@@ -155,7 +155,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
     /**
      * Creates a new plot.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public MultiplePiePlot(CategoryDataset dataset) {
         super();
@@ -167,7 +167,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
         this.dataExtractOrder = TableOrder.BY_COLUMN;
         this.pieChart.setBackgroundPaint(null);
         TextTitle seriesTitle = new TextTitle("Series Title",
-                new Font("Tahoma", Font.BOLD, 12));
+                new Font("SansSerif", Font.BOLD, 12));
         seriesTitle.setPosition(RectangleEdge.BOTTOM);
         this.pieChart.setTitle(seriesTitle);
         this.aggregatedItemsKey = "Other";
@@ -179,7 +179,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the dataset used by the plot.
      *
-     * @return The dataset (possibly <code>null</code>).
+     * @return The dataset (possibly {@code null}).
      */
     public CategoryDataset getDataset() {
         return this.dataset;
@@ -189,7 +189,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Sets the dataset used by the plot and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param dataset  the dataset (<code>null</code> permitted).
+     * @param dataset  the dataset ({@code null} permitted).
      */
     public void setDataset(CategoryDataset dataset) {
         // if there is an existing dataset, remove the plot from the list of
@@ -206,9 +206,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
         }
 
         // send a dataset change event to self to trigger plot change event
-        datasetChanged(new DatasetChangeEvent(this, dataset,
-                new DatasetChangeInfo()));
-        // TODO: fill in real dataset change type
+        datasetChanged(new DatasetChangeEvent(this, dataset));
     }
 
     /**
@@ -216,7 +214,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Note that there are some attributes on this chart instance that will
      * be ignored at rendering time (for example, legend item settings).
      *
-     * @return The pie chart (never <code>null</code>).
+     * @return The pie chart (never {@code null}).
      *
      * @see #setPieChart(JFreeChart)
      */
@@ -228,14 +226,12 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Sets the chart that is used to draw the individual pie plots.  The
      * chart's plot must be an instance of {@link PiePlot}.
      *
-     * @param pieChart  the pie chart (<code>null</code> not permitted).
+     * @param pieChart  the pie chart ({@code null} not permitted).
      *
      * @see #getPieChart()
      */
     public void setPieChart(JFreeChart pieChart) {
-        if (pieChart == null) {
-            throw new IllegalArgumentException("Null 'pieChart' argument.");
-        }
+        Args.nullNotPermitted(pieChart, "pieChart");
         if (!(pieChart.getPlot() instanceof PiePlot)) {
             throw new IllegalArgumentException("The 'pieChart' argument must "
                     + "be a chart based on a PiePlot.");
@@ -247,7 +243,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the data extract order (by row or by column).
      *
-     * @return The data extract order (never <code>null</code>).
+     * @return The data extract order (never {@code null}).
      */
     public TableOrder getDataExtractOrder() {
         return this.dataExtractOrder;
@@ -257,12 +253,10 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Sets the data extract order (by row or by column) and sends a
      * {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param order  the order (<code>null</code> not permitted).
+     * @param order  the order ({@code null} not permitted).
      */
     public void setDataExtractOrder(TableOrder order) {
-        if (order == null) {
-            throw new IllegalArgumentException("Null 'order' argument");
-        }
+        Args.nullNotPermitted(order, "order");
         this.dataExtractOrder = order;
         fireChangeEvent();
     }
@@ -304,21 +298,19 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Sets the key for aggregated items in the pie plots.  You must ensure
      * that this doesn't clash with any keys in the dataset.
      *
-     * @param key  the key (<code>null</code> not permitted).
+     * @param key  the key ({@code null} not permitted).
      *
      * @since 1.0.2
      */
     public void setAggregatedItemsKey(Comparable key) {
-        if (key == null) {
-            throw new IllegalArgumentException("Null 'key' argument.");
-        }
+        Args.nullNotPermitted(key, "key");
         this.aggregatedItemsKey = key;
         fireChangeEvent();
     }
 
     /**
      * Returns the paint used to draw the pie section representing the
-     * aggregated items.  The default value is <code>Color.lightGray</code>.
+     * aggregated items.  The default value is {code Color.lightGray}.
      *
      * @return The paint.
      *
@@ -332,14 +324,12 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Sets the paint used to draw the pie section representing the aggregated
      * items and sends a {@link PlotChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @since 1.0.2
      */
     public void setAggregatedItemsPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.aggregatedItemsPaint = paint;
         fireChangeEvent();
     }
@@ -349,6 +339,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      *
      * @return The plot type.
      */
+    @Override
     public String getPlotType() {
         return "Multiple Pie Plot";
          // TODO: need to fetch this from localised resources
@@ -357,7 +348,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
     /**
      * Returns the shape used for legend items.
      *
-     * @return The shape (never <code>null</code>).
+     * @return The shape (never {@code null}).
      *
      * @see #setLegendItemShape(Shape)
      *
@@ -371,16 +362,14 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Sets the shape used for legend items and sends a {@link PlotChangeEvent}
      * to all registered listeners.
      *
-     * @param shape  the shape (<code>null</code> not permitted).
+     * @param shape  the shape ({@code null} not permitted).
      *
      * @see #getLegendItemShape()
      *
      * @since 1.0.12
      */
     public void setLegendItemShape(Shape shape) {
-        if (shape == null) {
-            throw new IllegalArgumentException("Null 'shape' argument.");
-        }
+        Args.nullNotPermitted(shape, "shape");
         this.legendItemShape = shape;
         fireChangeEvent();
     }
@@ -391,16 +380,13 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      *
      * @param g2  the graphics device.
      * @param area  the area within which the plot should be drawn.
-     * @param anchor  the anchor point (<code>null</code> permitted).
+     * @param anchor  the anchor point ({@code null} permitted).
      * @param parentState  the state from the parent plot, if there is one.
      * @param info  collects info about the drawing.
      */
-    public void draw(Graphics2D g2,
-                     Rectangle2D area,
-                     Point2D anchor,
-                     PlotState parentState,
-                     PlotRenderingInfo info) {
-
+    @Override
+    public void draw(Graphics2D g2, Rectangle2D area, Point2D anchor,
+            PlotState parentState, PlotRenderingInfo info) {
 
         // adjust the drawing area for the plot insets (if any)...
         RectangleInsets insets = getInsets();
@@ -409,12 +395,12 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
         drawOutline(g2, area);
 
         // check that there is some data to display...
-        if (DatasetUtilities.isEmptyOrNull(this.dataset)) {
+        if (DatasetUtils.isEmptyOrNull(this.dataset)) {
             drawNoDataMessage(g2, area);
             return;
         }
 
-        int pieCount = 0;
+        int pieCount;
         if (this.dataExtractOrder == TableOrder.BY_ROW) {
             pieCount = this.dataset.getRowCount();
         }
@@ -450,7 +436,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
             rect.setBounds(x + xoffset + (width * column), y + (height * row),
                     width, height);
 
-            String title = null;
+            String title;
             if (this.dataExtractOrder == TableOrder.BY_ROW) {
                 title = this.dataset.getRowKey(pieIndex).toString();
             }
@@ -459,11 +445,11 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
             }
             this.pieChart.setTitle(title);
 
-            PieDataset piedataset = null;
+            PieDataset piedataset;
             PieDataset dd = new CategoryToPieDataset(this.dataset,
                     this.dataExtractOrder, pieIndex);
             if (this.limit > 0.0) {
-                piedataset = DatasetUtilities.createConsolidatedPieDataset(
+                piedataset = DatasetUtils.createConsolidatedPieDataset(
                         dd, this.aggregatedItemsKey, this.limit);
             }
             else {
@@ -492,6 +478,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
             }
             this.pieChart.draw(g2, rect, subinfo);
             if (info != null) {
+                assert subinfo != null;
                 info.getOwner().getEntityCollection().addAll(
                         subinfo.getEntityCollection());
                 info.addSubplotInfo(subinfo.getPlotInfo());
@@ -511,7 +498,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
     }
 
     /**
-     * For each key in the dataset, check the <code>sectionPaints</code>
+     * For each key in the dataset, check the {@code sectionPaints}
      * cache to see if a paint is associated with that key and, if not,
      * fetch one from the drawing supplier.  These colors are cached so that
      * the legend and all the subplots use consistent colors.
@@ -528,7 +515,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
             // column keys provide potential keys for individual pies
             for (int c = 0; c < this.dataset.getColumnCount(); c++) {
                 Comparable key = this.dataset.getColumnKey(c);
-                Paint p = piePlot.getSectionPaint(key, false);
+                Paint p = piePlot.getSectionPaint(key);
                 if (p == null) {
                     p = (Paint) this.sectionPaints.get(key);
                     if (p == null) {
@@ -542,7 +529,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
             // row keys provide potential keys for individual pies
             for (int r = 0; r < this.dataset.getRowCount(); r++) {
                 Comparable key = this.dataset.getRowKey(r);
-                Paint p = piePlot.getSectionPaint(key, false);
+                Paint p = piePlot.getSectionPaint(key);
                 if (p == null) {
                     p = (Paint) this.sectionPaints.get(key);
                     if (p == null) {
@@ -560,6 +547,7 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      *
      * @return The legend items.
      */
+    @Override
     public LegendItemCollection getLegendItems() {
 
         LegendItemCollection result = new LegendItemCollection();
@@ -608,11 +596,12 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * Tests this plot for equality with an arbitrary object.  Note that the
      * plot's dataset is not considered in the equality test.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> if this plot is equal to <code>obj</code>, and
-     *     <code>false</code> otherwise.
+     * @return {@code true} if this plot is equal to {@code obj}, and
+     *     {@code false} otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -630,14 +619,14 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
         if (!this.aggregatedItemsKey.equals(that.aggregatedItemsKey)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.aggregatedItemsPaint,
+        if (!PaintUtils.equal(this.aggregatedItemsPaint,
                 that.aggregatedItemsPaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.pieChart, that.pieChart)) {
+        if (!ObjectUtils.equal(this.pieChart, that.pieChart)) {
             return false;
         }
-        if (!ShapeUtilities.equal(this.legendItemShape, that.legendItemShape)) {
+        if (!ShapeUtils.equal(this.legendItemShape, that.legendItemShape)) {
             return false;
         }
         if (!super.equals(obj)) {
@@ -654,11 +643,12 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      * @throws CloneNotSupportedException if some component of the plot does
      *         not support cloning.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         MultiplePiePlot clone = (MultiplePiePlot) super.clone();
         clone.pieChart = (JFreeChart) this.pieChart.clone();
         clone.sectionPaints = new HashMap(this.sectionPaints);
-        clone.legendItemShape = ShapeUtilities.clone(this.legendItemShape);
+        clone.legendItemShape = ShapeUtils.clone(this.legendItemShape);
         return clone;
     }
 
@@ -671,8 +661,8 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.aggregatedItemsPaint, stream);
-        SerialUtilities.writeShape(this.legendItemShape, stream);
+        SerialUtils.writePaint(this.aggregatedItemsPaint, stream);
+        SerialUtils.writeShape(this.legendItemShape, stream);
     }
 
     /**
@@ -686,8 +676,8 @@ public class MultiplePiePlot extends Plot implements Cloneable, Serializable {
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.aggregatedItemsPaint = SerialUtilities.readPaint(stream);
-        this.legendItemShape = SerialUtilities.readShape(stream);
+        this.aggregatedItemsPaint = SerialUtils.readPaint(stream);
+        this.legendItemShape = SerialUtils.readShape(stream);
         this.sectionPaints = new HashMap();
     }
 

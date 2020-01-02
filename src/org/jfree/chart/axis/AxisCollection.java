@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * AxisCollection.java
  * -------------------
- * (C) Copyright 2003-2008, by Object Refinery Limited.
+ * (C) Copyright 2003-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,14 +35,15 @@
  * Changes
  * -------
  * 03-Nov-2003 : Added standard header (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
 package org.jfree.chart.axis;
 
 import java.util.List;
-
-import org.jfree.chart.util.RectangleEdge;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.Args;
 
 /**
  * A collection of axes that have been assigned to the TOP, BOTTOM, LEFT or
@@ -116,17 +117,13 @@ public class AxisCollection {
     /**
      * Adds an axis to the collection.
      *
-     * @param axis  the axis (<code>null</code> not permitted).
+     * @param axis  the axis ({@code null} not permitted).
      * @param edge  the edge of the plot that the axis should be drawn on
-     *              (<code>null</code> not permitted).
+     *              ({@code null} not permitted).
      */
     public void add(Axis axis, RectangleEdge edge) {
-        if (axis == null) {
-            throw new IllegalArgumentException("Null 'axis' argument.");
-        }
-        if (edge == null) {
-            throw new IllegalArgumentException("Null 'edge' argument.");
-        }
+        Args.nullNotPermitted(axis, "axis");
+        Args.nullNotPermitted(edge, "edge");
         if (edge == RectangleEdge.TOP) {
             this.axesAtTop.add(axis);
         }

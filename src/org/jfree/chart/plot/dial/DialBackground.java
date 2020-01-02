@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * DialBackground.java
  * -------------------
- * (C) Copyright 2006-2008, by Object Refinery Limited.
+ * (C) Copyright 2006-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,8 +35,8 @@
  * Changes
  * -------
  * 03-Nov-2006 : Version 1 (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 16-Oct-2007 : The equals() method needs to call super.equals() (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -52,12 +52,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-import org.jfree.chart.util.GradientPaintTransformer;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.HashUtils;
+import org.jfree.chart.ui.GradientPaintTransformer;
+import org.jfree.chart.ui.StandardGradientPaintTransformer;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.SerialUtilities;
-import org.jfree.chart.util.StandardGradientPaintTransformer;
+import org.jfree.chart.util.SerialUtils;
 
 /**
  * A regular dial layer that can be used to draw the background for a dial.
@@ -78,30 +79,28 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
 
     /**
      * The transformer used when the background paint is an instance of
-     * <code>GradientPaint</code>.
+     * {@code GradientPaint}.
      */
     private GradientPaintTransformer gradientPaintTransformer;
 
     /**
-     * Creates a new instance of <code>DialBackground</code>.  The
-     * default background paint is <code>Color.white</code>.
+     * Creates a new instance of {@code DialBackground}.  The
+     * default background paint is {@code Color.WHITE}.
      */
     public DialBackground() {
-        this(Color.white);
+        this(Color.WHITE);
     }
 
     /**
-     * Creates a new instance of <code>DialBackground</code>.  The
+     * Creates a new instance of {@code DialBackground}.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
-     * @throws IllegalArgumentException if <code>paint</code> is
-     *     <code>null</code>.
+     * @throws IllegalArgumentException if {@code Paint} is
+     *     {@code null}.
      */
     public DialBackground(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.paint = paint;
         this.gradientPaintTransformer = new StandardGradientPaintTransformer();
     }
@@ -109,7 +108,7 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
     /**
      * Returns the paint used to fill the background.
      *
-     * @return The paint (never <code>null</code>).
+     * @return The paint (never {@code null}).
      *
      * @see #setPaint(Paint)
      */
@@ -121,23 +120,21 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
      * Sets the paint for the dial background and sends a
      * {@link DialLayerChangeEvent} to all registered listeners.
      *
-     * @param paint  the paint (<code>null</code> not permitted).
+     * @param paint  the paint ({@code null} not permitted).
      *
      * @see #getPaint()
      */
     public void setPaint(Paint paint) {
-        if (paint == null) {
-            throw new IllegalArgumentException("Null 'paint' argument.");
-        }
+        Args.nullNotPermitted(paint, "paint");
         this.paint = paint;
         notifyListeners(new DialLayerChangeEvent(this));
     }
 
     /**
      * Returns the transformer used to adjust the coordinates of any
-     * <code>GradientPaint</code> instance used for the background paint.
+     * {@code GradientPaint} instance used for the background paint.
      *
-     * @return The transformer (never <code>null</code>).
+     * @return The transformer (never {@code null}).
      *
      * @see #setGradientPaintTransformer(GradientPaintTransformer)
      */
@@ -147,27 +144,26 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
 
     /**
      * Sets the transformer used to adjust the coordinates of any
-     * <code>GradientPaint</code> instance used for the background paint, and
+     * {@code GradientPaint} instance used for the background paint, and
      * sends a {@link DialLayerChangeEvent} to all registered listeners.
      *
-     * @param t  the transformer (<code>null</code> not permitted).
+     * @param t  the transformer ({@code null} not permitted).
      *
      * @see #getGradientPaintTransformer()
      */
     public void setGradientPaintTransformer(GradientPaintTransformer t) {
-        if (t == null) {
-            throw new IllegalArgumentException("Null 't' argument.");
-        }
+        Args.nullNotPermitted(t, "t");
         this.gradientPaintTransformer = t;
         notifyListeners(new DialLayerChangeEvent(this));
     }
 
     /**
-     * Returns <code>true</code> to indicate that this layer should be
+     * Returns {@code true} to indicate that this layer should be
      * clipped within the dial window.
      *
-     * @return <code>true</code>.
+     * @return {@code true}.
      */
+    @Override
     public boolean isClippedToWindow() {
         return true;
     }
@@ -177,11 +173,12 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
      * frame specifies a window, the clipping region will already have been
      * set to this window before this method is called.
      *
-     * @param g2  the graphics device (<code>null</code> not permitted).
+     * @param g2  the graphics device ({@code null} not permitted).
      * @param plot  the plot (ignored here).
      * @param frame  the dial frame (ignored here).
-     * @param view  the view rectangle (<code>null</code> not permitted).
+     * @param view  the view rectangle ({@code null} not permitted).
      */
+    @Override
     public void draw(Graphics2D g2, DialPlot plot, Rectangle2D frame,
             Rectangle2D view) {
 
@@ -197,10 +194,11 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -209,7 +207,7 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
             return false;
         }
         DialBackground that = (DialBackground) obj;
-        if (!PaintUtilities.equal(this.paint, that.paint)) {
+        if (!PaintUtils.equal(this.paint, that.paint)) {
             return false;
         }
         if (!this.gradientPaintTransformer.equals(
@@ -224,9 +222,10 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
      *
      * @return The hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
-        result = 37 * result + HashUtilities.hashCodeForPaint(this.paint);
+        result = 37 * result + HashUtils.hashCodeForPaint(this.paint);
         result = 37 * result + this.gradientPaintTransformer.hashCode();
         return result;
     }
@@ -239,6 +238,7 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
      * @throws CloneNotSupportedException if some attribute of this instance
      *     cannot be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -252,7 +252,7 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.paint, stream);
+        SerialUtils.writePaint(this.paint, stream);
     }
 
     /**
@@ -266,7 +266,7 @@ public class DialBackground extends AbstractDialLayer implements DialLayer,
     private void readObject(ObjectInputStream stream)
             throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.paint = SerialUtilities.readPaint(stream);
+        this.paint = SerialUtils.readPaint(stream);
     }
 
 }

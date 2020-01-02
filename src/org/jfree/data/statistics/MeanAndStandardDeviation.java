@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------------------
  * MeanAndStandardDeviation.java
@@ -36,7 +36,6 @@
  * --------
  * 05-Feb-2002 : Version 1 (DG);
  * 05-Feb-2005 : Added equals() method and implemented Serializable (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 02-Oct-2007 : Added getMeanValue() and getStandardDeviationValue() methods
  *               for convenience, and toString() method for debugging (DG);
  *
@@ -45,8 +44,7 @@
 package org.jfree.data.statistics;
 
 import java.io.Serializable;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
 
 /**
  * A simple data structure that holds a mean value and a standard deviation
@@ -77,8 +75,8 @@ public class MeanAndStandardDeviation implements Serializable {
     /**
      * Creates a new mean and standard deviation record.
      *
-     * @param mean  the mean (<code>null</code> permitted).
-     * @param standardDeviation  the standard deviation (<code>null</code>
+     * @param mean  the mean ({@code null} permitted).
+     * @param standardDeviation  the standard deviation ({@code null}
      *                           permitted.
      */
     public MeanAndStandardDeviation(Number mean, Number standardDeviation) {
@@ -97,7 +95,7 @@ public class MeanAndStandardDeviation implements Serializable {
 
     /**
      * Returns the mean as a double primitive.  If the underlying mean is
-     * <code>null</code>, this method will return <code>Double.NaN</code>.
+     * {@code null}, this method will return {@code Double.NaN}.
      *
      * @return The mean.
      *
@@ -124,8 +122,8 @@ public class MeanAndStandardDeviation implements Serializable {
 
     /**
      * Returns the standard deviation as a double primitive.  If the underlying
-     * standard deviation is <code>null</code>, this method will return
-     * <code>Double.NaN</code>.
+     * standard deviation is {@code null}, this method will return
+     * {@code Double.NaN}.
      *
      * @return The standard deviation.
      *
@@ -142,10 +140,11 @@ public class MeanAndStandardDeviation implements Serializable {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -154,10 +153,10 @@ public class MeanAndStandardDeviation implements Serializable {
             return false;
         }
         MeanAndStandardDeviation that = (MeanAndStandardDeviation) obj;
-        if (!ObjectUtilities.equal(this.mean, that.mean)) {
+        if (!ObjectUtils.equal(this.mean, that.mean)) {
             return false;
         }
-        if (!ObjectUtilities.equal(
+        if (!ObjectUtils.equal(
             this.standardDeviation, that.standardDeviation)
         ) {
             return false;
@@ -172,6 +171,7 @@ public class MeanAndStandardDeviation implements Serializable {
      *
      * @since 1.0.7
      */
+    @Override
     public String toString() {
         return "[" + this.mean + ", " + this.standardDeviation + "]";
     }

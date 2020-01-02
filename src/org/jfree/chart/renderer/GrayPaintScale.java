@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------
  * GrayPaintScale.java
@@ -36,7 +36,6 @@
  * -------
  * 05-Jul-2006 : Version 1 (DG);
  * 31-Jan-2007 : Renamed min and max to lowerBound and upperBound (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 26-Sep-2007 : Fixed bug 1767315, problem in getPaint() method (DG);
  * 29-Jan-2009 : Added alpha transparency field and hashCode() method (DG);
  *
@@ -48,7 +47,7 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.io.Serializable;
 
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.util.PublicCloneable;
 
 /**
@@ -73,7 +72,7 @@ public class GrayPaintScale
     private int alpha;
 
     /**
-     * Creates a new <code>GrayPaintScale</code> instance with default values.
+     * Creates a new {@code GrayPaintScale} instance with default values.
      */
     public GrayPaintScale() {
         this(0.0, 1.0);
@@ -85,8 +84,8 @@ public class GrayPaintScale
      * @param lowerBound  the lower bound.
      * @param upperBound  the upper bound.
      *
-     * @throws IllegalArgumentException if <code>lowerBound</code> is not
-     *       less than <code>upperBound</code>.
+     * @throws IllegalArgumentException if {@code lowerBound} is not
+     *       less than {@code upperBound}.
      */
     public GrayPaintScale(double lowerBound, double upperBound) {
         this(lowerBound, upperBound, 255);
@@ -99,8 +98,8 @@ public class GrayPaintScale
      * @param upperBound  the upper bound.
      * @param alpha  the alpha transparency (0-255).
      *
-     * @throws IllegalArgumentException if <code>lowerBound</code> is not
-     *       less than <code>upperBound</code>, or <code>alpha</code> is not in
+     * @throws IllegalArgumentException if {@code lowerBound} is not
+     *       less than {@code upperBound}, or {@code alpha} is not in
      *       the range 0 to 255.
      *
      * @since 1.0.13
@@ -127,6 +126,7 @@ public class GrayPaintScale
      *
      * @see #getUpperBound()
      */
+    @Override
     public double getLowerBound() {
         return this.lowerBound;
     }
@@ -138,15 +138,16 @@ public class GrayPaintScale
      *
      * @see #getLowerBound()
      */
+    @Override
     public double getUpperBound() {
         return this.upperBound;
     }
 
     /**
      * Returns the alpha transparency that was specified in the constructor.
-     *
+     * 
      * @return The alpha transparency (in the range 0 to 255).
-     *
+     * 
      * @since 1.0.13
      */
     public int getAlpha() {
@@ -161,27 +162,31 @@ public class GrayPaintScale
      *
      * @return A paint for the specified value.
      */
+    @Override
     public Paint getPaint(double value) {
         double v = Math.max(value, this.lowerBound);
         v = Math.min(v, this.upperBound);
         int g = (int) ((v - this.lowerBound) / (this.upperBound
                 - this.lowerBound) * 255.0);
+        // FIXME:  it probably makes sense to allocate an array of 256 Colors
+        // and lazily populate this array...
         return new Color(g, g, g, this.alpha);
     }
 
     /**
-     * Tests this <code>GrayPaintScale</code> instance for equality with an
-     * arbitrary object.  This method returns <code>true</code> if and only
+     * Tests this {@code GrayPaintScale} instance for equality with an
+     * arbitrary object.  This method returns {@code true} if and only
      * if:
      * <ul>
-     * <li><code>obj</code> is not <code>null</code>;</li>
-     * <li><code>obj</code> is an instance of <code>GrayPaintScale</code>;</li>
+     * <li>{@code obj} is not {@code null};</li>
+     * <li>{@code obj} is an instance of {@code GrayPaintScale};</li>
      * </ul>
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -207,22 +212,24 @@ public class GrayPaintScale
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int hash = 7;
-        hash = HashUtilities.hashCode(hash, this.lowerBound);
-        hash = HashUtilities.hashCode(hash, this.upperBound);
+        hash = HashUtils.hashCode(hash, this.lowerBound);
+        hash = HashUtils.hashCode(hash, this.upperBound);
         hash = 43 * hash + this.alpha;
         return hash;
     }
 
     /**
-     * Returns a clone of this <code>GrayPaintScale</code> instance.
+     * Returns a clone of this {@code GrayPaintScale} instance.
      *
      * @return A clone.
      *
      * @throws CloneNotSupportedException if there is a problem cloning this
      *     instance.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

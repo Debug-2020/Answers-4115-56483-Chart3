@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * --------------
  * DateTitle.java
  * --------------
- * (C) Copyright 2000-2008, by David Berry and Contributors.
+ * (C) Copyright 2000-2017, by David Berry and Contributors.
  *
  * Original Author:  David Berry;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -42,7 +42,6 @@
  * 31-Jan-2005 : Updated for changes to super class (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- * 20-Jun-2007 : Removed JCommon dependency (DG);
  *
  */
 
@@ -56,16 +55,11 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import org.jfree.chart.util.HorizontalAlignment;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.RectangleInsets;
-import org.jfree.chart.util.VerticalAlignment;
-
 /**
  * A chart title that displays the date.
  * <p>
  * Keep in mind that a chart can have several titles, and that they can appear
- * at the top, left, right or bottom of the chart - a <code>DateTitle</code>
+ * at the top, left, right or bottom of the chart - a {@code DateTitle}
  * will commonly appear at the bottom of a chart, although you can place it
  * anywhere.
  * <P>
@@ -73,6 +67,10 @@ import org.jfree.chart.util.VerticalAlignment;
  * the given locale. For example, a date would appear as "January 17, 2000" in
  * the US, but "17 January 2000" in most European locales.
  */
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.chart.ui.VerticalAlignment;
 public class DateTitle extends TextTitle implements Serializable {
 
     /** For serialization. */
@@ -94,25 +92,25 @@ public class DateTitle extends TextTitle implements Serializable {
      * Creates a new chart title that displays the current date with the
      * specified style (for the default locale).
      * <P>
-     * The date style should be one of:  <code>SHORT</code>,
-     * <code>MEDIUM</code>, <code>LONG</code> or <code>FULL</code>
-     * (defined in <code>java.util.DateFormat<code>).
+     * The date style should be one of:  {@code SHORT},
+     * {@code MEDIUM}, {@code LONG} or {@code FULL}
+     * (defined in {@code java.util.DateFormat}).
      *
      * @param style  the date style.
      */
     public DateTitle(int style) {
-        this(style, Locale.getDefault(), new Font("Tahoma", Font.PLAIN, 12),
-                Color.black);
+        this(style, Locale.getDefault(), new Font("Dialog", Font.PLAIN, 12),
+                Color.BLACK);
     }
 
     /**
      * Creates a new chart title that displays the current date.
      * <p>
-     * The date style should be one of:  <code>SHORT</code>,
-     * <code>MEDIUM</code>, <code>LONG</code> or <code>FULL</code> (defined
-     * in <code>java.util.DateFormat<code>).
+     * The date style should be one of:  {@code SHORT},
+     * {@code MEDIUM}, {@code LONG} or {@code FULL} (defined
+     * in {@code java.util.DateFormat}).
      * <P>
-     * For the locale, you can use <code>Locale.getDefault()</code> for the
+     * For the locale, you can use {@code Locale.getDefault()} for the
      * default locale.
      *
      * @param style  the date style.
@@ -129,11 +127,11 @@ public class DateTitle extends TextTitle implements Serializable {
     /**
      * Creates a new chart title that displays the current date.
      * <p>
-     * The date style should be one of:  <code>SHORT</code>,
-     * <code>MEDIUM</code>, <code>LONG</code> or <code>FULL</code> (defined
-     * in <code>java.util.DateFormat<code>).
+     * The date style should be one of:  {@code SHORT},
+     * {@code MEDIUM}, {@code LONG} or {@code FULL} (defined
+     * in {@code java.util.DateFormat}).
      * <P>
-     * For the locale, you can use <code>Locale.getDefault()</code> for the
+     * For the locale, you can use {@code Locale.getDefault()} for the
      * default locale.
      *
      * @param style  the date style.
@@ -150,10 +148,8 @@ public class DateTitle extends TextTitle implements Serializable {
      *                 title (not null).
      */
     public DateTitle(int style, Locale locale, Font font, Paint paint,
-                     RectangleEdge position,
-                     HorizontalAlignment horizontalAlignment,
-                     VerticalAlignment verticalAlignment,
-                     RectangleInsets padding) {
+            RectangleEdge position, HorizontalAlignment horizontalAlignment,
+            VerticalAlignment verticalAlignment, RectangleInsets padding) {
         super(DateFormat.getDateInstance(style, locale).format(new Date()),
                 font, paint, position, horizontalAlignment, verticalAlignment,
                 padding);
@@ -162,11 +158,11 @@ public class DateTitle extends TextTitle implements Serializable {
     /**
      * Set the format of the date.
      * <P>
-     * The date style should be one of:  <code>SHORT</code>,
-     * <code>MEDIUM</code>, <code>LONG</code> or <code>FULL</code> (defined
-     * in <code>java.util.DateFormat<code>).
+     * The date style should be one of:  {@code SHORT},
+     * {@code MEDIUM}, {@code LONG} or {@code FULL} (defined
+     * in {@code java.util.DateFormat}).
      * <P>
-     * For the locale, you can use <code>Locale.getDefault()</code> for the
+     * For the locale, you can use {@code Locale.getDefault()} for the
      * default locale.
      *
      * @param style  the date style.

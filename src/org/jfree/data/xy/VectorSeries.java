@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * VectorSeries.java
  * -----------------
- * (C) Copyright 2007, 2008, by Object Refinery Limited.
+ * (C) Copyright 2007-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -40,6 +40,7 @@
  * 25-May-2007 : Added remove(int) and clear() methods, and moved from the
  *               experimental to the main source tree (DG);
  * 27-Nov-2007 : Removed redundant clear() method (DG);
+ * 09-Jan-2014 : Added add(VectorDataItem, boolean) method (DG);
  *
  */
 
@@ -47,7 +48,7 @@ package org.jfree.data.xy;
 
 import org.jfree.data.ComparableObjectItem;
 import org.jfree.data.ComparableObjectSeries;
-import org.jfree.data.event.SeriesChangeEvent;
+import org.jfree.data.general.SeriesChangeEvent;
 
 /**
  * A list of (x,y, deltaX, deltaY) data items.
@@ -61,7 +62,7 @@ public class VectorSeries extends ComparableObjectSeries {
     /**
      * Creates a new empty series.
      *
-     * @param key  the series key (<code>null</code> not permitted).
+     * @param key  the series key ({@code null} not permitted).
      */
     public VectorSeries(Comparable key) {
         this(key, false, true);
@@ -71,7 +72,7 @@ public class VectorSeries extends ComparableObjectSeries {
      * Constructs a new series that contains no data.  You can specify
      * whether or not duplicate x-values are allowed for the series.
      *
-     * @param key  the series key (<code>null</code> not permitted).
+     * @param key  the series key ({@code null} not permitted).
      * @param autoSort  a flag that controls whether or not the items in the
      *                  series are sorted.
      * @param allowDuplicateXValues  a flag that controls whether duplicate
@@ -91,7 +92,20 @@ public class VectorSeries extends ComparableObjectSeries {
      * @param deltaY  the vector y.
      */
     public void add(double x, double y, double deltaX, double deltaY) {
-        super.add(new VectorDataItem(x, y, deltaX, deltaY), true);
+        add(new VectorDataItem(x, y, deltaX, deltaY), true);
+    }
+    
+    /**
+     * Adds a data item to the series and, if requested, sends a 
+     * {@link SeriesChangeEvent} to all registered listeners.
+     * 
+     * @param item  the data item ({@code null} not permitted).
+     * @param notify  notify listeners?
+     * 
+     * @since 1.0.18
+     */
+    public void add(VectorDataItem item, boolean notify) {
+        super.add(item, notify);
     }
 
     /**
@@ -102,6 +116,7 @@ public class VectorSeries extends ComparableObjectSeries {
      *
      * @return The item removed.
      */
+    @Override
     public ComparableObjectItem remove(int index) {
         VectorDataItem result = (VectorDataItem) this.data.remove(index);
         fireSeriesChanged();
@@ -163,6 +178,7 @@ public class VectorSeries extends ComparableObjectSeries {
      *
      * @return The data item.
      */
+    @Override
     public ComparableObjectItem getDataItem(int index) {
         // overridden to make public
         return super.getDataItem(index);

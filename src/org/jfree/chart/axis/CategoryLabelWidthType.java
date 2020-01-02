@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * CategoryLabelWidthType.java
  * ---------------------------
- * (C) Copyright 2004-2008, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,6 +35,7 @@
  * Changes:
  * --------
  * 24-Mar-2004 : Version 1 (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -42,6 +43,7 @@ package org.jfree.chart.axis;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import org.jfree.chart.util.Args;
 
 /**
  * Represents the width types for a category label.
@@ -52,14 +54,12 @@ public final class CategoryLabelWidthType implements Serializable {
     private static final long serialVersionUID = -6976024792582949656L;
 
     /** Percentage of category. */
-    public static final CategoryLabelWidthType
-        CATEGORY = new CategoryLabelWidthType(
-            "CategoryLabelWidthType.CATEGORY"
-        );
+    public static final CategoryLabelWidthType CATEGORY 
+            = new CategoryLabelWidthType("CategoryLabelWidthType.CATEGORY");
 
     /** Percentage of range. */
-    public static final CategoryLabelWidthType
-        RANGE = new CategoryLabelWidthType("CategoryLabelWidthType.RANGE");
+    public static final CategoryLabelWidthType RANGE 
+            = new CategoryLabelWidthType("CategoryLabelWidthType.RANGE");
 
     /** The name. */
     private String name;
@@ -67,34 +67,33 @@ public final class CategoryLabelWidthType implements Serializable {
     /**
      * Private constructor.
      *
-     * @param name  the name (<code>null</code> not permitted).
+     * @param name  the name ({@code null} not permitted).
      */
     private CategoryLabelWidthType(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Null 'name' argument.");
-        }
+        Args.nullNotPermitted(name, "name");
         this.name = name;
     }
 
     /**
      * Returns a string representing the object.
      *
-     * @return The string (never </code>null</code>).
+     * @return The string (never {@code null}).
      */
+    @Override
     public String toString() {
         return this.name;
     }
 
     /**
-     * Returns <code>true</code> if this object is equal to the specified
-     * object, and <code>false</code> otherwise.
+     * Returns {@code true} if this object is equal to the specified
+     * object, and {@code false} otherwise.
      *
      * @param obj  the other object.
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
-
         if (this == obj) {
             return true;
         }
@@ -106,7 +105,6 @@ public final class CategoryLabelWidthType implements Serializable {
             return false;
         }
         return true;
-
     }
 
     /**

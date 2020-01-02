@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -------------------------
  * AbstractXYAnnotation.java
  * -------------------------
- * (C) Copyright 2004-2009, by Object Refinery Limited.
+ * (C) Copyright 2004-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Peter Kolb (patch 2809117);
@@ -37,7 +37,6 @@
  * 29-Sep-2004 : Version 1 (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 06-Mar-2007 : Implemented hashCode() (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 24-Jun-2009 : Now extends AbstractAnnotation (see patch 2809117 by PK) (DG);
  *
  */
@@ -53,7 +52,7 @@ import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.entity.XYAnnotationEntity;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
 
 /**
  * The interface that must be supported by annotations that are to be added to
@@ -82,7 +81,7 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
      * a {@link org.jfree.chart.ChartPanel} when the mouse pointer hovers over
      * the annotation.
      *
-     * @return The tool tip text (possibly <code>null</code>).
+     * @return The tool tip text (possibly {@code null}).
      *
      * @see #setToolTipText(String)
      */
@@ -93,7 +92,7 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
     /**
      * Sets the tool tip text for the annotation.
      *
-     * @param text  the tool tip text (<code>null</code> permitted).
+     * @param text  the tool tip text ({@code null} permitted).
      *
      * @see #getToolTipText()
      */
@@ -105,7 +104,7 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
      * Returns the URL for the annotation.  This URL will be used to provide
      * hyperlinks when an HTML image map is created for the chart.
      *
-     * @return The URL (possibly <code>null</code>).
+     * @return The URL (possibly {@code null}).
      *
      * @see #setURL(String)
      */
@@ -116,7 +115,7 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
     /**
      * Sets the URL for the annotation.
      *
-     * @param url  the URL (<code>null</code> permitted).
+     * @param url  the URL ({@code null} permitted).
      *
      * @see #getURL()
      */
@@ -136,6 +135,7 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
      * @param info  if supplied, this info object will be populated with
      *              entity information.
      */
+    @Override
     public abstract void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                               ValueAxis domainAxis, ValueAxis rangeAxis,
                               int rendererIndex,
@@ -145,7 +145,7 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
      * A utility method for adding an {@link XYAnnotationEntity} to
      * a {@link PlotRenderingInfo} instance.
      *
-     * @param info  the plot rendering info (<code>null</code> permitted).
+     * @param info  the plot rendering info ({@code null} permitted).
      * @param hotspot  the hotspot area.
      * @param rendererIndex  the renderer index.
      * @param toolTipText  the tool tip text.
@@ -169,10 +169,11 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
     /**
      * Tests this annotation for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -181,10 +182,10 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
             return false;
         }
         AbstractXYAnnotation that = (AbstractXYAnnotation) obj;
-        if (!ObjectUtilities.equal(this.toolTipText, that.toolTipText)) {
+        if (!ObjectUtils.equal(this.toolTipText, that.toolTipText)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.url, that.url)) {
+        if (!ObjectUtils.equal(this.url, that.url)) {
             return false;
         }
         return true;
@@ -195,6 +196,7 @@ public abstract class AbstractXYAnnotation extends AbstractAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
         if (this.toolTipText != null) {

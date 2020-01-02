@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * DomainInfo.java
  * ---------------
- * (C) Copyright 2000-2008, by Object Refinery Limited.
+ * (C) Copyright 2000-2017, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -43,6 +43,7 @@
  * 17-Nov-2004 : Added 'includeInterval' argument to all methods (DG);
  * 11-Jan-2005 : Removed deprecated code in preparation for the 1.0.0
  *               release (DG);
+ * 02-Aug-2013 : Updated Javadocs from David Tonhofer (bug 1117) (DG);
  *
  */
 
@@ -50,7 +51,9 @@ package org.jfree.data;
 
 /**
  * An interface (optional) that can be implemented by a dataset to assist in
- * determining the minimum and maximum values.
+ * determining the minimum and maximum values.  If not present, 
+ * {@link org.jfree.data.general.DatasetUtils} will iterate over all the 
+ * values in the dataset to get the bounds.
  */
 public interface DomainInfo {
 
@@ -60,7 +63,8 @@ public interface DomainInfo {
      * @param includeInterval  a flag that determines whether or not the
      *                         x-interval is taken into account.
      *
-     * @return The minimum value.
+     * @return The minimum value or {@code Double.NaN} if there are no 
+     *     values.
      */
     public double getDomainLowerBound(boolean includeInterval);
 
@@ -70,7 +74,8 @@ public interface DomainInfo {
      * @param includeInterval  a flag that determines whether or not the
      *                         x-interval is taken into account.
      *
-     * @return The maximum value.
+     * @return The maximum value or {@code Double.NaN} if there are no 
+     *     values.
      */
     public double getDomainUpperBound(boolean includeInterval);
 
@@ -80,7 +85,8 @@ public interface DomainInfo {
      * @param includeInterval  a flag that determines whether or not the
      *                         x-interval is taken into account.
      *
-     * @return The range.
+     * @return The range (or {@code null} if the dataset contains no
+     *     values).
      */
     public Range getDomainBounds(boolean includeInterval);
 

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * BoxAndWhiskerItem.java
@@ -38,7 +38,6 @@
  * 01-Mar-2004 : Added equals() method and implemented Serializable (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 15-Nov-2006 : Added toString() method override (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 02-Oct-2007 : Added new constructor (for convenience) (DG);
  *
  */
@@ -48,8 +47,7 @@ package org.jfree.data.statistics;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
 
 /**
  * Represents one data item within a box-and-whisker dataset.  Instances of
@@ -90,17 +88,17 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Creates a new box-and-whisker item.
      *
-     * @param mean  the mean (<code>null</code> permitted).
-     * @param median  the median (<code>null</code> permitted).
-     * @param q1  the first quartile (<code>null</code> permitted).
-     * @param q3  the third quartile (<code>null</code> permitted).
-     * @param minRegularValue  the minimum regular value (<code>null</code>
+     * @param mean  the mean ({@code null} permitted).
+     * @param median  the median ({@code null} permitted).
+     * @param q1  the first quartile ({@code null} permitted).
+     * @param q3  the third quartile ({@code null} permitted).
+     * @param minRegularValue  the minimum regular value ({@code null}
      *                         permitted).
-     * @param maxRegularValue  the maximum regular value (<code>null</code>
+     * @param maxRegularValue  the maximum regular value ({@code null}
      *                         permitted).
-     * @param minOutlier  the minimum outlier (<code>null</code> permitted).
-     * @param maxOutlier  the maximum outlier (<code>null</code> permitted).
-     * @param outliers  the outliers (<code>null</code> permitted).
+     * @param minOutlier  the minimum outlier ({@code null} permitted).
+     * @param maxOutlier  the maximum outlier ({@code null} permitted).
+     * @param outliers  the outliers ({@code null} permitted).
      */
     public BoxAndWhiskerItem(Number mean,
                              Number median,
@@ -154,7 +152,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the mean.
      *
-     * @return The mean (possibly <code>null</code>).
+     * @return The mean (possibly {@code null}).
      */
     public Number getMean() {
         return this.mean;
@@ -163,7 +161,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the median.
      *
-     * @return The median (possibly <code>null</code>).
+     * @return The median (possibly {@code null}).
      */
     public Number getMedian() {
         return this.median;
@@ -172,7 +170,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the first quartile.
      *
-     * @return The first quartile (possibly <code>null</code>).
+     * @return The first quartile (possibly {@code null}).
      */
     public Number getQ1() {
         return this.q1;
@@ -181,7 +179,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the third quartile.
      *
-     * @return The third quartile (possibly <code>null</code>).
+     * @return The third quartile (possibly {@code null}).
      */
     public Number getQ3() {
         return this.q3;
@@ -190,7 +188,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the minimum regular value.
      *
-     * @return The minimum regular value (possibly <code>null</code>).
+     * @return The minimum regular value (possibly {@code null}).
      */
     public Number getMinRegularValue() {
         return this.minRegularValue;
@@ -199,7 +197,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the maximum regular value.
      *
-     * @return The maximum regular value (possibly <code>null</code>).
+     * @return The maximum regular value (possibly {@code null}).
      */
     public Number getMaxRegularValue() {
         return this.maxRegularValue;
@@ -208,7 +206,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the minimum outlier.
      *
-     * @return The minimum outlier (possibly <code>null</code>).
+     * @return The minimum outlier (possibly {@code null}).
      */
     public Number getMinOutlier() {
         return this.minOutlier;
@@ -217,7 +215,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns the maximum outlier.
      *
-     * @return The maximum outlier (possibly <code>null</code>).
+     * @return The maximum outlier (possibly {@code null}).
      */
     public Number getMaxOutlier() {
         return this.maxOutlier;
@@ -226,7 +224,7 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Returns a list of outliers.
      *
-     * @return A list of outliers (possibly <code>null</code>).
+     * @return A list of outliers (possibly {@code null}).
      */
     public List getOutliers() {
         if (this.outliers == null) {
@@ -241,6 +239,7 @@ public class BoxAndWhiskerItem implements Serializable {
      *
      * @return A string representation of this instance.
      */
+    @Override
     public String toString() {
         return super.toString() + "[mean=" + this.mean + ",median="
                 + this.median + ",q1=" + this.q1 + ",q3=" + this.q3 + "]";
@@ -249,10 +248,11 @@ public class BoxAndWhiskerItem implements Serializable {
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object to test against (<code>null</code> permitted).
+     * @param obj  the object to test against ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj == this) {
@@ -262,33 +262,33 @@ public class BoxAndWhiskerItem implements Serializable {
             return false;
         }
         BoxAndWhiskerItem that = (BoxAndWhiskerItem) obj;
-        if (!ObjectUtilities.equal(this.mean, that.mean)) {
+        if (!ObjectUtils.equal(this.mean, that.mean)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.median, that.median)) {
+        if (!ObjectUtils.equal(this.median, that.median)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.q1, that.q1)) {
+        if (!ObjectUtils.equal(this.q1, that.q1)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.q3, that.q3)) {
+        if (!ObjectUtils.equal(this.q3, that.q3)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.minRegularValue,
+        if (!ObjectUtils.equal(this.minRegularValue,
                 that.minRegularValue)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.maxRegularValue,
+        if (!ObjectUtils.equal(this.maxRegularValue,
                 that.maxRegularValue)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.minOutlier, that.minOutlier)) {
+        if (!ObjectUtils.equal(this.minOutlier, that.minOutlier)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.maxOutlier, that.maxOutlier)) {
+        if (!ObjectUtils.equal(this.maxOutlier, that.maxOutlier)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.outliers, that.outliers)) {
+        if (!ObjectUtils.equal(this.outliers, that.outliers)) {
             return false;
         }
         return true;

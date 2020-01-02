@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------
  * NumberTick.java
@@ -35,14 +35,13 @@
  * Changes
  * -------
  * 07-Nov-2003 : Version 1 (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
  * 02-Aug-2007 : Added new constructor with tick type (DG);
  *
  */
 
 package org.jfree.chart.axis;
 
-import org.jfree.chart.text.TextAnchor;
+import org.jfree.chart.ui.TextAnchor;
 
 /**
  * A numerical tick.
@@ -55,7 +54,7 @@ public class NumberTick extends ValueTick {
     /**
      * Creates a new tick.
      *
-     * @param number  the number (<code>null</code> not permitted).
+     * @param number  the number ({@code null} not permitted).
      * @param label  the label.
      * @param textAnchor  the part of the label that is aligned with the anchor
      *                    point.

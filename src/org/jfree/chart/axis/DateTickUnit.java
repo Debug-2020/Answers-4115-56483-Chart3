@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * DateTickUnit.java
  * -----------------
- * (C) Copyright 2000-2009, by Object Refinery Limited.
+ * (C) Copyright 2000-2016, by Object Refinery Limited.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Chris Boek;
@@ -47,10 +47,10 @@
  * 21-Mar-2007 : Added toString() for debugging (DG);
  * 04-Apr-2007 : Added new methods addToDate(Date, TimeZone) and rollDate(Date,
  *               TimeZone) (CB);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  * 09-Jun-2008 : Deprecated addToDate(Date) (DG);
  * 09-Jan-2009 : Replaced the unit and rollUnit fields with an enumerated
  *               type (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -61,8 +61,8 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 
 /**
  * A tick unit for use by subclasses of {@link DateAxis}.  Instances of this
@@ -99,8 +99,8 @@ public class DateTickUnit extends TickUnit implements Serializable {
     /**
      * Creates a new date tick unit.
      *
-     * @param unitType  the unit type (<code>null</code> not permitted).
-     * @param multiple  the multiple (of the unit type, must be > 0).
+     * @param unitType  the unit type ({@code null} not permitted).
+     * @param multiple  the multiple (of the unit type, must be &gt; 0).
      *
      * @since 1.0.13
      */
@@ -111,9 +111,9 @@ public class DateTickUnit extends TickUnit implements Serializable {
     /**
      * Creates a new date tick unit.
      *
-     * @param unitType  the unit type (<code>null</code> not permitted).
-     * @param multiple  the multiple (of the unit type, must be > 0).
-     * @param formatter  the date formatter (<code>null</code> not permitted).
+     * @param unitType  the unit type ({@code null} not permitted).
+     * @param multiple  the multiple (of the unit type, must be &gt; 0).
+     * @param formatter  the date formatter ({@code null} not permitted).
      *
      * @since 1.0.13
      */
@@ -129,7 +129,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
      * @param multiple  the multiple.
      * @param rollUnitType  the roll unit.
      * @param rollMultiple  the roll multiple.
-     * @param formatter  the date formatter (<code>null</code> not permitted).
+     * @param formatter  the date formatter ({@code null} not permitted).
      *
      * @since 1.0.13
      */
@@ -137,9 +137,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
             DateTickUnitType rollUnitType, int rollMultiple,
             DateFormat formatter) {
         super(DateTickUnit.getMillisecondCount(unitType, multiple));
-        if (formatter == null) {
-            throw new IllegalArgumentException("Null 'formatter' argument.");
-        }
+        Args.nullNotPermitted(formatter, "formatter");
         if (multiple <= 0) {
             throw new IllegalArgumentException("Requires 'multiple' > 0.");
         }
@@ -156,7 +154,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
     /**
      * Returns the unit type.
      *
-     * @return The unit type (never <code>null</code>).
+     * @return The unit type (never {@code null}).
      *
      * @since 1.0.13
      */
@@ -167,7 +165,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
     /**
      * Returns the unit multiple.
      *
-     * @return The unit multiple (always > 0).
+     * @return The unit multiple (always &gt; 0).
      */
     public int getMultiple() {
         return this.count;
@@ -176,7 +174,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
     /**
      * Returns the roll unit type.
      *
-     * @return The roll unit type (never <code>null</code>).
+     * @return The roll unit type (never {@code null}).
      *
      * @since 1.0.13
      */
@@ -202,6 +200,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
      *
      * @return The formatted date.
      */
+    @Override
     public String valueToString(double milliseconds) {
         return this.formatter.format(new Date((long) milliseconds));
     }
@@ -275,7 +274,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
     }
 
     /**
-     * Returns a field code that can be used with the <code>Calendar</code>
+     * Returns a field code that can be used with the {@code Calendar}
      * class.
      *
      * @return The field code.
@@ -322,36 +321,20 @@ public class DateTickUnit extends TickUnit implements Serializable {
             return count;
         }
         else {
-            throw new IllegalArgumentException("The 'unit' argument has a " +
-                    "value that is not recognised.");
+            throw new IllegalArgumentException("The 'unit' argument has a " 
+                    + "value that is not recognised.");
         }
 
-    }
-
-    /**
-     * A utility method to put a default in place if a null formatter is
-     * supplied.
-     *
-     * @param formatter  the formatter (<code>null</code> permitted).
-     *
-     * @return The formatter if it is not null, otherwise a default.
-     */
-    private static DateFormat notNull(DateFormat formatter) {
-        if (formatter == null) {
-            return DateFormat.getDateInstance(DateFormat.SHORT);
-        }
-        else {
-            return formatter;
-        }
     }
 
     /**
      * Tests this unit for equality with another object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
-     * @return <code>true</code> or <code>false</code>.
+     * @return {@code true} or {@code false}.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -369,7 +352,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
         if (this.count != that.count) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.formatter, that.formatter)) {
+        if (!ObjectUtils.equal(this.formatter, that.formatter)) {
             return false;
         }
         return true;
@@ -380,6 +363,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 19;
         result = 37 * result + this.unitType.hashCode();
@@ -394,6 +378,7 @@ public class DateTickUnit extends TickUnit implements Serializable {
      *
      * @return A string representation of this instance.
      */
+    @Override
     public String toString() {
         return "DateTickUnit[" + this.unitType.toString() + ", "
                 + this.count + "]";

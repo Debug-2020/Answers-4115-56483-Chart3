@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * XYShapeAnnotation.java
  * ----------------------
- * (C) Copyright 2003-2009, by Ondax, Inc. and Contributors.
+ * (C) Copyright 2003-2017, by Ondax, Inc. and Contributors.
  *
  * Original Author:  Greg Steckman (for Ondax, Inc.);
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -49,7 +49,7 @@
  * 24-Oct-2006 : Calculate AffineTransform on shape's bounding rectangle
  *               rather than sample points (0, 0) and (1, 1) (DG);
  * 06-Mar-2007 : Implemented hashCode() (DG);
- * 20-Jun-2007 : Removed JCommon dependencies (DG);
+ * 02-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -68,20 +68,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.SerialUtilities;
+import org.jfree.chart.util.SerialUtils;
 
 /**
- * A simple <code>Shape</code> annotation that can be placed on an
+ * A simple {@code Shape} annotation that can be placed on an
  * {@link XYPlot}.  The shape coordinates are specified in data space.
  */
 public class XYShapeAnnotation extends AbstractXYAnnotation
@@ -106,20 +107,20 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
      * Creates a new annotation (where, by default, the shape is drawn
      * with a black outline).
      *
-     * @param shape  the shape (coordinates in data space, <code>null</code>
+     * @param shape  the shape (coordinates in data space, {@code null}
      *     not permitted).
      */
     public XYShapeAnnotation(Shape shape) {
-        this(shape, new BasicStroke(1.0f), Color.black);
+        this(shape, new BasicStroke(1.0f), Color.BLACK);
     }
 
     /**
      * Creates a new annotation where the shape is drawn as an outline using
-     * the specified <code>stroke</code> and <code>outlinePaint</code>.
+     * the specified {@code stroke} and {@code outlinePaint}.
      *
-     * @param shape  the shape (<code>null</code> not permitted).
-     * @param stroke  the shape stroke (<code>null</code> permitted).
-     * @param outlinePaint  the shape color (<code>null</code> permitted).
+     * @param shape  the shape ({@code null} not permitted).
+     * @param stroke  the shape stroke ({@code null} permitted).
+     * @param outlinePaint  the shape color ({@code null} permitted).
      */
     public XYShapeAnnotation(Shape shape, Stroke stroke, Paint outlinePaint) {
         this(shape, stroke, outlinePaint, null);
@@ -128,18 +129,16 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
     /**
      * Creates a new annotation.
      *
-     * @param shape  the shape (<code>null</code> not permitted).
-     * @param stroke  the shape stroke (<code>null</code> permitted).
-     * @param outlinePaint  the shape color (<code>null</code> permitted).
-     * @param fillPaint  the paint used to fill the shape (<code>null</code>
+     * @param shape  the shape ({@code null} not permitted).
+     * @param stroke  the shape stroke ({@code null} permitted).
+     * @param outlinePaint  the shape color ({@code null} permitted).
+     * @param fillPaint  the paint used to fill the shape ({@code null}
      *                   permitted.
      */
     public XYShapeAnnotation(Shape shape, Stroke stroke, Paint outlinePaint,
                              Paint fillPaint) {
         super();
-        if (shape == null) {
-            throw new IllegalArgumentException("Null 'shape' argument.");
-        }
+        Args.nullNotPermitted(shape, "shape");
         this.shape = shape;
         this.stroke = stroke;
         this.outlinePaint = outlinePaint;
@@ -158,6 +157,7 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
      * @param rendererIndex  the renderer index.
      * @param info  the plot rendering info.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                      ValueAxis domainAxis, ValueAxis rangeAxis,
                      int rendererIndex,
@@ -218,10 +218,11 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
     /**
      * Tests this annotation for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -237,13 +238,13 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
         if (!this.shape.equals(that.shape)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.stroke, that.stroke)) {
+        if (!ObjectUtils.equal(this.stroke, that.stroke)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.outlinePaint, that.outlinePaint)) {
+        if (!PaintUtils.equal(this.outlinePaint, that.outlinePaint)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.fillPaint, that.fillPaint)) {
+        if (!PaintUtils.equal(this.fillPaint, that.fillPaint)) {
             return false;
         }
         // seem to be the same
@@ -255,15 +256,16 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
         result = 37 * result + this.shape.hashCode();
         if (this.stroke != null) {
             result = 37 * result + this.stroke.hashCode();
         }
-        result = 37 * result + HashUtilities.hashCodeForPaint(
+        result = 37 * result + HashUtils.hashCodeForPaint(
                 this.outlinePaint);
-        result = 37 * result + HashUtilities.hashCodeForPaint(this.fillPaint);
+        result = 37 * result + HashUtils.hashCodeForPaint(this.fillPaint);
         return result;
     }
 
@@ -274,6 +276,7 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
      *
      * @throws CloneNotSupportedException ???.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
@@ -287,10 +290,10 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writeShape(this.shape, stream);
-        SerialUtilities.writeStroke(this.stroke, stream);
-        SerialUtilities.writePaint(this.outlinePaint, stream);
-        SerialUtilities.writePaint(this.fillPaint, stream);
+        SerialUtils.writeShape(this.shape, stream);
+        SerialUtils.writeStroke(this.stroke, stream);
+        SerialUtils.writePaint(this.outlinePaint, stream);
+        SerialUtils.writePaint(this.fillPaint, stream);
     }
 
     /**
@@ -304,10 +307,10 @@ public class XYShapeAnnotation extends AbstractXYAnnotation
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.shape = SerialUtilities.readShape(stream);
-        this.stroke = SerialUtilities.readStroke(stream);
-        this.outlinePaint = SerialUtilities.readPaint(stream);
-        this.fillPaint = SerialUtilities.readPaint(stream);
+        this.shape = SerialUtils.readShape(stream);
+        this.stroke = SerialUtils.readStroke(stream);
+        this.outlinePaint = SerialUtils.readPaint(stream);
+        this.fillPaint = SerialUtils.readPaint(stream);
     }
 
 }

@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------
  * MeterInterval.java
  * ------------------
- * (C) Copyright 2005-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2005-2016, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,7 +36,7 @@
  * -------
  * 22-Mar-2005 : Version 1 (DG);
  * 29-Mar-2005 : Fixed serialization (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -50,10 +50,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.PaintUtils;
+import org.jfree.chart.util.Args;
+import org.jfree.chart.util.SerialUtils;
 
-import org.jfree.chart.util.ObjectUtilities;
-import org.jfree.chart.util.PaintUtilities;
-import org.jfree.chart.util.SerialUtilities;
 import org.jfree.data.Range;
 
 /**
@@ -83,31 +84,27 @@ public class MeterInterval implements Serializable {
     /**
      * Creates a new interval.
      *
-     * @param label  the label (<code>null</code> not permitted).
-     * @param range  the range (<code>null</code> not permitted).
+     * @param label  the label ({@code null} not permitted).
+     * @param range  the range ({@code null} not permitted).
      */
     public MeterInterval(String label, Range range) {
-        this(label, range, Color.yellow, new BasicStroke(2.0f), null);
+        this(label, range, Color.YELLOW, new BasicStroke(2.0f), null);
     }
 
     /**
      * Creates a new interval.
      *
-     * @param label  the label (<code>null</code> not permitted).
-     * @param range  the range (<code>null</code> not permitted).
-     * @param outlinePaint  the outline paint (<code>null</code> permitted).
-     * @param outlineStroke  the outline stroke (<code>null</code> permitted).
-     * @param backgroundPaint  the background paint (<code>null</code>
+     * @param label  the label ({@code null} not permitted).
+     * @param range  the range ({@code null} not permitted).
+     * @param outlinePaint  the outline paint ({@code null} permitted).
+     * @param outlineStroke  the outline stroke ({@code null} permitted).
+     * @param backgroundPaint  the background paint ({@code null}
      *                         permitted).
      */
     public MeterInterval(String label, Range range, Paint outlinePaint,
                          Stroke outlineStroke, Paint backgroundPaint) {
-        if (label == null) {
-            throw new IllegalArgumentException("Null 'label' argument.");
-        }
-        if (range == null) {
-            throw new IllegalArgumentException("Null 'range' argument.");
-        }
+        Args.nullNotPermitted(label, "label");
+        Args.nullNotPermitted(range, "range");
         this.label = label;
         this.range = range;
         this.outlinePaint = outlinePaint;
@@ -118,7 +115,7 @@ public class MeterInterval implements Serializable {
     /**
      * Returns the label.
      *
-     * @return The label (never <code>null</code>).
+     * @return The label (never {@code null}).
      */
     public String getLabel() {
         return this.label;
@@ -127,17 +124,17 @@ public class MeterInterval implements Serializable {
     /**
      * Returns the range.
      *
-     * @return The range (never <code>null</code>).
+     * @return The range (never {@code null}).
      */
     public Range getRange() {
         return this.range;
     }
 
     /**
-     * Returns the background paint.  If <code>null</code>, the background
+     * Returns the background paint.  If {@code null}, the background
      * should remain unfilled.
      *
-     * @return The background paint (possibly <code>null</code>).
+     * @return The background paint (possibly {@code null}).
      */
     public Paint getBackgroundPaint() {
         return this.backgroundPaint;
@@ -146,7 +143,7 @@ public class MeterInterval implements Serializable {
     /**
      * Returns the outline paint.
      *
-     * @return The outline paint (possibly <code>null</code>).
+     * @return The outline paint (possibly {@code null}).
      */
     public Paint getOutlinePaint() {
         return this.outlinePaint;
@@ -155,7 +152,7 @@ public class MeterInterval implements Serializable {
     /**
      * Returns the outline stroke.
      *
-     * @return The outline stroke (possibly <code>null</code>).
+     * @return The outline stroke (possibly {@code null}).
      */
     public Stroke getOutlineStroke() {
         return this.outlineStroke;
@@ -164,10 +161,11 @@ public class MeterInterval implements Serializable {
     /**
      * Checks this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -182,13 +180,13 @@ public class MeterInterval implements Serializable {
         if (!this.range.equals(that.range)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.outlinePaint, that.outlinePaint)) {
+        if (!PaintUtils.equal(this.outlinePaint, that.outlinePaint)) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.outlineStroke, that.outlineStroke)) {
+        if (!ObjectUtils.equal(this.outlineStroke, that.outlineStroke)) {
             return false;
         }
-        if (!PaintUtilities.equal(this.backgroundPaint, that.backgroundPaint)) {
+        if (!PaintUtils.equal(this.backgroundPaint, that.backgroundPaint)) {
             return false;
         }
         return true;
@@ -203,9 +201,9 @@ public class MeterInterval implements Serializable {
      */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.defaultWriteObject();
-        SerialUtilities.writePaint(this.outlinePaint, stream);
-        SerialUtilities.writeStroke(this.outlineStroke, stream);
-        SerialUtilities.writePaint(this.backgroundPaint, stream);
+        SerialUtils.writePaint(this.outlinePaint, stream);
+        SerialUtils.writeStroke(this.outlineStroke, stream);
+        SerialUtils.writePaint(this.backgroundPaint, stream);
     }
 
     /**
@@ -219,9 +217,9 @@ public class MeterInterval implements Serializable {
     private void readObject(ObjectInputStream stream)
         throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
-        this.outlinePaint = SerialUtilities.readPaint(stream);
-        this.outlineStroke = SerialUtilities.readStroke(stream);
-        this.backgroundPaint = SerialUtilities.readPaint(stream);
+        this.outlinePaint = SerialUtils.readPaint(stream);
+        this.outlineStroke = SerialUtils.readStroke(stream);
+        this.backgroundPaint = SerialUtils.readPaint(stream);
     }
 
 }

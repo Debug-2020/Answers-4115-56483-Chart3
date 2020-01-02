@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * XYTitleAnnotation.java
  * ----------------------
- * (C) Copyright 2007-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2007-2011, by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   Andrew Mickish;
@@ -50,24 +50,27 @@ import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
+
+import org.jfree.chart.HashUtils;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.BlockParams;
 import org.jfree.chart.block.EntityBlockResult;
 import org.jfree.chart.block.RectangleConstraint;
+import org.jfree.chart.event.AnnotationChangeEvent;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.title.Title;
-import org.jfree.chart.util.HashUtilities;
-import org.jfree.chart.util.ObjectUtilities;
+import org.jfree.chart.ui.RectangleAnchor;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.Size2D;
+import org.jfree.chart.util.ObjectUtils;
+import org.jfree.chart.util.Args;
 import org.jfree.chart.util.PublicCloneable;
-import org.jfree.chart.util.RectangleAnchor;
-import org.jfree.chart.util.RectangleEdge;
-import org.jfree.chart.util.Size2D;
-import org.jfree.data.Range;
 import org.jfree.chart.util.XYCoordinateType;
+import org.jfree.data.Range;
 
 /**
  * An annotation that allows any {@link Title} to be placed at a location on
@@ -110,7 +113,7 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
      *
      * @param x  the x-coordinate (in data space).
      * @param y  the y-coordinate (in data space).
-     * @param title  the title (<code>null</code> not permitted).
+     * @param title  the title ({@code null} not permitted).
      */
     public XYTitleAnnotation(double x, double y, Title title) {
         this(x, y, title, RectangleAnchor.CENTER);
@@ -122,18 +125,14 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
      *
      * @param x  the x-coordinate (in data space).
      * @param y  the y-coordinate (in data space).
-     * @param title  the title (<code>null</code> not permitted).
-     * @param anchor  the title anchor (<code>null</code> not permitted).
+     * @param title  the title ({@code null} not permitted).
+     * @param anchor  the title anchor ({@code null} not permitted).
      */
     public XYTitleAnnotation(double x, double y, Title title,
             RectangleAnchor anchor) {
         super();
-        if (title == null) {
-            throw new IllegalArgumentException("Null 'title' argument.");
-        }
-        if (anchor == null) {
-            throw new IllegalArgumentException("Null 'anchor' argument.");
-        }
+        Args.nullNotPermitted(title, "title");
+        Args.nullNotPermitted(anchor, "anchor");
         this.coordinateType = XYCoordinateType.RELATIVE;
         this.x = x;
         this.y = y;
@@ -146,7 +145,7 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
     /**
      * Returns the coordinate type (set in the constructor).
      *
-     * @return The coordinate type (never <code>null</code>).
+     * @return The coordinate type (never {@code null}).
      */
     public XYCoordinateType getCoordinateType() {
         return this.coordinateType;
@@ -242,10 +241,10 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
      * @param info  if supplied, this info object will be populated with
      *              entity information.
      */
+    @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea,
                      ValueAxis domainAxis, ValueAxis rangeAxis,
-                     int rendererIndex,
-                     PlotRenderingInfo info) {
+                     int rendererIndex, PlotRenderingInfo info) {
 
         PlotOrientation orientation = plot.getOrientation();
         AxisLocation domainAxisLocation = plot.getDomainAxisLocation();
@@ -256,8 +255,7 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
                 rangeAxisLocation, orientation);
         Range xRange = domainAxis.getRange();
         Range yRange = rangeAxis.getRange();
-        double anchorX = 0.0;
-        double anchorY = 0.0;
+        double anchorX, anchorY;
         if (this.coordinateType == XYCoordinateType.RELATIVE) {
             anchorX = xRange.getLowerBound() + (this.x * xRange.getLength());
             anchorY = yRange.getLowerBound() + (this.y * yRange.getLength());
@@ -302,8 +300,7 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
         Size2D size = this.title.arrange(g2, rc);
         Rectangle2D titleRect = new Rectangle2D.Double(0, 0, size.width,
                 size.height);
-        Point2D anchorPoint = RectangleAnchor.coordinates(titleRect,
-                this.anchor);
+        Point2D anchorPoint = this.anchor.getAnchorPoint(titleRect);
         xx = xx - (float) anchorPoint.getX();
         yy = yy - (float) anchorPoint.getY();
         titleRect.setRect(xx, yy, titleRect.getWidth(), titleRect.getHeight());
@@ -333,10 +330,11 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
     /**
      * Tests this object for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -360,7 +358,7 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
         if (this.maxHeight != that.maxHeight) {
             return false;
         }
-        if (!ObjectUtilities.equal(this.title, that.title)) {
+        if (!ObjectUtils.equal(this.title, that.title)) {
             return false;
         }
         if (!this.anchor.equals(that.anchor)) {
@@ -374,15 +372,16 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 193;
-        result = HashUtilities.hashCode(result, this.anchor);
-        result = HashUtilities.hashCode(result, this.coordinateType);
-        result = HashUtilities.hashCode(result, this.x);
-        result = HashUtilities.hashCode(result, this.y);
-        result = HashUtilities.hashCode(result, this.maxWidth);
-        result = HashUtilities.hashCode(result, this.maxHeight);
-        result = HashUtilities.hashCode(result, this.title);
+        result = HashUtils.hashCode(result, this.anchor);
+        result = HashUtils.hashCode(result, this.coordinateType);
+        result = HashUtils.hashCode(result, this.x);
+        result = HashUtils.hashCode(result, this.y);
+        result = HashUtils.hashCode(result, this.maxWidth);
+        result = HashUtils.hashCode(result, this.maxHeight);
+        result = HashUtils.hashCode(result, this.title);
         return result;
     }
 
@@ -393,6 +392,7 @@ public class XYTitleAnnotation extends AbstractXYAnnotation
      *
      * @throws CloneNotSupportedException  if the annotation can't be cloned.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }

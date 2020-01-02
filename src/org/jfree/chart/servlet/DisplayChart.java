@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * -----------------
  * DisplayChart.java
  * -----------------
- * (C) Copyright 2002-2008, by Richard Atkinson and Contributors.
+ * (C) Copyright 2002-2016, by Richard Atkinson and Contributors.
  *
  * Original Author:  Richard Atkinson;
  * Contributor(s):   David Gilbert (for Object Refinery Limited);
@@ -39,7 +39,8 @@
  *               ServletUtilities.java (DG);
  * ------------- JFREECHART 1.0.x ---------------------------------------------
  * 02-Feb-2007 : Removed author tags all over JFreeChart sources (DG);
- *
+ * 03-Dec-2011 : Fixed path disclosure vulnerability - see bug 2879650 (DG);
+ * 
  */
 
 package org.jfree.chart.servlet;
@@ -57,16 +58,17 @@ import javax.servlet.http.HttpSession;
  * Servlet used for streaming charts to the client browser from the temporary
  * directory.  You need to add this servlet and mapping to your deployment
  * descriptor (web.xml) in order to get it to work.  The syntax is as follows:
- * <xmp>
- * <servlet>
- *    <servlet-name>DisplayChart</servlet-name>
- *    <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
- * </servlet>
- * <servlet-mapping>
- *     <servlet-name>DisplayChart</servlet-name>
- *     <url-pattern>/servlet/DisplayChart</url-pattern>
- * </servlet-mapping>
- * </xmp>
+ * 
+ * &lt;xmp&gt;
+ * &lt;servlet&gt;
+ *    &lt;servlet-name&gt;DisplayChart&lt;/servlet-name&gt;
+ *    &lt;servlet-class&gt;org.jfree.chart.servlet.DisplayChart&lt;/servlet-class&gt;
+ * &lt;/servlet&gt;
+ * &lt;servlet-mapping&gt;
+ *     &lt;servlet-name&gt;DisplayChart&lt;/servlet-name&gt;
+ *     &lt;url-pattern&gt;/servlet/DisplayChart&lt;/url-pattern&gt;
+ * &lt;/servlet-mapping&gt;
+ * &lt;/xmp&gt;
  */
 public class DisplayChart extends HttpServlet {
 
@@ -82,8 +84,9 @@ public class DisplayChart extends HttpServlet {
      *
      * @throws ServletException never.
      */
+    @Override
     public void init() throws ServletException {
-        return;
+        // nothing to do
     }
 
     /**
@@ -95,6 +98,7 @@ public class DisplayChart extends HttpServlet {
      * @throws ServletException ??.
      * @throws IOException ??.
      */
+    @Override
     public void service(HttpServletRequest request,
                         HttpServletResponse response)
             throws ServletException, IOException {
@@ -113,8 +117,9 @@ public class DisplayChart extends HttpServlet {
         //  Check the file exists
         File file = new File(System.getProperty("java.io.tmpdir"), filename);
         if (!file.exists()) {
-            throw new ServletException("File '" + file.getAbsolutePath()
-                    + "' does not exist");
+            throw new ServletException(
+                    "Unable to display the chart with the filename '" 
+                    + filename + "'.");
         }
 
         //  Check that the graph being served was created by the current user
@@ -148,7 +153,6 @@ public class DisplayChart extends HttpServlet {
         else {
             throw new ServletException("Chart image not found");
         }
-        return;
     }
 
 }

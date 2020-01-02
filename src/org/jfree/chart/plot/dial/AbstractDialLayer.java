@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ----------------------
  * AbstractDialLayer.java
@@ -50,7 +50,7 @@ import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
-import org.jfree.chart.util.HashUtilities;
+import org.jfree.chart.HashUtils;
 
 /**
  * A base class that can be used to implement a {@link DialLayer}.  It includes
@@ -75,13 +75,14 @@ public abstract class AbstractDialLayer implements DialLayer {
     }
 
     /**
-     * Returns <code>true</code> if this layer is visible (should be displayed),
-     * and <code>false</code> otherwise.
+     * Returns {@code true} if this layer is visible (should be displayed),
+     * and {@code false} otherwise.
      *
      * @return A boolean.
      *
      * @see #setVisible(boolean)
      */
+    @Override
     public boolean isVisible() {
         return this.visible;
     }
@@ -103,10 +104,11 @@ public abstract class AbstractDialLayer implements DialLayer {
     /**
      * Tests this instance for equality with an arbitrary object.
      *
-     * @param obj  the object (<code>null</code> permitted).
+     * @param obj  the object ({@code null} permitted).
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -123,9 +125,10 @@ public abstract class AbstractDialLayer implements DialLayer {
      *
      * @return A hash code.
      */
+    @Override
     public int hashCode() {
         int result = 23;
-        result = HashUtilities.hashCode(result, this.visible);
+        result = HashUtils.hashCode(result, this.visible);
         return result;
     }
 
@@ -137,6 +140,7 @@ public abstract class AbstractDialLayer implements DialLayer {
      * @throws CloneNotSupportedException if there is a problem cloning this
      *     instance.
      */
+    @Override
     public Object clone() throws CloneNotSupportedException {
         AbstractDialLayer clone = (AbstractDialLayer) super.clone();
         // we don't clone the listeners
@@ -151,6 +155,7 @@ public abstract class AbstractDialLayer implements DialLayer {
      *
      * @see #removeChangeListener(DialLayerChangeListener)
      */
+    @Override
     public void addChangeListener(DialLayerChangeListener listener) {
         this.listenerList.add(DialLayerChangeListener.class, listener);
     }
@@ -162,12 +167,13 @@ public abstract class AbstractDialLayer implements DialLayer {
      *
      * @see #addChangeListener(DialLayerChangeListener)
      */
+    @Override
     public void removeChangeListener(DialLayerChangeListener listener) {
         this.listenerList.remove(DialLayerChangeListener.class, listener);
     }
 
     /**
-     * Returns <code>true</code> if the specified object is registered with
+     * Returns {@code true} if the specified object is registered with
      * the dataset as a listener.  Most applications won't need to call this
      * method, it exists mainly for use by unit testing code.
      *
@@ -175,6 +181,7 @@ public abstract class AbstractDialLayer implements DialLayer {
      *
      * @return A boolean.
      */
+    @Override
     public boolean hasListener(EventListener listener) {
         List list = Arrays.asList(this.listenerList.getListenerList());
         return list.contains(listener);

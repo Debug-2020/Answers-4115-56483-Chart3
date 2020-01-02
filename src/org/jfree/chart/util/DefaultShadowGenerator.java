@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2017, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ---------------------------
  * DefaultShadowGenerator.java
  * ---------------------------
- * (C) Copyright 2009, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2009-2017 by Object Refinery Limited and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -35,6 +35,8 @@
  * Changes:
  * --------
  * 10-Jul-2009 : Version 1 (DG);
+ * 29-Oct-2011 : Fixed Eclipse warnings (DG);
+ * 03-Jul-2013 : Use ParamChecks (DG);
  *
  */
 
@@ -45,16 +47,19 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.Serializable;
+import org.jfree.chart.HashUtils;
 
 /**
  * A default implementation of the {@link ShadowGenerator} interface, based on
- * code in a
+ * code in a 
  * <a href="http://www.jroller.com/gfx/entry/fast_or_good_drop_shadows">blog
  * post by Romain Guy</a>.
  *
  * @since 1.0.14
  */
 public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
+
+    private static final long serialVersionUID = 2732993885591386064L;
 
     /** The shadow size. */
     private int shadowSize;
@@ -75,7 +80,7 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
      * Creates a new instance with default attributes.
      */
     public DefaultShadowGenerator() {
-        this(5, Color.black, 0.5f, 5, -Math.PI / 4);
+        this(5, Color.BLACK, 0.5f, 5, -Math.PI / 4);
     }
 
     /**
@@ -89,9 +94,7 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
      */
     public DefaultShadowGenerator(int size, Color color, float opacity,
             int distance, double angle) {
-        if (color == null) {
-            throw new IllegalArgumentException("Null 'color' argument.");
-        }
+        Args.nullNotPermitted(color, "color");
         this.shadowSize = size;
         this.shadowColor = color;
         this.shadowOpacity = opacity;
@@ -111,7 +114,7 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
     /**
      * Returns the shadow color.
      *
-     * @return The shadow color (never <code>null</code>).
+     * @return The shadow color (never {@code null}).
      */
     public Color getShadowColor() {
         return this.shadowColor;
@@ -150,6 +153,7 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
      *
      * @return The x-offset.
      */
+    @Override
     public int calculateOffsetX() {
         return (int) (Math.cos(this.angle) * this.distance) - this.shadowSize;
     }
@@ -160,6 +164,7 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
      *
      * @return The y-offset.
      */
+    @Override
     public int calculateOffsetY() {
         return -(int) (Math.sin(this.angle) * this.distance) - this.shadowSize;
     }
@@ -172,6 +177,7 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
      *
      * @return A new image containing the shadow.
      */
+    @Override
     public BufferedImage createDropShadow(BufferedImage source) {
         BufferedImage subject = new BufferedImage(
                 source.getWidth() + this.shadowSize * 2,
@@ -179,7 +185,7 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
                 BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = subject.createGraphics();
-        g2.drawImage(source, null, shadowSize, shadowSize);
+        g2.drawImage(source, null, this.shadowSize, this.shadowSize);
         g2.dispose();
         applyShadow(subject);
         return subject;
@@ -194,30 +200,30 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
         int dstWidth = image.getWidth();
         int dstHeight = image.getHeight();
 
-        int left = (shadowSize - 1) >> 1;
-        int right = shadowSize - left;
+        int left = (this.shadowSize - 1) >> 1;
+        int right = this.shadowSize - left;
         int xStart = left;
         int xStop = dstWidth - right;
         int yStart = left;
         int yStop = dstHeight - right;
 
-        int shadowRgb = shadowColor.getRGB() & 0x00FFFFFF;
+        int shadowRgb = this.shadowColor.getRGB() & 0x00FFFFFF;
 
-        int[] aHistory = new int[shadowSize];
-        int historyIdx = 0;
+        int[] aHistory = new int[this.shadowSize];
+        int historyIdx;
 
         int aSum;
 
         int[] dataBuffer = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
         int lastPixelOffset = right * dstWidth;
-        float sumDivider = shadowOpacity / shadowSize;
+        float sumDivider = this.shadowOpacity / this.shadowSize;
 
         // horizontal pass
 
         for (int y = 0, bufferOffset = 0; y < dstHeight; y++, bufferOffset = y * dstWidth) {
             aSum = 0;
             historyIdx = 0;
-            for (int x = 0; x < shadowSize; x++, bufferOffset++) {
+            for (int x = 0; x < this.shadowSize; x++, bufferOffset++) {
                 int a = dataBuffer[bufferOffset] >>> 24;
                 aHistory[x] = a;
                 aSum += a;
@@ -237,8 +243,8 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
                 aHistory[historyIdx] = a;
                 aSum += a;
 
-                if (++historyIdx >= shadowSize) {
-                    historyIdx -= shadowSize;
+                if (++historyIdx >= this.shadowSize) {
+                    historyIdx -= this.shadowSize;
                 }
             }
         }
@@ -247,7 +253,8 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
         for (int x = 0, bufferOffset = 0; x < dstWidth; x++, bufferOffset = x) {
             aSum = 0;
             historyIdx = 0;
-            for (int y = 0; y < shadowSize; y++, bufferOffset += dstWidth) {
+            for (int y = 0; y < this.shadowSize; y++,
+                    bufferOffset += dstWidth) {
                 int a = dataBuffer[bufferOffset] >>> 24;
                 aHistory[y] = a;
                 aSum += a;
@@ -267,8 +274,8 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
                 aHistory[historyIdx] = a;
                 aSum += a;
 
-                if (++historyIdx >= shadowSize) {
-                    historyIdx -= shadowSize;
+                if (++historyIdx >= this.shadowSize) {
+                    historyIdx -= this.shadowSize;
                 }
             }
         }
@@ -276,11 +283,12 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
 
     /**
      * Tests this object for equality with an arbitrary object.
-     *
-     * @param obj  the object (<code>null</code> permitted).
-     *
+     * 
+     * @param obj  the object ({@code null} permitted).
+     * 
      * @return The object.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
@@ -309,15 +317,16 @@ public class DefaultShadowGenerator implements ShadowGenerator, Serializable {
 
     /**
      * Returns a hash code for this instance.
-     *
+     * 
      * @return The hash code.
      */
+    @Override
     public int hashCode() {
-        int hash = HashUtilities.hashCode(17, this.shadowSize);
-        hash = HashUtilities.hashCode(hash, this.shadowColor);
-        hash = HashUtilities.hashCode(hash, this.shadowOpacity);
-        hash = HashUtilities.hashCode(hash, this.distance);
-        hash = HashUtilities.hashCode(hash, this.angle);
+        int hash = HashUtils.hashCode(17, this.shadowSize);
+        hash = HashUtils.hashCode(hash, this.shadowColor);
+        hash = HashUtils.hashCode(hash, this.shadowOpacity);
+        hash = HashUtils.hashCode(hash, this.distance);
+        hash = HashUtils.hashCode(hash, this.angle);
         return hash;
     }
 

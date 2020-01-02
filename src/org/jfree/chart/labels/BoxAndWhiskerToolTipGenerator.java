@@ -2,7 +2,7 @@
  * JFreeChart : a free chart library for the Java(tm) platform
  * ===========================================================
  *
- * (C) Copyright 2000-2008, by Object Refinery Limited and Contributors.
+ * (C) Copyright 2000-2016, by Object Refinery Limited and Contributors.
  *
  * Project Info:  http://www.jfree.org/jfreechart/index.html
  *
@@ -21,13 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  *
- * [Java is a trademark or registered trademark of Sun Microsystems, Inc.
- * in the United States and other countries.]
+ * [Oracle and Java are registered trademarks of Oracle and/or its affiliates. 
+ * Other names may be trademarks of their respective owners.]
  *
  * ------------------------------------
  * BoxAndWhiskerToolTipGenerator.java
  * ------------------------------------
- * (C) Copyright 2004-2008, by David Browning and Contributors.
+ * (C) Copyright 2004-2016, by David Browning and Contributors.
  *
  * Original Author:  David Gilbert (for Object Refinery Limited);
  * Contributor(s):   -;
@@ -36,7 +36,6 @@
  * -------
  * 02-Jun-2004 : Version 1 (DG);
  * 23-Mar-2005 : Implemented PublicCloneable (DG);
- * 21-Jun-2007 : Removed JCommon dependencies (DG);
  *
  */
 
@@ -45,8 +44,8 @@ package org.jfree.chart.labels;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
-
 import org.jfree.chart.util.PublicCloneable;
+
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.statistics.BoxAndWhiskerCategoryDataset;
 
@@ -55,18 +54,18 @@ import org.jfree.data.statistics.BoxAndWhiskerCategoryDataset;
  * {@link BoxAndWhiskerCategoryDataset}.
  * <P>
  * The tooltip text and item label text are composed using a
- * {@link MessageFormat} object, that can aggregate some or all of
+ * {@link java.text.MessageFormat} object, that can aggregate some or all of
  * the following string values into a message.
- * <table>
- * <tr><td>0</td><td>Series Name</td></tr>
- * <tr><td>1</td><td>X (value or date)</td></tr>
- * <tr><td>2</td><td>Mean</td></tr>
- * <tr><td>3</td><td>Median</td></tr>
- * <tr><td>4</td><td>Minimum</td></tr>
- * <tr><td>5</td><td>Maximum</td></tr>
- * <tr><td>6</td><td>Quartile 1</td></tr>
- * <tr><td>7</td><td>Quartile 3</td></tr>
- * </table>
+ * <ul>
+ * <li>0 : Series Name</li>
+ * <li>1 : X (value or date)</li>
+ * <li>2 : Mean</li>
+ * <li>3 : Median</li>
+ * <li>4 : Minimum</li>
+ * <li>5 : Maximum</li>
+ * <li>6 : Quartile 1</li>
+ * <li>7 : Quartile 3</li>
+ * </ul>
  */
 public class BoxAndWhiskerToolTipGenerator
         extends StandardCategoryToolTipGenerator
@@ -102,12 +101,13 @@ public class BoxAndWhiskerToolTipGenerator
      * Creates the array of items that can be passed to the
      * {@link MessageFormat} class for creating labels.
      *
-     * @param dataset  the dataset (<code>null</code> not permitted).
+     * @param dataset  the dataset ({@code null} not permitted).
      * @param series  the series (zero-based index).
      * @param item  the item (zero-based index).
      *
-     * @return The items (never <code>null</code>).
+     * @return The items (never {@code null}).
      */
+    @Override
     protected Object[] createItemArray(CategoryDataset dataset, int series,
                                        int item) {
         Object[] result = new Object[8];
@@ -135,6 +135,7 @@ public class BoxAndWhiskerToolTipGenerator
      *
      * @return A boolean.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
